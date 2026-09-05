@@ -55,7 +55,7 @@ implementation plan is authoritative — never invent tasks that are not in it.
 
 - [x] Task 12: FastAPI routes + SSE with backfill
 - [x] Task 13: Frontend state — types, reducer, SSE client, store
-- [ ] Task 14: Shell layout — TopBar, ModeChip, meters, ProcessTable, KernelLog, MissionBar
+- [x] Task 14: Shell layout — TopBar, ModeChip, meters, ProcessTable, KernelLog, MissionBar
 - [ ] Task 15: Live agent graph (xyflow + dagre) with pulses
 - [ ] Task 16: Command palette (⌘K) + mission start
 
