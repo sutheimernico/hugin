@@ -38,7 +38,7 @@ Source of truth for spec and decisions: `PROJECT.md`.
 
 - `uv sync` · `uv run pytest -q` · `uv run ruff check .`
 - Start the API: `scripts/serve.sh` → http://127.0.0.1:8770 (health: `/api/health`).
-- Frontend (from Task 2 on): `npm --prefix frontend run dev` (Vite, proxies `/api` to 8770) ·
+- Frontend: `npm --prefix frontend run dev` → http://127.0.0.1:5177 (proxies `/api` to 8770) ·
   `npm --prefix frontend run check` · `npm --prefix frontend test -- --run`.
 
 ## Best first edits

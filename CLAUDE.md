@@ -39,8 +39,8 @@ Build route with the binding contracts: `docs/superpowers/plans/2026-09-05-hugin
 - Conventional Commits. Nie direkt auf `main` — Arbeit läuft auf `autopilot/work`.
 - Neue Logik kommt mit Test. Netz-/LLM-Code hinter Seam, in Tests gefakt: kein echter `claude`,
   kein echtes Ollama, kein Netz.
-- Gate vor jedem Commit: `uv run pytest -q` grün + `uv run ruff check .` sauber (ab `frontend/`
-  zusätzlich `npm --prefix frontend run check` + `npm --prefix frontend test -- --run`).
+- Gate vor jedem Commit: `uv run pytest -q` grün + `uv run ruff check .` sauber +
+  `npm --prefix frontend run check` sauber + `npm --prefix frontend test -- --run` grün.
 - Ehrlichkeit: keine erfundenen Zahlen; Simulation/Replay immer sichtbar gelabelt.
 - Kein Firmenbezug im Repo — der Firmen-Workspace wird nie gemountet, gelesen oder erwähnt.
 

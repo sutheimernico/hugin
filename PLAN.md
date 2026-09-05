@@ -14,9 +14,9 @@ implementation plan is authoritative — never invent tasks that are not in it.
 - **Local & free only.** Claude Code headless on the subscription, local Ollama, SQLite. No paid
   API, no `ANTHROPIC_API_KEY`, no cloud. A task needing a paid resource or a Nico-only input goes
   to "Needs Nico", never faked.
-- **Gate is objective:** `uv run pytest -q` green AND `uv run ruff check .` clean; once
-  `frontend/` exists also `npm --prefix frontend run check` clean AND
-  `npm --prefix frontend test -- --run` green. Never commit red.
+- **Gate is objective:** `uv run pytest -q` green AND `uv run ruff check .` clean AND
+  `npm --prefix frontend run check` clean AND `npm --prefix frontend test -- --run` green.
+  Never commit red.
 - **One change per iteration.** No bundling. No speculative abstractions (YAGNI).
 - **New logic ships with a test.** No live network in tests, no real `claude`, no real Ollama —
   use the Scripted driver, fake subprocess factories and `httpx.MockTransport`.
@@ -29,12 +29,12 @@ implementation plan is authoritative — never invent tasks that are not in it.
 
 ## Status
 
-- [ ] **Phase 0 — Scaffold** (Task 1 done)
+- [ ] **Phase 0 — Scaffold** (Tasks 1–2 done)
 
 ## Milestone 0 — Scaffold
 
 - [x] Task 1: Python project scaffold + house docs + register entry
-- [ ] Task 2: Frontend scaffold (Vite · React 19 · TS · Tailwind v4 · vitest) + fonts + proxy
+- [x] Task 2: Frontend scaffold (Vite · React 19 · TS · Tailwind v4 · vitest) + fonts + proxy
 - [ ] Task 3: Base UI components
 
 ## Milestone 1 — Kernel core

@@ -54,6 +54,7 @@ Gate:
 
 ```bash
 uv run pytest -q && uv run ruff check .
+npm --prefix frontend run check && npm --prefix frontend test -- --run
 ```
 
 ## Stack

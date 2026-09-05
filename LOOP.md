@@ -17,9 +17,9 @@ never in context.
 4. Do that one task. Small, reviewable diff. Read existing code before writing; match
    conventions. Code blocks marked **BINDING** in the plan are implemented verbatim. New logic
    ships with a test; drivers and network stay behind their seams and are faked in tests.
-5. Run the gate: `uv run pytest -q` green AND `uv run ruff check .` clean (plus
-   `npm --prefix frontend run check` and `npm --prefix frontend test -- --run` once `frontend/`
-   exists). If red, fix or revert.
+5. Run the gate: `uv run pytest -q` green AND `uv run ruff check .` clean AND
+   `npm --prefix frontend run check` clean AND `npm --prefix frontend test -- --run` green.
+   If red, fix or revert.
 6. On green: commit (Conventional Commits, English, imperative), check off the task in `PLAN.md`,
    append a one-line note to `AUTOPILOT_LOG.md`. Then exit.
 7. If a task needs a paid resource, live usage or a Nico-only input: move it to "Needs Nico",
@@ -41,8 +41,8 @@ never in context.
 
 ## Gate (objective done-check)
 
-`uv run pytest -q` green + `uv run ruff check .` clean (+ `npm --prefix frontend run check` and
-`npm --prefix frontend test -- --run` once `frontend/` exists). Commit only a green gate.
+`uv run pytest -q` green + `uv run ruff check .` clean + `npm --prefix frontend run check` clean
++ `npm --prefix frontend test -- --run` green. Commit only a green gate.
 
 ## Where things are
 

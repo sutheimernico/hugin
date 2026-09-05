@@ -132,8 +132,8 @@ per-task backlog lives in `PLAN.md`.
 Superpowers flow (`brainstorming` → `writing-plans` → `executing-plans` /
 `subagent-driven-development` → `verification-before-completion`); details and conventions in
 `CLAUDE.md`, codebase operations in `AGENTS.md`. Gate before every commit:
-`uv run pytest -q` green **and** `uv run ruff check .` clean; once `frontend/` exists also
-`npm --prefix frontend run check` and `npm --prefix frontend test -- --run`.
+`uv run pytest -q` green **and** `uv run ruff check .` clean **and**
+`npm --prefix frontend run check` clean **and** `npm --prefix frontend test -- --run` green.
 
 ## §Decisions (register — closed, dated)
 
