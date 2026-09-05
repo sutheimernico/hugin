@@ -35,7 +35,7 @@ implementation plan is authoritative — never invent tasks that are not in it.
 
 - [x] Task 1: Python project scaffold + house docs + register entry
 - [x] Task 2: Frontend scaffold (Vite · React 19 · TS · Tailwind v4 · vitest) + fonts + proxy
-- [ ] Task 3: Base UI components
+- [x] Task 3: Base UI components
 
 ## Milestone 1 — Kernel core
 
