@@ -39,7 +39,7 @@ implementation plan is authoritative — never invent tasks that are not in it.
 
 ## Milestone 1 — Kernel core
 
-- [ ] Task 4: Event model
+- [x] Task 4: Event model
 - [ ] Task 5: EventLog (SQLite) + EventBus
 - [ ] Task 6: AgentProcess, state machine, ProcessTable, Budget watcher
 - [ ] Task 7: Programs (YAML) + kernel contract

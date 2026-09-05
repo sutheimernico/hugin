@@ -5,3 +5,4 @@ One line per iteration. Newest last.
 - 2026-09-05 — Task 1: Python scaffold (uv/hatchling/src-layout), Settings, FastAPI health, house docs, register entry. Gate: 2 passed, ruff clean.
 - 2026-09-05 — Task 2: Frontend scaffold (Vite 8 · React 19 · TS · Tailwind v4 · vitest), design tokens, self-hosted fonts, /api proxy to 8770. Gate: 2 pytest, 1 vitest, ruff + tsc/eslint clean.
 - 2026-09-05 — Task 3: Base UI components (Panel, Chip, Meter, Button, Kbd, StateRing) + BINDING formatters fmtTokens/fmtDuration/fmtUsd, glow and ring-spin keyframes. Gate: 2 pytest, 27 vitest, ruff + tsc/eslint clean.
+- 2026-09-05 — Task 4: Event model — closed 24-kind `EventKind`, one strict pydantic payload per kind, `PAYLOADS` map and `make_event` validating payload into a plain `data` dict. Gate: 5 pytest, 27 vitest, ruff + tsc/eslint clean.
