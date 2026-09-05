@@ -7,7 +7,7 @@ so events serialise trivially to JSON and to SQLite; validation happens in `make
 from enum import StrEnum
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class EventKind(StrEnum):
@@ -52,9 +52,10 @@ class Usage(Strict):
 
 
 class BudgetSpec(Strict):
-    max_turns: int = 12
-    max_seconds: int = 300
-    max_output_tokens: int = 6000
+    # A zero limit would divide by zero in `BudgetWatcher.pct`, so it is rejected at load time.
+    max_turns: int = Field(default=12, gt=0)
+    max_seconds: int = Field(default=300, gt=0)
+    max_output_tokens: int = Field(default=6000, gt=0)
 
 
 class KernelBoot(Strict):
