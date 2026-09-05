@@ -289,8 +289,7 @@ class Kernel:
         self._kill_reasons[pid] = by if by.startswith("budget:") else "killed"
         if proc.state == "queued":
             # It never started, so no driver and no `_run` will ever finalise it.
-            with contextlib.suppress(ValueError):
-                self._queue.remove(pid)
+            self._dequeue(pid)
             self._blocked.discard(pid)
             await self._finalize(pid, ExitInfo("killed", proc.usage))
             return
@@ -303,6 +302,12 @@ class Kernel:
             await self.kill(proc.pid, by=by)
 
     # --- scheduling --------------------------------------------------------------------
+
+    def _dequeue(self, pid: int) -> None:
+        """Take a pid out of the queue. `kill` and `_pump` both do it, and either may get there
+        first, so the loser of that race is a no-op rather than a `ValueError`."""
+        with contextlib.suppress(ValueError):
+            self._queue.remove(pid)
 
     def _running_by_driver(self) -> dict[str, int]:
         counts: dict[str, int] = {}
@@ -318,10 +323,10 @@ class Kernel:
             for pid in list(self._queue):
                 proc = self.procs.get(pid)
                 if not proc.alive:
-                    self._queue.remove(pid)
+                    self._dequeue(pid)
                     continue
                 if self._scheduler.can_start(proc.driver, counts):
-                    self._queue.remove(pid)
+                    self._dequeue(pid)
                     self._blocked.discard(pid)
                     counts[proc.driver] = counts.get(proc.driver, 0) + 1
                     await self._start(pid)
@@ -455,6 +460,10 @@ class Kernel:
         proc = self.procs.get(pid)
         if not proc.alive:
             return False
+        if pid in self._kill_reasons:
+            # The ticker and a usage report can see the same breach before the process is gone;
+            # a kill is already on its way, so this one is announced once, not once per observer.
+            return True
         which = BudgetWatcher.breach(proc, self.clock())
         if which is None:
             return False

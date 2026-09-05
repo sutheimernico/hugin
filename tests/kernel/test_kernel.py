@@ -55,6 +55,25 @@ class SlowDriver:
         self.release.set()
 
 
+class TwiceOverBudgetDriver:
+    """Reports the same over-budget usage twice before the kill flag reaches it."""
+
+    name = "twice"
+
+    def __init__(self) -> None:
+        self.killed = asyncio.Event()
+
+    async def run(self, proc: AgentProcess, prompt: str, sink) -> ExitInfo:
+        usage = Usage(turns=5, input_tokens=10, output_tokens=10)
+        await sink.usage(usage)
+        await sink.usage(usage)
+        await self.killed.wait()
+        return ExitInfo("killed", usage)
+
+    async def kill(self, proc: AgentProcess) -> None:
+        self.killed.set()
+
+
 async def test_boot_emits_the_kernel_boot_event(kernel):
     boot = _of_kind(kernel, EventKind.KERNEL_BOOT)
     assert len(boot) == 1
@@ -190,6 +209,20 @@ async def test_budget_breach_kills_the_process(make_kernel, tmp_path, until):
     assert [e.data["by"] for e in _of_kind(kernel, EventKind.KILL)] == ["budget:turns"]
     assert _of_kind(kernel, EventKind.PROC_EXIT)[0].data["reason"] == "budget:turns"
     assert kernel.runs[run_id].state == "failed"
+
+
+async def test_one_breach_seen_twice_is_killed_once(kernel, until):
+    driver = TwiceOverBudgetDriver()
+    kernel.drivers["twice"] = driver
+    run_id = await kernel.create_run("Doppelt", driver="twice")
+    pid = await kernel.spawn(
+        run_id, "scout", "egal", driver="twice", budget=BudgetSpec(max_turns=1)
+    )
+    await until(lambda: not kernel.procs.get(pid).alive)
+
+    assert [e.pid for e in _of_kind(kernel, EventKind.BUDGET_EXCEEDED)] == [pid]
+    assert [e.data["target"] for e in _of_kind(kernel, EventKind.KILL)] == [pid]
+    assert kernel.procs.get(pid).exit_reason == "budget:turns"
 
 
 async def test_budget_ticker_reports_progress(kernel, until):
