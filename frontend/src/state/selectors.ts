@@ -3,7 +3,7 @@
  * these work on the live store, on a replay snapshot and in a unit test alike.
  */
 
-import type { Mode, Proc, Run, State } from "./types";
+import type { Mode, Proc, ProcState, Run, State } from "./types";
 
 export interface ModeInput {
   state: State;
@@ -27,4 +27,16 @@ export function selectActiveRun(state: State): Run | undefined {
 /** The process table's order: by pid, which is also the order they were spawned in. */
 export function selectProcs(state: State): Proc[] {
   return Object.values(state.procs).sort((a, b) => a.pid - b.pid);
+}
+
+/** The states a process still occupies the machine in — the meters and the kill switch use it. */
+export const ALIVE_STATES: ReadonlySet<ProcState> = new Set<ProcState>([
+  "queued",
+  "spawning",
+  "running",
+  "waiting_tool",
+]);
+
+export function isAlive(proc: Proc): boolean {
+  return ALIVE_STATES.has(proc.state);
 }

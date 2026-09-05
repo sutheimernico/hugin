@@ -12,6 +12,7 @@
  */
 
 import { STATE_LABEL } from "../lib/i18n";
+import { ALIVE_STATES } from "./selectors";
 import type {
   Budget,
   Driver,
@@ -33,7 +34,6 @@ const PULSE_TTL_S = 1.2;
 const TOKEN_WINDOW_S = 60;
 /** High-frequency noise: the log would be nothing else if these two were in it. */
 const UNLOGGED = new Set(["proc.text", "budget.tick"]);
-const ALIVE: ReadonlySet<string> = new Set(["queued", "spawning", "running", "waiting_tool"]);
 
 const PROC_STATES: ProcState[] = [
   "queued",
@@ -362,7 +362,7 @@ function meters(state: State): Meters {
   let totalTokens = 0;
   for (const proc of Object.values(state.procs)) {
     totalTokens += proc.usage.input_tokens + proc.usage.output_tokens;
-    if (!ALIVE.has(proc.state)) continue;
+    if (!ALIVE_STATES.has(proc.state)) continue;
     activeProcs += 1;
     budgetPct = Math.max(budgetPct, proc.budgetPct);
   }

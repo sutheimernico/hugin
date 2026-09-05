@@ -6,6 +6,7 @@ const FILL_CLASS: Record<Tone, string> = {
   green: "bg-green",
   amber: "bg-amber",
   red: "bg-red",
+  rose: "bg-rose",
   muted: "bg-muted",
 };
 
