@@ -44,7 +44,7 @@ implementation plan is authoritative — never invent tasks that are not in it.
 - [x] Task 6: AgentProcess, state machine, ProcessTable, Budget watcher
 - [x] Task 7: Programs (YAML) + kernel contract
 - [x] Task 8: Driver protocol + ScriptedDriver
-- [ ] Task 9: Kernel façade + Scheduler (with ScriptedDriver end-to-end)
+- [x] Task 9: Kernel façade + Scheduler (with ScriptedDriver end-to-end)
 - [ ] Task 10: Munin memory store (SQLite FTS5)
 - [ ] Task 11: Syscalls — registry, handlers, capabilities, single writer
 
