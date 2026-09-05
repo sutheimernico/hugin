@@ -53,7 +53,7 @@ implementation plan is authoritative — never invent tasks that are not in it.
 
 ## Milestone 2 — API, SSE and the Mission Control shell
 
-- [ ] Task 12: FastAPI routes + SSE with backfill
+- [x] Task 12: FastAPI routes + SSE with backfill
 - [ ] Task 13: Frontend state — types, reducer, SSE client, store
 - [ ] Task 14: Shell layout — TopBar, ModeChip, meters, ProcessTable, KernelLog, MissionBar
 - [ ] Task 15: Live agent graph (xyflow + dagre) with pulses
