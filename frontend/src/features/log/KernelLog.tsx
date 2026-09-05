@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Virtuoso } from "react-virtuoso";
+import { useEffect, useRef, useState } from "react";
+import { Virtuoso, type VirtuosoHandle } from "react-virtuoso";
 import { Panel } from "../../components/Panel";
 import type { LogLine } from "../../state/types";
 
@@ -42,29 +42,46 @@ export function KernelLog({ lines }: { lines: LogLine[] }) {
 }
 
 /**
- * Its own component so the initial scroll position can be read at *its* first render — which is
- * the render that mounts the list, not the one that mounted the empty panel.
+ * Its own component so its state starts when the list appears, not when the empty panel does.
+ *
+ * Sticking to the bottom is done here rather than through Virtuoso's `followOutput`, and that is
+ * a measured decision: the SSE backfill arrives in a burst of frame-sized batches, so the list
+ * appears with a few hundred lines and keeps growing before its first scroll has settled.
+ * `followOutput` only follows a list that is *already* at its end, so it never engaged and the
+ * ticker stayed frozen on the oldest lines. Pinning the last line ourselves has no such race.
  */
 function LogList({ lines }: { lines: LogLine[] }) {
-  // The SSE backfill hands the log its whole history in one batch, so the list is already long
-  // when it appears. Starting at line 1 would also disable `followOutput`, which only follows a
-  // list that *is* at its end. Virtuoso reads this once, so a stale value costs nothing.
-  const [initialIndex] = useState(() => Math.max(0, lines.length - 1));
+  const handle = useRef<VirtuosoHandle>(null);
+  // The user's intent, not the scroll position: scrolling up means "let me read", coming back
+  // to the end means "follow again". Appended lines never change it.
+  const [stick, setStick] = useState(true);
+
+  useEffect(() => {
+    if (!stick) return;
+    handle.current?.scrollToIndex({ index: "LAST", align: "end" });
+  }, [lines.length, stick]);
 
   return (
-    <Virtuoso
-      data={lines}
-      initialTopMostItemIndex={initialIndex}
-      // Smooth follow keeps the newest line in view without ripping the scroll position away
-      // from someone who scrolled up (Virtuoso stops following once you leave the end).
-      followOutput={(isAtBottom) => (isAtBottom ? "smooth" : false)}
-      // A log line is 20 px high; a few pixels of rounding must still count as "at the end", or
-      // a fast stream drops out of follow mode on its own.
-      atBottomThreshold={24}
-      computeItemKey={(_, line) => line.seq}
-      itemContent={(_, line) => <LogRow line={line} />}
-      style={{ height: "100%" }}
-    />
+    <div
+      className="h-full"
+      onWheel={(event) => {
+        if (event.deltaY < 0) setStick(false);
+      }}
+    >
+      <Virtuoso
+        ref={handle}
+        data={lines}
+        initialTopMostItemIndex={{ index: "LAST", align: "end" }}
+        // A log line is 20 px high; a few pixels of rounding must still count as "at the end".
+        atBottomThreshold={24}
+        atBottomStateChange={(atBottom) => {
+          if (atBottom) setStick(true);
+        }}
+        computeItemKey={(_, line) => line.seq}
+        itemContent={(_, line) => <LogRow line={line} />}
+        style={{ height: "100%" }}
+      />
+    </div>
   );
 }
 
