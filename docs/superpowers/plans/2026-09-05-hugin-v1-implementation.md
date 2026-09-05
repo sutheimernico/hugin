@@ -643,7 +643,7 @@ class AgentDriver(Protocol):
 
 Tests use a `RecordingSink` (in `tests/drivers/conftest.py`, records calls; `syscall` returns `{"ok": True}` or raises when `name == "forbidden"`): hello script yields the recorded ops in order and `ExitInfo.reason == "done"` with `usage.turns == 1`; kill flag mid-run → `"killed"`; `script:` prefix selects another script; `SyscallError` without `expect_error` → `"failed"`.
 
-- [ ] Steps: failing tests → implement → gate → `git commit -m "feat(drivers): add driver protocol and deterministic scripted driver"`
+- [x] Steps: failing tests → implement → gate → `git commit -m "feat(drivers): add driver protocol and deterministic scripted driver"`
 
 ---
 
