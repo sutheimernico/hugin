@@ -1,0 +1,6 @@
+[
+  {"delay_ms": 0, "op": "text", "delta": "Hallo aus dem Simulations-Driver."},
+  {"delay_ms": 0, "op": "text", "delta": " Ich laufe aus einem Skript, nicht aus einem Modell."},
+  {"op": "usage", "turns": 1, "input_tokens": 800, "output_tokens": 120},
+  {"op": "exit", "reason": "done"}
+]
