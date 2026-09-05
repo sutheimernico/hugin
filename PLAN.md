@@ -29,7 +29,10 @@ implementation plan is authoritative — never invent tasks that are not in it.
 
 ## Status
 
-- [ ] **Phase 0 — Scaffold** (Tasks 1–2 done)
+- [x] **Milestone 0 — Scaffold** (Tasks 1–3)
+- [x] **Milestone 1 — Kernel core** (Tasks 4–11): events, log, bus, processes, budgets,
+  programs, drivers, kernel façade, munin and the capability-gated syscalls
+- [ ] **Milestone 2 — API, SSE and the Mission Control shell** (Tasks 12–16)
 
 ## Milestone 0 — Scaffold
 
@@ -46,7 +49,7 @@ implementation plan is authoritative — never invent tasks that are not in it.
 - [x] Task 8: Driver protocol + ScriptedDriver
 - [x] Task 9: Kernel façade + Scheduler (with ScriptedDriver end-to-end)
 - [x] Task 10: Munin memory store (SQLite FTS5)
-- [ ] Task 11: Syscalls — registry, handlers, capabilities, single writer
+- [x] Task 11: Syscalls — registry, handlers, capabilities, single writer
 
 ## Milestone 2 — API, SSE and the Mission Control shell
 
