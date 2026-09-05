@@ -12,7 +12,7 @@ import time
 from collections import deque
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Literal, Protocol
+from typing import Literal
 
 from hugin.drivers.base import AgentDriver, ExitInfo
 from hugin.kernel.budget import BudgetWatcher
@@ -22,20 +22,16 @@ from hugin.kernel.log import EventLog
 from hugin.kernel.process import AgentProcess, Message, ProcessTable
 from hugin.kernel.scheduler import Scheduler
 from hugin.kernel.sink import ProcessSink
+from hugin.munin.store import MuninStore
 from hugin.programs.loader import Program, full_system_prompt
 from hugin.settings import Settings
+from hugin.syscalls.registry import SyscallRegistry
 
 logger = logging.getLogger(__name__)
 
 FAN_OUT_LIMIT = 4
 RUN_ID_LENGTH = 12
 _WAIT_POLL_S = 0.02
-
-
-class SyscallDispatcher(Protocol):
-    """All the kernel needs from the syscall registry, which is attached in Task 11."""
-
-    async def call(self, pid: int, name: str, args: dict) -> dict: ...
 
 
 @dataclass
@@ -81,6 +77,7 @@ class Kernel:
         bus: EventBus,
         programs: dict[str, Program],
         drivers: dict[str, AgentDriver],
+        munin: MuninStore,
         clock: Callable[[], float] = time.time,
         tick_s: float = 1.0,
     ):
@@ -92,7 +89,8 @@ class Kernel:
         self.clock = clock
         self.procs = ProcessTable()
         self.runs: dict[str, RunInfo] = {}
-        self.syscalls: SyscallDispatcher | None = None
+        # The registry imports the kernel for type checking only, so this direction is safe.
+        self.syscalls = SyscallRegistry(self, munin)
         self._scheduler = Scheduler(settings.max_concurrent)
         self._tick_s = tick_s
         self._run_stamp = ""

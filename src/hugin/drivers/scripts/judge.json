@@ -1,0 +1,8 @@
+[
+  {"delay_ms": 300, "op": "thinking", "on": true},
+  {"delay_ms": 500, "op": "thinking", "on": false},
+  {"delay_ms": 0, "op": "text", "delta": "Zwei Einwände: die Durchsatzzahl hängt an einer einzigen Blog-Quelle, und der Kostenvergleich lässt den Stromverbrauch aus."},
+  {"delay_ms": 400, "op": "syscall", "name": "mission_report", "args": {"summary": "1) Die Durchsatzangabe stammt aus einer einzigen Blog-Quelle — als unbestätigt kennzeichnen oder streichen. 2) Der Vergleich lokal gegen Cloud nennt keinen Stromverbrauch, die Kostenaussage bleibt deshalb unvollständig. Fazit: mit diesen beiden Korrekturen ist der Text tragfähig."}},
+  {"op": "usage", "turns": 2, "input_tokens": 2200, "output_tokens": 400},
+  {"op": "exit", "reason": "done"}
+]

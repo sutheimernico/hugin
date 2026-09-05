@@ -6,7 +6,7 @@ one as an argument — a driver cannot speak for a process that is not its own.
 
 from typing import TYPE_CHECKING
 
-from hugin.drivers.base import EventSink, SyscallError
+from hugin.drivers.base import EventSink
 from hugin.kernel.events import EventKind, ProcState, Usage
 
 if TYPE_CHECKING:  # pragma: no cover - import cycle guard, the kernel imports this module
@@ -47,7 +47,4 @@ class ProcessSink(EventSink):
         await self._kernel.report_usage(self._pid, usage)
 
     async def syscall(self, name: str, args: dict) -> dict:
-        registry = self._kernel.syscalls
-        if registry is None:
-            raise SyscallError("no syscalls")
-        return await registry.call(self._pid, name, args)
+        return await self._kernel.syscalls.call(self._pid, name, args)

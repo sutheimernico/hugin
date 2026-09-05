@@ -15,6 +15,7 @@ from hugin.kernel.bus import EventBus
 from hugin.kernel.events import Event
 from hugin.kernel.kernel import Kernel
 from hugin.kernel.log import EventLog
+from hugin.munin.store import MuninStore
 from hugin.programs.loader import load_programs
 from hugin.settings import Settings
 
@@ -28,7 +29,7 @@ async def _no_sleep(_seconds: float) -> None:
 @pytest.fixture
 async def make_kernel(tmp_path: Path):
     """Factory for kernels, each on its own tmp dirs; every kernel is shut down afterwards."""
-    built: list[tuple[Kernel, EventLog]] = []
+    built: list[tuple[Kernel, EventLog, MuninStore]] = []
 
     async def _make(
         *,
@@ -44,8 +45,10 @@ async def make_kernel(tmp_path: Path):
         )
         log = EventLog(settings.db_path)
         bus = EventBus(log)
+        # munin shares the event log's database file, exactly as production wires it.
+        munin = MuninStore(settings.db_path)
         drivers = {"scripted": ScriptedDriver(scripts_dir=scripts_dir, clock_sleep=_no_sleep)}
-        kernel = Kernel(settings, log, bus, load_programs(), drivers, tick_s=tick_s)
+        kernel = Kernel(settings, log, bus, load_programs(), drivers, munin, tick_s=tick_s)
         collected: list[Event] = []
 
         async def _collect(event: Event) -> None:
@@ -54,14 +57,15 @@ async def make_kernel(tmp_path: Path):
         bus.subscribe(_collect)
         # Test-only handle on the event stream; the kernel itself never reads it.
         kernel.collected = collected
-        built.append((kernel, log))
+        built.append((kernel, log, munin))
         await kernel.boot()
         return kernel
 
     yield _make
 
-    for kernel, log in built:
+    for kernel, log, munin in built:
         await kernel.shutdown()
+        munin.close()
         log.close()
 
 
