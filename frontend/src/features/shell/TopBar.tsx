@@ -19,9 +19,10 @@ type TopBarProps = {
   mode: Mode;
   meters: Meters;
   onKillAll: () => void;
+  onOpenPalette: () => void;
 };
 
-export function TopBar({ mode, meters, onKillAll }: TopBarProps) {
+export function TopBar({ mode, meters, onKillAll, onOpenPalette }: TopBarProps) {
   return (
     <header className="flex h-12 items-center gap-4 border-b border-border bg-surface/80 px-4 backdrop-blur">
       <div className="flex min-w-0 items-baseline gap-3">
@@ -65,9 +66,16 @@ export function TopBar({ mode, meters, onKillAll }: TopBarProps) {
           </div>
         </div>
 
-        <span className="hidden sm:inline">
+        {/* The hint is the button: the shortcut and the way to find it without one. */}
+        <button
+          type="button"
+          aria-label="Befehle öffnen"
+          onClick={onOpenPalette}
+          className="ease-out-expo hidden h-7 items-center gap-2 rounded-panel border border-border px-2 text-[11px] text-muted transition-colors duration-150 hover:bg-surface-2 hover:text-text sm:inline-flex"
+        >
           <Kbd>⌘K</Kbd>
-        </span>
+          <span className="hidden md:inline">Befehle</span>
+        </button>
         <PanicButton onKillAll={onKillAll} />
       </div>
     </header>

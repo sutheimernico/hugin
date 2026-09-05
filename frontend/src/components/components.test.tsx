@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { fmtTokens } from "../lib/format";
@@ -8,6 +8,7 @@ import { Kbd } from "./Kbd";
 import { Meter } from "./Meter";
 import { Panel } from "./Panel";
 import { StateRing, type AgentStateName } from "./StateRing";
+import { Toast } from "./Toast";
 
 describe("Panel", () => {
   it("renders title, right slot and children", () => {
@@ -126,5 +127,26 @@ describe("StateRing", () => {
   it("takes its size from the size prop", () => {
     render(<StateRing state="running" size={16} />);
     expect(screen.getByRole("img")).toHaveStyle({ width: "16px", height: "16px" });
+  });
+});
+
+describe("Toast", () => {
+  it("announces the message politely and dismisses itself after four seconds", () => {
+    vi.useFakeTimers();
+    const onDone = vi.fn();
+    try {
+      render(<Toast toast={{ id: 1, text: "Mission gestartet", tone: "info" }} onDone={onDone} />);
+      expect(screen.getByRole("status")).toHaveTextContent("Mission gestartet");
+      expect(onDone).not.toHaveBeenCalled();
+      act(() => vi.advanceTimersByTime(4_000));
+      expect(onDone).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("renders nothing without a message", () => {
+    render(<Toast toast={null} onDone={vi.fn()} />);
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
   });
 });

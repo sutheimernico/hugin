@@ -69,7 +69,7 @@ describe("ModeChip", () => {
 
 describe("TopBar", () => {
   it("shows the wordmark, the tagline, the mode chip, three meters and the palette hint", () => {
-    render(<TopBar mode="idle" meters={METERS} onKillAll={vi.fn()} />);
+    render(<TopBar mode="idle" meters={METERS} onKillAll={vi.fn()} onOpenPalette={vi.fn()} />);
     expect(screen.getByText("hugin")).toBeInTheDocument();
     expect(screen.getByText("Gedanken ausschicken. Wissen zurückholen.")).toBeInTheDocument();
     expect(screen.getByText(MODE_LABEL.idle)).toBeInTheDocument();
@@ -79,9 +79,20 @@ describe("TopBar", () => {
     expect(screen.getByText("⌘K").tagName).toBe("KBD");
   });
 
+  it("opens the palette from the ⌘K hint", async () => {
+    const onOpenPalette = vi.fn();
+    render(
+      <TopBar mode="idle" meters={METERS} onKillAll={vi.fn()} onOpenPalette={onOpenPalette} />,
+    );
+    await userEvent.click(screen.getByRole("button", { name: "Befehle öffnen" }));
+    expect(onOpenPalette).toHaveBeenCalledTimes(1);
+  });
+
   it("asks before killing and only then reports the confirmation", async () => {
     const onKillAll = vi.fn();
-    render(<TopBar mode="scripted" meters={METERS} onKillAll={onKillAll} />);
+    render(
+      <TopBar mode="scripted" meters={METERS} onKillAll={onKillAll} onOpenPalette={vi.fn()} />,
+    );
 
     await userEvent.click(screen.getByRole("button", { name: "Panik" }));
     expect(screen.getByText("Alle Prozesse beenden?")).toBeInTheDocument();
@@ -94,7 +105,9 @@ describe("TopBar", () => {
 
   it("closes the confirmation without killing anything", async () => {
     const onKillAll = vi.fn();
-    render(<TopBar mode="scripted" meters={METERS} onKillAll={onKillAll} />);
+    render(
+      <TopBar mode="scripted" meters={METERS} onKillAll={onKillAll} onOpenPalette={vi.fn()} />,
+    );
 
     await userEvent.click(screen.getByRole("button", { name: "Panik" }));
     await userEvent.click(screen.getByRole("button", { name: "Abbrechen" }));

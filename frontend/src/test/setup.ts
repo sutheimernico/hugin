@@ -41,6 +41,10 @@ class TestDOMMatrixReadOnly {
   }
 }
 
+// cmdk keeps the highlighted command in view. jsdom has no scroll box to move, so the call is
+// a no-op here — without the stub every palette test dies on the first keystroke.
+HTMLElement.prototype.scrollIntoView = () => {};
+
 const globals = globalThis as unknown as Record<string, unknown>;
 globals.ResizeObserver = TestResizeObserver;
 globals.DOMMatrixReadOnly = TestDOMMatrixReadOnly;

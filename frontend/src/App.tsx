@@ -1,8 +1,10 @@
 import { MotionConfig } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Panel } from "./components/Panel";
+import { Toast, type ToastMessage, type ToastTone } from "./components/Toast";
 import { AgentGraph } from "./features/graph/AgentGraph";
 import { KernelLog } from "./features/log/KernelLog";
+import { CommandPalette } from "./features/palette/CommandPalette";
 import { ProcessTable } from "./features/procs/ProcessTable";
 import { Layout } from "./features/shell/Layout";
 import { MissionBar } from "./features/shell/MissionBar";
@@ -23,6 +25,16 @@ export default function App() {
 
   useEventStream(dispatch);
 
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const [toast, setToast] = useState<ToastMessage | null>(null);
+  const openPalette = useCallback(() => setPaletteOpen(true), []);
+  const closePalette = useCallback(() => setPaletteOpen(false), []);
+  // A fresh id per message, so two identical texts still read as two events.
+  const showToast = useCallback((text: string, tone: ToastTone) => {
+    setToast({ id: Date.now(), text, tone });
+  }, []);
+  const clearToast = useCallback(() => setToast(null), []);
+
   const mode = selectMode({ state, replay });
   // Live runs follow the wall clock; a replay follows the events it is replaying.
   const now = useNow(mode !== "replay", state.log.at(-1)?.ts ?? 0);
@@ -40,7 +52,14 @@ export default function App() {
     // globals.css cannot reach — this is what makes JS motion obey the same system setting.
     <MotionConfig reducedMotion="user">
       <Layout
-        topBar={<TopBar mode={mode} meters={state.meters} onKillAll={onKillAll} />}
+        topBar={
+          <TopBar
+            mode={mode}
+            meters={state.meters}
+            onKillAll={onKillAll}
+            onOpenPalette={openPalette}
+          />
+        }
         left={
           <ProcessTable
             procs={selectProcs(state)}
@@ -63,6 +82,13 @@ export default function App() {
         right={<KernelLog lines={state.log} />}
         bottom={<MissionBar run={run} now={now} />}
       />
+      <CommandPalette
+        open={paletteOpen}
+        onOpen={openPalette}
+        onClose={closePalette}
+        onToast={showToast}
+      />
+      <Toast toast={toast} onDone={clearToast} />
     </MotionConfig>
   );
 }
