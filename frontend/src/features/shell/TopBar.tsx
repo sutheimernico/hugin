@@ -39,16 +39,13 @@ export function TopBar({ mode, meters, onKillAll }: TopBarProps) {
       </div>
 
       <div className="ml-auto flex shrink-0 items-center gap-5">
-        <div className="hidden items-center gap-5 lg:flex">
-          <div className="w-32">
-            <Meter
-              label="Aktive Prozesse"
-              value={meters.activeProcs}
-              max={PROC_SCALE}
-              tone="violet"
-            />
+        {/* One fixed width per meter, so a longer label or readout can never push into its
+            neighbour — the bars are a HUD row and must stay on one line. */}
+        <div className="hidden items-center gap-6 lg:flex">
+          <div className="w-40 shrink-0">
+            <Meter label="Prozesse" value={meters.activeProcs} max={PROC_SCALE} tone="violet" />
           </div>
-          <div className="w-24">
+          <div className="w-40 shrink-0">
             <Meter
               label="Tokens/min"
               value={meters.tokensPerMin}
@@ -57,7 +54,7 @@ export function TopBar({ mode, meters, onKillAll }: TopBarProps) {
               format={fmtTokens}
             />
           </div>
-          <div className="w-24">
+          <div className="w-40 shrink-0">
             <Meter
               label="Budget"
               value={Math.round(meters.budgetPct * 100)}

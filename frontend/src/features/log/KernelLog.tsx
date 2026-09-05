@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Virtuoso } from "react-virtuoso";
 import { Panel } from "../../components/Panel";
 import type { LogLine } from "../../state/types";
@@ -34,17 +35,36 @@ export function KernelLog({ lines }: { lines: LogLine[] }) {
           Kernel bereit — warte auf Ereignisse
         </p>
       ) : (
-        <Virtuoso
-          data={lines}
-          // Smooth follow keeps the newest line in view without ripping the scroll position
-          // away from someone who scrolled up (Virtuoso stops following once you leave the end).
-          followOutput="smooth"
-          computeItemKey={(_, line) => line.seq}
-          itemContent={(_, line) => <LogRow line={line} />}
-          style={{ height: "100%" }}
-        />
+        <LogList lines={lines} />
       )}
     </Panel>
+  );
+}
+
+/**
+ * Its own component so the initial scroll position can be read at *its* first render — which is
+ * the render that mounts the list, not the one that mounted the empty panel.
+ */
+function LogList({ lines }: { lines: LogLine[] }) {
+  // The SSE backfill hands the log its whole history in one batch, so the list is already long
+  // when it appears. Starting at line 1 would also disable `followOutput`, which only follows a
+  // list that *is* at its end. Virtuoso reads this once, so a stale value costs nothing.
+  const [initialIndex] = useState(() => Math.max(0, lines.length - 1));
+
+  return (
+    <Virtuoso
+      data={lines}
+      initialTopMostItemIndex={initialIndex}
+      // Smooth follow keeps the newest line in view without ripping the scroll position away
+      // from someone who scrolled up (Virtuoso stops following once you leave the end).
+      followOutput={(isAtBottom) => (isAtBottom ? "smooth" : false)}
+      // A log line is 20 px high; a few pixels of rounding must still count as "at the end", or
+      // a fast stream drops out of follow mode on its own.
+      atBottomThreshold={24}
+      computeItemKey={(_, line) => line.seq}
+      itemContent={(_, line) => <LogRow line={line} />}
+      style={{ height: "100%" }}
+    />
   );
 }
 

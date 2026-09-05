@@ -23,8 +23,11 @@ export function Meter({ label, value, max, tone, format }: MeterProps) {
   return (
     <div className="flex flex-col gap-1">
       <div className="flex items-baseline justify-between gap-2">
-        <span className="text-[11px] tracking-[0.12em] text-muted uppercase">{label}</span>
-        <span className="font-mono text-[11px] text-text">
+        {/* Neither half may wrap: two meters side by side would then overlap (see TopBar). */}
+        <span className="truncate text-[11px] tracking-[0.12em] whitespace-nowrap text-muted uppercase">
+          {label}
+        </span>
+        <span className="font-mono text-[11px] whitespace-nowrap text-text">
           {format ? format(value) : String(value)}
         </span>
       </div>

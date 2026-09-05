@@ -73,7 +73,7 @@ describe("TopBar", () => {
     expect(screen.getByText("hugin")).toBeInTheDocument();
     expect(screen.getByText("Gedanken ausschicken. Wissen zurückholen.")).toBeInTheDocument();
     expect(screen.getByText(MODE_LABEL.idle)).toBeInTheDocument();
-    expect(screen.getByRole("progressbar", { name: "Aktive Prozesse" })).toBeInTheDocument();
+    expect(screen.getByRole("progressbar", { name: "Prozesse" })).toBeInTheDocument();
     expect(screen.getByRole("progressbar", { name: "Tokens/min" })).toBeInTheDocument();
     expect(screen.getByRole("progressbar", { name: "Budget" })).toBeInTheDocument();
     expect(screen.getByText("⌘K").tagName).toBe("KBD");
