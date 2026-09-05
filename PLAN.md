@@ -32,7 +32,8 @@ implementation plan is authoritative — never invent tasks that are not in it.
 - [x] **Milestone 0 — Scaffold** (Tasks 1–3)
 - [x] **Milestone 1 — Kernel core** (Tasks 4–11): events, log, bus, processes, budgets,
   programs, drivers, kernel façade, munin and the capability-gated syscalls
-- [ ] **Milestone 2 — API, SSE and the Mission Control shell** (Tasks 12–16)
+- [x] **Milestone 2 — API, SSE and the Mission Control shell** (Tasks 12–16): API and SSE,
+  frontend state, shell layout, live graph and the ⌘K palette
 
 ## Milestone 0 — Scaffold
 
@@ -57,7 +58,7 @@ implementation plan is authoritative — never invent tasks that are not in it.
 - [x] Task 13: Frontend state — types, reducer, SSE client, store
 - [x] Task 14: Shell layout — TopBar, ModeChip, meters, ProcessTable, KernelLog, MissionBar
 - [x] Task 15: Live agent graph (xyflow + dagre) with pulses
-- [ ] Task 16: Command palette (⌘K) + mission start
+- [x] Task 16: Command palette (⌘K) + mission start
 
 ## Milestone 3 — Real drivers
 
