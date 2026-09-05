@@ -42,7 +42,7 @@ implementation plan is authoritative — never invent tasks that are not in it.
 - [x] Task 4: Event model
 - [x] Task 5: EventLog (SQLite) + EventBus
 - [x] Task 6: AgentProcess, state machine, ProcessTable, Budget watcher
-- [ ] Task 7: Programs (YAML) + kernel contract
+- [x] Task 7: Programs (YAML) + kernel contract
 - [ ] Task 8: Driver protocol + ScriptedDriver
 - [ ] Task 9: Kernel façade + Scheduler (with ScriptedDriver end-to-end)
 - [ ] Task 10: Munin memory store (SQLite FTS5)
