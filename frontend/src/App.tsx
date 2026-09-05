@@ -1,6 +1,7 @@
 import { MotionConfig } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Panel } from "./components/Panel";
+import { AgentGraph } from "./features/graph/AgentGraph";
 import { KernelLog } from "./features/log/KernelLog";
 import { ProcessTable } from "./features/procs/ProcessTable";
 import { Layout } from "./features/shell/Layout";
@@ -50,10 +51,13 @@ export default function App() {
           />
         }
         center={
-          <Panel title="Graph" className="h-full" bodyClassName="min-h-0 p-3">
-            <div className="flex h-full items-center justify-center text-center text-[12px] text-muted">
-              Der Live-Graph ist noch nicht angeschlossen.
-            </div>
+          <Panel title="Graph" className="h-full" bodyClassName="min-h-0 p-0">
+            <AgentGraph
+              state={state}
+              runId={state.activeRunId}
+              selectedPid={selectedPid}
+              onSelect={setSelectedPid}
+            />
           </Panel>
         }
         right={<KernelLog lines={state.log} />}

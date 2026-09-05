@@ -42,3 +42,33 @@ body {
     transition-duration: 0.001ms !important;
   }
 }
+
+/*
+ * xyflow ships its own (light) theme. Its whole surface is a set of `--xy-*` variables, so the
+ * repaint is a variable swap onto our tokens. Two class names, because the library's own rules
+ * are injected after this file and would otherwise win the tie.
+ */
+.hugin-graph.react-flow {
+  --xy-background-color: transparent;
+  --xy-background-pattern-color: var(--color-border);
+  --xy-edge-stroke: var(--color-border);
+  --xy-edge-stroke-selected: var(--color-muted);
+  --xy-node-color: var(--color-text);
+  --xy-node-background-color: transparent;
+  --xy-node-border: none;
+  --xy-node-boxshadow-hover: none;
+  --xy-node-boxshadow-selected: none;
+  --xy-handle-background-color: transparent;
+  --xy-handle-border-color: transparent;
+  --xy-attribution-background-color: transparent;
+}
+
+.hugin-graph .react-flow__attribution a {
+  color: var(--color-muted);
+  opacity: 0.5;
+}
+
+/* Re-layout moves a node instead of teleporting it (spec §2.9: 150–400 ms, house easing). */
+.hugin-graph .react-flow__node {
+  transition: transform 400ms var(--ease-out-expo);
+}
