@@ -9,6 +9,31 @@ body {
   font-family: var(--font-mono);
 }
 
+/* Glow only on live elements: a chip glows while it carries data-pulse. */
+@keyframes hugin-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+  50% {
+    box-shadow: 0 0 12px -2px currentColor;
+  }
+}
+
+.hugin-chip[data-pulse="true"] {
+  animation: hugin-glow 2.4s var(--ease-out-expo) infinite;
+}
+
+@keyframes hugin-ring-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.hugin-ring[data-state="running"] .hugin-ring-track {
+  animation: hugin-ring-spin 3s linear infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
