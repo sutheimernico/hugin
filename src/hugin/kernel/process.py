@@ -78,6 +78,11 @@ class ProcessTable:
         self._procs: dict[int, AgentProcess] = {}
         self._next_pid = 1
 
+    @property
+    def pid_counter(self) -> int:
+        """The pid the next `next_pid()` call will hand out."""
+        return self._next_pid
+
     def next_pid(self) -> int:
         pid = self._next_pid
         self._next_pid += 1
