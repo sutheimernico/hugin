@@ -74,7 +74,7 @@ implementation plan is authoritative — never invent tasks that are not in it.
 
 - [x] Task 22: Agent window (layoutId morph, streaming transcript, tool cards)
 - [x] Task 23: Munin browser view
-- [ ] Task 24: Replay backend — Player, Recorder (scrub), recordings routes
+- [x] Task 24: Replay backend — Player, Recorder (scrub), recordings routes
 - [ ] Task 25: Runs & Replay view + timeline scrubber (REPLAY mode)
 - [ ] Task 26: Boot sequence
 
