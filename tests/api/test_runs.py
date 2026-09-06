@@ -151,3 +151,17 @@ async def test_template_is_recorded_on_the_run(api, start_mission):
     run_id = await start_mission(api, template="research_brief")
 
     assert (await api.client.get(f"/api/runs/{run_id}")).json()["template"] == "research_brief"
+
+
+async def test_program_prefix_runs_that_program_as_root(api, wait_for_run):
+    response = await api.client.post(
+        "/api/missions",
+        json={"goal": "program:scout Suche nach lokalen Modellen", "driver": "scripted"},
+    )
+    assert response.status_code == 201
+    run_id = response.json()["run_id"]
+    await wait_for_run(api, run_id)
+    procs = [p for p in (await api.client.get("/api/procs")).json() if p["run_id"] == run_id]
+    assert procs[0]["program"] == "scout"
+    assert procs[0]["task"] == "Suche nach lokalen Modellen"
+    assert (await api.client.get(f"/api/runs/{run_id}")).json()["goal"].startswith("program:scout")

@@ -171,7 +171,9 @@ class OllamaDriver:
                 "messages": messages,
                 "tools": tools,
                 "stream": True,
-                "options": {"num_predict": self._num_predict(proc, progress)},
+                # Greedy decoding: small models follow tool schemas far more reliably at
+                # temperature 0 than when sampling (observed live with qwen2.5:7b).
+                "options": {"num_predict": self._num_predict(proc, progress), "temperature": 0},
             }
             async with self._client.stream(
                 "POST", f"{self._base_url}/api/chat", json=body

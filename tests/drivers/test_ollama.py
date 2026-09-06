@@ -263,6 +263,7 @@ async def test_run_asks_only_for_the_remaining_output_budget(tmp_path: Path, sin
     await driver.run(_proc(tmp_path, max_output_tokens=500), "Suche.", sink)
 
     assert chat.requests[0]["options"]["num_predict"] == 500
+    assert chat.requests[0]["options"]["temperature"] == 0
     # 500 - 480 = 20, below the floor that keeps a follow-up turn able to say anything at all.
     assert chat.requests[1]["options"]["num_predict"] == 64
 

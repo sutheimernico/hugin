@@ -38,8 +38,9 @@ async def start_mission(
         raise HTTPException(status_code=422, detail="Ziel darf nicht leer sein.")
     _reject_foreign_paths(goal)
     await _require_available_driver(kernel, system, driver)
+    program, task = _split_program_prefix(goal)
     run_id = await kernel.create_run(goal, driver, template)
-    await kernel.spawn(run_id, ROOT_PROGRAM, goal, driver=driver)
+    await kernel.spawn(run_id, program, task, driver=driver)
     return run_id
 
 
@@ -71,3 +72,18 @@ async def _require_available_driver(
             status_code=409,
             detail=f"{LIVE_DRIVERS[driver]} nicht verfügbar: {subsystem['detail']}",
         )
+
+
+_PROGRAM_PREFIX = re.compile(r"^program:([a-z][a-z0-9_-]{1,31})\s+(.+)$", re.DOTALL)
+
+
+def _split_program_prefix(goal: str) -> tuple[str, str]:
+    """`program:<name> <task>` runs that program as the root instead of the planner.
+
+    The escape hatch for weak local models: a single scout can still deliver a report when
+    the planner cannot hold a multi-step tool protocol. Everything else keeps the planner.
+    """
+    match = _PROGRAM_PREFIX.match(goal)
+    if match is None:
+        return ROOT_PROGRAM, goal
+    return match.group(1), match.group(2).strip()
