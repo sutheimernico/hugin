@@ -3,6 +3,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Panel } from "./components/Panel";
 import { Toast, type ToastMessage, type ToastTone } from "./components/Toast";
 import { AgentWindow } from "./features/agent/AgentWindow";
+import { BootScreen } from "./features/boot/BootScreen";
+import { hasBooted, markBooted } from "./features/boot/sequence";
 import { AgentGraph } from "./features/graph/AgentGraph";
 import { KernelLog } from "./features/log/KernelLog";
 import { MuninBrowser } from "./features/munin/MuninBrowser";
@@ -14,11 +16,14 @@ import { Timeline } from "./features/replay/Timeline";
 import { Layout } from "./features/shell/Layout";
 import { MissionBar } from "./features/shell/MissionBar";
 import { TopBar } from "./features/shell/TopBar";
-import { killAll, killProc } from "./lib/api";
+import { getSystem, killAll, killProc } from "./lib/api";
 import { connectEvents } from "./lib/sse";
 import { selectMode, selectProcs } from "./state/selectors";
-import type { HEvent } from "./state/types";
+import type { HEvent, SystemStatus } from "./state/types";
 import { selectVisibleState, useHuginStore } from "./state/store";
+
+/** How often the shell re-asks `/api/system` while the tab is visible. */
+const SYSTEM_POLL_MS = 30_000;
 
 /** Mission Control (spec §2.9, view 2): the shell is a pure projection of the event stream. */
 export default function App() {
@@ -30,7 +35,18 @@ export default function App() {
   const setView = useHuginStore((store) => store.setView);
   const dispatch = useHuginStore((store) => store.dispatch);
 
+  const setSystem = useHuginStore((store) => store.setSystem);
+
   useEventStream(dispatch);
+  useSystemStatus(setSystem);
+
+  // Once per browser session, and never in the way: the stream above is already connected
+  // while the overlay is still counting subsystems.
+  const [booted, setBooted] = useState(hasBooted);
+  const finishBoot = useCallback(() => {
+    markBooted();
+    setBooted(true);
+  }, []);
 
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [toast, setToast] = useState<ToastMessage | null>(null);
@@ -131,6 +147,7 @@ export default function App() {
         onToast={showToast}
       />
       <Toast toast={toast} onDone={clearToast} />
+      {!booted && <BootScreen onDone={finishBoot} />}
     </MotionConfig>
   );
 }
@@ -156,6 +173,33 @@ function useEventStream(dispatch: (events: HEvent[]) => void): void {
       disconnect();
     };
   }, [dispatch]);
+}
+
+/**
+ * What this machine can run right now. The palette gates its drivers on this, so it is loaded
+ * on every start — the boot screen may be skipped, the gate may not be. A failed refresh keeps
+ * the previous answer: not reaching the kernel is not the same as learning that a driver died.
+ */
+function useSystemStatus(setSystem: (system: SystemStatus) => void): void {
+  useEffect(() => {
+    let live = true;
+    const load = () => {
+      void getSystem()
+        .then((system) => {
+          if (live) setSystem(system);
+        })
+        .catch(report);
+    };
+    load();
+    // A hidden tab has nobody to inform; the next visible tick brings it up to date.
+    const timer = window.setInterval(() => {
+      if (document.visibilityState === "visible") load();
+    }, SYSTEM_POLL_MS);
+    return () => {
+      live = false;
+      window.clearInterval(timer);
+    };
+  }, [setSystem]);
 }
 
 /** Seconds since the epoch, ticking once a second — but only while something can move. */

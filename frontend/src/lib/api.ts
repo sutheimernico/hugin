@@ -8,7 +8,15 @@
  * `src/hugin/api/` without a translation step.
  */
 
-import type { Budget, Driver, HEvent, ProcState, Run, Usage } from "../state/types";
+import type {
+  Budget,
+  Driver,
+  HEvent,
+  ProcState,
+  Run,
+  SystemStatus,
+  Usage,
+} from "../state/types";
 
 export interface ApiProc {
   pid: number;
@@ -95,6 +103,11 @@ export class ApiError extends Error {
     this.name = "ApiError";
     this.status = status;
   }
+}
+
+/** What this machine can actually run — the boot screen, the palette and the gate share it. */
+export async function getSystem(): Promise<SystemStatus> {
+  return request<SystemStatus>("/api/system");
 }
 
 export async function getRuns(): Promise<Run[]> {
