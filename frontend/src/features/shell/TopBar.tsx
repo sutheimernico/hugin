@@ -40,8 +40,11 @@ export function TopBar({
   onKillAll,
   onOpenPalette,
 }: TopBarProps) {
+  // `relative z-40` on the bar: `backdrop-blur` makes it its own stacking context, and without
+  // a z-index the main area below paints over it — which swallowed every click on the Panik
+  // confirmation, because the kernel log sat in front of it.
   return (
-    <header className="flex h-12 items-center gap-4 border-b border-border bg-surface/80 px-4 backdrop-blur">
+    <header className="relative z-40 flex h-12 items-center gap-4 border-b border-border bg-surface/80 px-4 backdrop-blur">
       <div className="flex min-w-0 items-baseline gap-3">
         <span className="font-display shrink-0 text-[17px] leading-none font-bold tracking-[0.16em] text-text">
           hugin

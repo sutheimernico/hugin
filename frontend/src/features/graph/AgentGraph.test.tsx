@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { initialState } from "../../state/reducer";
 import type { Proc, State } from "../../state/types";
@@ -100,6 +100,43 @@ describe("AgentGraph", () => {
     renderGraph(mission());
     expect(await screen.findByLabelText("planner · PID 1")).toBeInTheDocument();
     expect(screen.getByLabelText("scout · PID 2")).toBeInTheDocument();
+  });
+
+  it("drops the glow when a process finishes", async () => {
+    const running = mission();
+    const { rerender } = render(
+      <div style={{ width: "800px", height: "600px" }}>
+        <AgentGraph
+          state={running}
+          runId={RUN}
+          selectedPid={null}
+          onSelect={vi.fn()}
+          panicking={false}
+        />
+      </div>,
+    );
+    const card = await screen.findByText("scout");
+    const node = card.closest("[data-testid=agent-node]") as HTMLElement;
+    expect(node.style.boxShadow).not.toBe("none");
+
+    const done: State = {
+      ...running,
+      procs: { 1: running.procs[1], 2: { ...running.procs[2], state: "done" } },
+    };
+    rerender(
+      <div style={{ width: "800px", height: "600px" }}>
+        <AgentGraph
+          state={done}
+          runId={RUN}
+          selectedPid={null}
+          onSelect={vi.fn()}
+          panicking={false}
+        />
+      </div>,
+    );
+
+    // `motion` never removes a style it has written, so the quiet state must be spelled out.
+    await waitFor(() => expect(node.style.boxShadow).toBe("none"));
   });
 
   it("desaturates the whole surface while a panic is propagating", () => {

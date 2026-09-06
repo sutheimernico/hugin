@@ -45,11 +45,14 @@ export function AgentNode({ data, selected }: NodeProps<AgentNodeType>) {
         initial={{ scale: 0.6, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={BLOOM}
+        // Both fall back to an explicit value rather than to `undefined`: `motion` writes the
+        // style imperatively and never removes a property it has already set, so a node that
+        // finished would keep the glow of the moment it was last alive.
         style={{
           width: NODE_W,
           height: NODE_H,
-          borderColor: selected ? accent : undefined,
-          boxShadow: glowing ? `0 0 24px ${accent}40` : undefined,
+          borderColor: selected ? accent : "var(--color-border)",
+          boxShadow: glowing ? `0 0 24px ${accent}40` : "none",
         }}
         className="relative flex cursor-pointer flex-col justify-center overflow-hidden rounded-panel border border-border bg-surface-2 px-3 transition-colors duration-150"
       >
