@@ -46,7 +46,7 @@ def parse_line(line: str) -> list[Op]:
         return []
     try:
         event = json.loads(line)
-    except (ValueError, TypeError):
+    except (ValueError, TypeError, RecursionError):
         return [Op("ignore", {"raw": line[:RAW_LIMIT]})]
     if not isinstance(event, dict):
         return [Op("ignore", {"raw": line[:RAW_LIMIT]})]
@@ -67,6 +67,20 @@ def parse_line(line: str) -> list[Op]:
             return [Op("ignore", {"type": other})]
 
 
+
+def _str_list(value: object) -> list[str]:
+    """Only a real list survives; a wrong-typed `tools` must not crash the parser."""
+    if not isinstance(value, list):
+        return []
+    return [str(v) for v in value]
+
+
+def _as_float(value: object) -> float:
+    try:
+        return float(value)  # type: ignore[arg-type]
+    except (TypeError, ValueError):
+        return 0.0
+
 def _system(event: dict) -> list[Op]:
     subtype = event.get("subtype")
     if subtype != "init":
@@ -80,7 +94,7 @@ def _system(event: dict) -> list[Op]:
                 # Absent means "unknown", not "none" — the driver refuses anything but "none",
                 # so the default has to fail closed rather than look like a subscription login.
                 "api_key_source": event.get("apiKeySource", "unknown"),
-                "tools": list(event.get("tools") or []),
+                "tools": _str_list(event.get("tools")),
             },
         )
     ]
@@ -189,7 +203,7 @@ def _result(event: dict) -> list[Op]:
                 "is_error": bool(event.get("is_error", False)),
                 "num_turns": event.get("num_turns") or 0,
                 "duration_ms": event.get("duration_ms") or 0,
-                "total_cost_usd": event.get("total_cost_usd") or 0.0,
+                "total_cost_usd": _as_float(event.get("total_cost_usd")),
                 "usage": usage if isinstance(usage, dict) else {},
                 "text": event.get("result", ""),
             },

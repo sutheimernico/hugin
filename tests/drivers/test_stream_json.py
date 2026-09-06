@@ -243,6 +243,9 @@ def test_the_parser_never_raises_on_odd_input():
         json.dumps({"type": "result"}),
         json.dumps("just a string"),
         json.dumps(None),
+        json.dumps({"type": "system", "subtype": "init", "tools": 123}),
+        json.dumps({"type": "result", "total_cost_usd": "n/a"}),
+        "[" * 100_000,
     ]
 
     for line in odd:
