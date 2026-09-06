@@ -109,7 +109,7 @@ react-virtuoso · zustand · lucide-react · @fontsource fonts · vitest + testi
 
 **v1 COMPLETE 2026-09-06 (Tasks 1–30).** Kernel, three drivers, capability-gated syscalls over
 MCP, munin FTS5, five programs, missions, replay with recordings and the six views all exist
-and run. Gate: 354 pytest + 234 vitest green, ruff/tsc/eslint clean, `npm audit --omit=dev`
+and run. Gate: 356 pytest + 234 vitest green, ruff/tsc/eslint clean, `npm audit --omit=dev`
 0 vulnerabilities. A live Claude mission ran end-to-end on the subscription
 (`apiKeySource=none`): planner + 3 scouts with WebSearch/WebFetch, 848 events, 51 turns, 231 s,
 5 munin writes, one `report.md` — API equivalent $1.12, billed 0 €. Simulation runs in 7.6 s /

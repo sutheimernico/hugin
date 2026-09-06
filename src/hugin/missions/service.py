@@ -39,6 +39,8 @@ async def start_mission(
     _reject_foreign_paths(goal)
     await _require_available_driver(kernel, system, driver)
     program, task = _split_program_prefix(goal)
+    if program not in kernel.programs:
+        raise HTTPException(status_code=422, detail=f"Programm „{program}“ ist unbekannt.")
     run_id = await kernel.create_run(goal, driver, template)
     await kernel.spawn(run_id, program, task, driver=driver)
     return run_id

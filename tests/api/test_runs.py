@@ -165,3 +165,12 @@ async def test_program_prefix_runs_that_program_as_root(api, wait_for_run):
     assert procs[0]["program"] == "scout"
     assert procs[0]["task"] == "Suche nach lokalen Modellen"
     assert (await api.client.get(f"/api/runs/{run_id}")).json()["goal"].startswith("program:scout")
+
+
+async def test_program_prefix_with_unknown_program_is_422(api):
+    response = await api.client.post(
+        "/api/missions", json={"goal": "program:bogus mach was", "driver": "scripted"}
+    )
+    assert response.status_code == 422
+    assert "bogus" in response.json()["detail"]
+    assert (await api.client.get("/api/runs")).json() == []

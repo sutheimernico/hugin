@@ -196,7 +196,7 @@ einen frischen Lauf.
 ## Entwicklung
 
 ```bash
-uv run pytest -q                          # 353 Tests
+uv run pytest -q                          # 356 Tests
 uv run ruff check .
 npm --prefix frontend run check           # tsc + eslint
 npm --prefix frontend test -- --run       # 234 Tests
@@ -225,7 +225,7 @@ docs/                  adr/ · sessions/ · superpowers/{specs,plans} · media/
 **v1 feature-complete (2026-09-06), Branch `autopilot/work`.** Kernel, drei Treiber,
 Syscalls über MCP, munin, fünf Programme, Missionen, Replay und die sechs Ansichten stehen; eine
 Claude-Mission ist live auf dem Abo durchgelaufen (`apiKeySource=none`), Simulation und Ollama
-ebenso. Gate: 353 pytest + 234 vitest grün, ruff/tsc/eslint sauber.
+ebenso. Gate: 356 pytest + 234 vitest grün, ruff/tsc/eslint sauber.
 
 Offen und nur von Nico zu entscheiden:
 

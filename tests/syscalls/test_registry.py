@@ -419,3 +419,10 @@ async def test_proc_spawn_floors_a_starving_child_budget(parked):
     child = kernel.procs.get(result["pid"])
     assert child.budget.max_turns == 3
     assert child.budget.max_seconds == 120
+
+
+async def test_artifact_write_treats_an_empty_name_as_the_default(parked):
+    kernel, run_id, spawn = parked
+    planner = await spawn("planner")
+    result = await kernel.syscalls.call(planner, "artifact_write", {"name": "", "content": "x"})
+    assert result["path"] == "artifacts/report.md"
