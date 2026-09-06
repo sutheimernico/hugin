@@ -226,7 +226,7 @@ def test_build_command_matches_the_binding_argv():
         "--tools",
         "mcp__hugin__munin_search,mcp__hugin__munin_write",
         "--allowedTools",
-        "mcp__hugin__munin_search,mcp__hugin__munin_write",
+        "mcp__hugin__munin_search,mcp__hugin__munin_write,mcp__hugin",
         "--strict-mcp-config",
         "--mcp-config",
         '{"mcpServers": {"hugin": {"type": "http", "url": "http://127.0.0.1:8770/mcp",'
@@ -260,7 +260,7 @@ def test_build_command_never_carries_bare_or_a_permission_bypass():
     assert "--dangerously-skip-permissions" not in argv
     # An empty whitelist stays an explicit empty string, never a dropped flag.
     assert argv[argv.index("--tools") + 1] == ""
-    assert argv[argv.index("--allowedTools") + 1] == ""
+    assert argv[argv.index("--allowedTools") + 1] == "mcp__hugin"
 
 
 def test_build_env_keeps_only_the_minimal_variables(tmp_path: Path):

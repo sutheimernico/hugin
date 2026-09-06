@@ -37,6 +37,7 @@ EXIT_GRACE_S = 5.0
 STDERR_READ_TIMEOUT_S = 1.0
 # One stream-json line carries a whole tool result, far past the reader's 64 KiB default.
 STREAM_LIMIT = 8 * 1024 * 1024
+MCP_SERVER_ALLOW = "mcp__hugin"  # allow-list token for every tool of the kernel's MCP server
 STDERR_TAIL_BYTES = 4096
 STDERR_CHUNK = 4096
 
@@ -54,6 +55,9 @@ def build_command(
 ) -> list[str]:
     """The exact argv of a headless run; the order is part of the binding contract."""
     whitelist = ",".join(tools) if tools else ""
+    # `dontAsk` denies every tool that is not pre-approved, MCP tools included; the kernel's
+    # own syscall server must therefore be allow-listed as a whole (verified live 2026-09-06).
+    allowed = ",".join([*tools, MCP_SERVER_ALLOW])
     mcp_config = json.dumps(
         {
             "mcpServers": {
@@ -81,7 +85,7 @@ def build_command(
         "--tools",
         whitelist,
         "--allowedTools",
-        whitelist,
+        allowed,
         "--strict-mcp-config",
         "--mcp-config",
         mcp_config,
