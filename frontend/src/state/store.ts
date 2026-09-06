@@ -51,12 +51,15 @@ export interface HuginStore {
   view: View;
   /** Prefilled by the palette's "Munin durchsuchen…" command, read by the browser (Task 23). */
   muninQuery: string;
+  /** Process table scope: the active run only (default), or every process the kernel knows. */
+  allProcs: boolean;
   /** One call per animation frame (see `lib/sse.ts`), never one per event. */
   dispatch: (events: HEvent[]) => void;
   setSystem: (system: SystemStatus | null) => void;
   setSelectedPid: (pid: number | null) => void;
   setView: (view: View) => void;
   setMuninQuery: (query: string) => void;
+  setAllProcs: (allProcs: boolean) => void;
   /**
    * Which run the shell follows. The reducer sets this when a run is created; the palette may
    * point it at an older run instead — that is a selection, like `selectedPid`, not a rewrite
@@ -82,6 +85,7 @@ export const useHuginStore = create<HuginStore>()((set, get) => ({
   selectedPid: null,
   view: "control",
   muninQuery: "",
+  allProcs: false,
 
   dispatch: (events) => {
     if (get().replay.runId !== null) {
@@ -100,6 +104,7 @@ export const useHuginStore = create<HuginStore>()((set, get) => ({
   setSelectedPid: (selectedPid) => set({ selectedPid }),
   setView: (view) => set({ view }),
   setMuninQuery: (muninQuery) => set({ muninQuery }),
+  setAllProcs: (allProcs) => set({ allProcs }),
   setActiveRunId: (activeRunId) => set({ state: { ...get().state, activeRunId } }),
 
   enterReplay: (source, events) => {

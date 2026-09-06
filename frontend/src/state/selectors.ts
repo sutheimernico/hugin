@@ -31,9 +31,17 @@ export function selectActiveRun(state: State, replay?: { runId: string | null })
   return replay?.runId != null || run.state === "running" ? run : undefined;
 }
 
-/** The process table's order: by pid, which is also the order they were spawned in. */
-export function selectProcs(state: State): Proc[] {
-  return Object.values(state.procs).sort((a, b) => a.pid - b.pid);
+/**
+ * The process table's order: by pid, which is also the order they were spawned in.
+ *
+ * `runId` scopes the table to one mission — the default view, because a kernel that has been
+ * up all day otherwise buries the running mission under every process it ever supervised.
+ * Pass `null` for the whole table (the "Alle" toggle).
+ */
+export function selectProcs(state: State, runId: string | null = null): Proc[] {
+  return Object.values(state.procs)
+    .filter((proc) => runId === null || proc.runId === runId)
+    .sort((a, b) => a.pid - b.pid);
 }
 
 /** The states a process still occupies the machine in — the meters and the kill switch use it. */

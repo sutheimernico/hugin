@@ -14,18 +14,41 @@ type ProcessTableProps = {
   selectedPid: number | null;
   onSelect: (pid: number) => void;
   onKill: (pid: number) => void;
+  /** False (default): only the active mission. True: every process this kernel supervised. */
+  showAll: boolean;
+  onShowAllChange: (showAll: boolean) => void;
 };
 
 const HEAD = "sticky top-0 z-10 bg-surface py-1.5 text-[10px] font-medium tracking-[0.12em] uppercase";
 
-export function ProcessTable({ procs, now, selectedPid, onSelect, onKill }: ProcessTableProps) {
+export function ProcessTable({
+  procs,
+  now,
+  selectedPid,
+  onSelect,
+  onKill,
+  showAll,
+  onShowAllChange,
+}: ProcessTableProps) {
   const alive = procs.filter(isAlive).length;
   return (
     <Panel
       title="Prozesse"
       right={
-        <span className="font-mono text-[11px] text-muted tabular-nums">
-          {procs.length === 0 ? "" : `${alive}/${procs.length}`}
+        <span className="flex items-center gap-2">
+          <span className="font-mono text-[11px] text-muted tabular-nums">
+            {procs.length === 0 ? "" : `${alive}/${procs.length}`}
+          </span>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={showAll}
+            title={showAll ? "Nur den laufenden Auftrag zeigen" : "Alle Prozesse zeigen"}
+            onClick={() => onShowAllChange(!showAll)}
+            className="ease-out-expo rounded-full border border-border px-2 py-0.5 text-[10px] tracking-[0.08em] text-muted uppercase transition-colors duration-150 hover:bg-surface-2 aria-checked:border-violet/50 aria-checked:bg-violet/12 aria-checked:text-violet"
+          >
+            Alle
+          </button>
         </span>
       }
       className="h-full"
@@ -33,7 +56,9 @@ export function ProcessTable({ procs, now, selectedPid, onSelect, onKill }: Proc
     >
       {procs.length === 0 ? (
         <div className="flex h-full flex-col items-center justify-center gap-2 px-6 text-center">
-          <p className="text-[12px] text-muted">Noch keine Prozesse</p>
+          <p className="text-[12px] text-muted">
+            {showAll ? "Noch keine Prozesse" : "Kein laufender Auftrag"}
+          </p>
           <p className="flex items-center gap-1.5 text-[11px] text-muted/70">
             Mission starten mit <Kbd>⌘K</Kbd>
           </p>

@@ -36,6 +36,8 @@ export default function App() {
   const dispatch = useHuginStore((store) => store.dispatch);
 
   const setSystem = useHuginStore((store) => store.setSystem);
+  const allProcs = useHuginStore((store) => store.allProcs);
+  const setAllProcs = useHuginStore((store) => store.setAllProcs);
 
   useEventStream(dispatch);
   useSystemStatus(setSystem);
@@ -98,11 +100,14 @@ export default function App() {
         left={
           control ? (
             <ProcessTable
-              procs={selectProcs(visible)}
+              // Scoped to the mission on screen by default; the kernel log stays global.
+              procs={selectProcs(visible, allProcs ? null : visible.activeRunId)}
               now={now}
               selectedPid={selectedPid}
               onSelect={setSelectedPid}
               onKill={onKill}
+              showAll={allProcs}
+              onShowAllChange={setAllProcs}
             />
           ) : undefined
         }

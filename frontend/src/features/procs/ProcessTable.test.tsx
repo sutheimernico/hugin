@@ -47,6 +47,8 @@ function renderTable(over: Partial<Parameters<typeof ProcessTable>[0]> = {}) {
     selectedPid: null,
     onSelect: vi.fn(),
     onKill: vi.fn(),
+    showAll: false,
+    onShowAllChange: vi.fn(),
     ...over,
   };
   render(<ProcessTable {...props} />);
@@ -92,8 +94,24 @@ describe("ProcessTable", () => {
   });
 
   it("shows a designed empty state instead of an empty grid", () => {
-    renderTable({ procs: [] });
+    renderTable({ procs: [], showAll: true });
     expect(screen.getByText("Noch keine Prozesse")).toBeInTheDocument();
     expect(screen.queryAllByTestId("proc-row")).toHaveLength(0);
+  });
+
+  it("counts what the filter shows and toggles the scope", async () => {
+    const { onShowAllChange } = renderTable();
+    // One of the two processes is still alive — the header count follows the rows on screen.
+    expect(screen.getByText("1/2")).toBeInTheDocument();
+
+    const toggle = screen.getByRole("switch", { name: "Alle" });
+    expect(toggle).toHaveAttribute("aria-checked", "false");
+    await userEvent.click(toggle);
+    expect(onShowAllChange).toHaveBeenCalledWith(true);
+  });
+
+  it("says the mission is over rather than claiming there are no processes at all", () => {
+    renderTable({ procs: [] });
+    expect(screen.getByText("Kein laufender Auftrag")).toBeInTheDocument();
   });
 });

@@ -56,7 +56,8 @@ describe("App", () => {
 
   it("shows the designed empty states of an idle shell", async () => {
     render(<App />);
-    expect(screen.getByText("Noch keine Prozesse")).toBeInTheDocument();
+    // Scoped to the active run by default, and an idle shell has none.
+    expect(screen.getByText("Kein laufender Auftrag")).toBeInTheDocument();
     expect(screen.getByText("Kernel bereit — warte auf Ereignisse")).toBeInTheDocument();
     expect(screen.getByText(/Keine aktive Mission/)).toBeInTheDocument();
     await settle();
