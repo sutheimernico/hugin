@@ -199,8 +199,8 @@ npm --prefix frontend test -- --run       # 234 Tests
 
 Kein Test spricht mit dem Netz, mit `claude` oder mit Ollama: der Kernel wird über den
 `ScriptedDriver` gefahren, Subprozesse über eine Fake-Factory, Ollama über
-`httpx.MockTransport`. Der Produktions-Build liegt bei 240,7 kB gzip (236,2 kB JS + 12,9 kB
-CSS); mit den lateinischen woff2-Subsets sind es im schlechtesten Fall 460 kB Transfer.
+`httpx.MockTransport`. Der Produktions-Build liegt bei 249,1 kB gzip (236,2 kB JS + 12,9 kB
+CSS); mit den lateinischen woff2-Subsets sind es im schlechtesten Fall rund 474 kB Transfer.
 
 ```
 src/hugin/kernel/      events · log · bus · process · budget · scheduler · kernel · sink
