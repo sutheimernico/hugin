@@ -406,3 +406,16 @@ async def test_artifact_write_defaults_the_name_to_report_md(parked):
     assert result["path"] == "artifacts/report.md"
     written = kernel.settings.runs_dir / run_id / "artifacts" / "report.md"
     assert written.read_text() == "# Bericht"
+
+
+async def test_proc_spawn_floors_a_starving_child_budget(parked):
+    kernel, _run_id, spawn = parked
+    planner = await spawn("planner")
+    result = await kernel.syscalls.call(
+        planner,
+        "proc_spawn",
+        {"program": "scout", "task": "x", "budget": {"max_turns": 1, "max_seconds": 60}},
+    )
+    child = kernel.procs.get(result["pid"])
+    assert child.budget.max_turns == 3
+    assert child.budget.max_seconds == 120

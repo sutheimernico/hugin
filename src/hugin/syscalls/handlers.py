@@ -21,6 +21,8 @@ if TYPE_CHECKING:  # pragma: no cover - import cycle guard, the kernel calls the
 # A file name, nothing else: no separators, no traversal, and short enough to display.
 ARTIFACT_NAME = re.compile(r"[A-Za-z0-9._-]{1,64}")
 ALL_CHILDREN = "children"
+MIN_CHILD_TURNS = 3
+MIN_CHILD_SECONDS = 120
 
 
 async def munin_search(kernel: "Kernel", pid: int, args: dict) -> dict:
@@ -79,6 +81,15 @@ async def proc_spawn(kernel: "Kernel", pid: int, args: dict) -> dict:
         raise SyscallError(
             "proc_spawn: budget takes positive max_turns, max_seconds and max_output_tokens only"
         ) from err
+    if budget is not None:
+        # A parent may tighten a child's budget, but not below what any real tool call needs:
+        # small models hand out 60-second budgets that no CPU inference can honour.
+        budget = budget.model_copy(
+            update={
+                "max_turns": max(budget.max_turns, MIN_CHILD_TURNS),
+                "max_seconds": max(budget.max_seconds, MIN_CHILD_SECONDS),
+            }
+        )
     try:
         # The child inherits the caller's driver, not the program's default: one mission runs
         # on one driver, so a SIMULATION planner never spawns a live `claude` worker.
