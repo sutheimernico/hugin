@@ -324,6 +324,15 @@ kernel's syscalls · isolated `CLAUDE_CONFIG_DIR` (no user hooks/MCP/CLAUDE.md) 
 arguments validated to `~/private/**` only · recordings scrubbed before export · no secrets
 in repo · publish checklist before any remote.
 
+**Implementation note (2026-09-06):** there are no syscalls that take a path argument, so
+"path arguments validated to `~/private/**`" landed as two narrower, verified checks instead:
+the mission goal is validated in `missions/service.py` (`_reject_foreign_paths`, 422 "Pfade
+müssen unter ~/private liegen." for any absolute or home path outside it), and artifact
+filenames are validated in `syscalls/handlers.py` (`ARTIFACT_NAME` regex, `1–64` chars of
+`A-Z a-z 0-9 . _ -`, no `..`, no separators — `artifact_write` cannot escape its run directory).
+Both are covered by tests; see ADR 0002 and 0003 for the driver- and kernel-side security
+decisions this section otherwise summarises.
+
 ## 8 · Acceptance criteria (v1 done when all hold)
 
 1. `scripts/serve.sh` starts the server on 8770; the browser boots with real subsystem checks in ≤ 2.5 s.
