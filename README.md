@@ -112,9 +112,14 @@ antwortet mit 409 statt still auf etwas anderes auszuweichen.
 
 Für kleine lokale Modelle sind die Syscall-Schemas absichtlich nachsichtig: `qwen2.5:7b`
 schickt Zahlen als Strings und packt einzelne PIDs nicht in eine Liste — das wird toleriert,
-statt die Mission an einer Formalie scheitern zu lassen. Am Tempo ändert das nichts: in einem
-Demo-Lauf riss der Ollama-Planner das 900-Sekunden-Budget und wurde vom Watcher beendet
-(`exit_reason=budget:seconds`, Run rot als `Fehler`) — genau dafür ist das Budget da.
+statt die Mission an einer Formalie scheitern zu lassen. Die Grenze bleibt das Modell selbst:
+in fünf Demo-Läufen hat der Ollama-Planner kein Mal einen vollständigen Mehr-Agenten-Lauf zu
+Ende gebracht — er gab seinen Kindern 60-Sekunden-Budgets, schrieb Tool-Aufrufe als Text oder
+kreiste bis zum 900-Sekunden-Budget (`exit_reason=budget:seconds`, Run rot als `Fehler`).
+Genau dafür ist das Budget da. Stabil ist Ollama als Einzelprogramm: eine Mission mit dem
+Präfix `program:scout …` lässt einen Späher allein recherchieren, in Munin schreiben und
+berichten — so entstand die Ollama-Aufnahme unten. Der Planner ist damit auf `claude`
+oder die Simulation angewiesen; ein 7B-Modell orchestriert (noch) nicht zuverlässig.
 
 ## Quickstart
 
@@ -162,7 +167,7 @@ Offline-Demo, für die weder ein Abo noch ein lokales Modell nötig ist. Was im 
 | --- | --- | --- | --- |
 | `simulation-research-brief` | Simulation | 127 | 7,6 s |
 | `claude-research-brief` | Claude (Abo) | 848 | 231,5 s |
-| `ollama-research-brief` | Ollama (lokal) | in Aufnahme | — |
+| `ollama-scout-brief` | Ollama (lokal, `program:scout`) | 462 | 242,0 s |
 
 Im Tab „Runs“ stehen sie unter „Demo-Aufnahmen“; „Replay“ lädt sie in denselben Cursor wie
 einen frischen Lauf.

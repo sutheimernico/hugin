@@ -1,0 +1,9 @@
+{
+  "slug": "claude-research-brief",
+  "run_id": "74c3e05a0000",
+  "goal": "Erstelle ein Recherche-Briefing zu: Stand der Technik bei Agent-Betriebssystemen 2026 (AIOS, Letta, Claude Agent SDK) \u2014 5 Kernaussagen mit Quellen",
+  "driver": "claude",
+  "events": 848,
+  "duration_s": 231.4909749031067,
+  "exported_at": 1788665664.6153367
+}

@@ -1,0 +1,9 @@
+{
+  "slug": "ollama-scout-brief",
+  "run_id": "74ee6e450000",
+  "goal": "program:scout Recherchiere Vorteile und Grenzen lokaler KI-Modelle (Ollama) gegen\u00fcber gehosteten Modellen. Speichere 1\u20133 belastbare Fakten mit munin_write und schlie\u00dfe mit mission_report (max. 150 W\u00f6rter, Deutsch).",
+  "driver": "ollama",
+  "events": 462,
+  "duration_s": 242.02417039871216,
+  "exported_at": 1788671488.0540311
+}

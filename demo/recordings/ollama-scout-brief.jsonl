@@ -1,0 +1,462 @@
+{"seq":1,"ts":1788668177.9897947,"run_id":"74ee6e450000","pid":null,"kind":"run.created","data":{"goal":"program:scout Recherchiere Vorteile und Grenzen lokaler KI-Modelle (Ollama) gegenüber gehosteten Modellen. Speichere 1–3 belastbare Fakten mit munin_write und schließe mit mission_report (max. 150 Wörter, Deutsch).","driver":"ollama","template":null}}
+{"seq":2,"ts":1788668177.991297,"run_id":"74ee6e450000","pid":149,"kind":"proc.spawned","data":{"ppid":null,"program":"scout","role":"Researcher","driver":"ollama","model":"sonnet","budget":{"max_turns":12,"max_seconds":300,"max_output_tokens":6000},"task":"Recherchiere Vorteile und Grenzen lokaler KI-Modelle (Ollama) gegenüber gehosteten Modellen. Speichere 1–3 belastbare Fakten mit munin_write und schließe mit mission_report (max. 150 Wörter, Deutsch)."}}
+{"seq":3,"ts":1788668177.9916813,"run_id":"74ee6e450000","pid":149,"kind":"sched.blocked","data":{"reason":"driver ollama at concurrency limit","limit":3}}
+{"seq":4,"ts":1788668186.9717865,"run_id":"74ee6e450000","pid":149,"kind":"sched.started","data":{}}
+{"seq":5,"ts":1788668186.9719052,"run_id":"74ee6e450000","pid":149,"kind":"proc.state","data":{"state":"spawning","prev":"queued"}}
+{"seq":6,"ts":1788668186.9721177,"run_id":"74ee6e450000","pid":149,"kind":"proc.state","data":{"state":"running","prev":"spawning"}}
+{"seq":7,"ts":1788668187.974931,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":1.0030097961425781,"pct":0.0033433659871419273,"input_tokens":0}}
+{"seq":8,"ts":1788668188.9757261,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":2.003809928894043,"pct":0.00667936642964681,"input_tokens":0}}
+{"seq":9,"ts":1788668189.9765556,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":3.0046379566192627,"pct":0.010015459855397542,"input_tokens":0}}
+{"seq":10,"ts":1788668190.9765515,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":4.004631280899048,"pct":0.01334877093633016,"input_tokens":0}}
+{"seq":11,"ts":1788668191.9766812,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":5.004758358001709,"pct":0.016682527860005698,"input_tokens":0}}
+{"seq":12,"ts":1788668192.9781408,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":6.006217956542969,"pct":0.020020726521809896,"input_tokens":0}}
+{"seq":13,"ts":1788668193.9901474,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":7.018228054046631,"pct":0.02339409351348877,"input_tokens":0}}
+{"seq":14,"ts":1788668194.9911258,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":8.019203186035156,"pct":0.026730677286783855,"input_tokens":0}}
+{"seq":15,"ts":1788668195.991839,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":9.019920110702515,"pct":0.030066400369008383,"input_tokens":0}}
+{"seq":16,"ts":1788668196.992688,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":10.020771026611328,"pct":0.033402570088704425,"input_tokens":0}}
+{"seq":17,"ts":1788668197.9939094,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":11.02199673652649,"pct":0.03673998912175496,"input_tokens":0}}
+{"seq":18,"ts":1788668198.9951794,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":12.023262977600098,"pct":0.04007754325866699,"input_tokens":0}}
+{"seq":19,"ts":1788668199.9960444,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":13.024129390716553,"pct":0.043413764635721844,"input_tokens":0}}
+{"seq":20,"ts":1788668200.9968944,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":14.024973392486572,"pct":0.04674991130828857,"input_tokens":0}}
+{"seq":21,"ts":1788668201.9978554,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":15.025938987731934,"pct":0.05008646329243978,"input_tokens":0}}
+{"seq":22,"ts":1788668202.9987414,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":16.02682065963745,"pct":0.053422735532124836,"input_tokens":0}}
+{"seq":23,"ts":1788668203.9998856,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":17.027969121932983,"pct":0.056759897073109945,"input_tokens":0}}
+{"seq":24,"ts":1788668205.000386,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":18.028467655181885,"pct":0.06009489218393962,"input_tokens":0}}
+{"seq":25,"ts":1788668206.0011928,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":19.029273509979248,"pct":0.06343091169993083,"input_tokens":0}}
+{"seq":26,"ts":1788668207.0014517,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":20.029529333114624,"pct":0.06676509777704874,"input_tokens":0}}
+{"seq":27,"ts":1788668208.001646,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":21.029722929000854,"pct":0.07009907643000285,"input_tokens":0}}
+{"seq":28,"ts":1788668209.002918,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":22.03099822998047,"pct":0.07343666076660156,"input_tokens":0}}
+{"seq":29,"ts":1788668210.0043209,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":23.032398223876953,"pct":0.07677466074625651,"input_tokens":0}}
+{"seq":30,"ts":1788668211.0052276,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":24.033308744430542,"pct":0.08011102914810181,"input_tokens":0}}
+{"seq":31,"ts":1788668212.0054727,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":25.033552885055542,"pct":0.08344517628351847,"input_tokens":0}}
+{"seq":32,"ts":1788668213.0062203,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":26.034300327301025,"pct":0.08678100109100342,"input_tokens":0}}
+{"seq":33,"ts":1788668214.0071573,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":27.03524136543274,"pct":0.09011747121810913,"input_tokens":0}}
+{"seq":34,"ts":1788668215.0076423,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":28.035717487335205,"pct":0.09345239162445068,"input_tokens":0}}
+{"seq":35,"ts":1788668216.0091789,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":29.037257194519043,"pct":0.09679085731506348,"input_tokens":0}}
+{"seq":36,"ts":1788668217.010105,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":30.038186073303223,"pct":0.10012728691101075,"input_tokens":0}}
+{"seq":37,"ts":1788668218.0111399,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":31.039220094680786,"pct":0.10346406698226929,"input_tokens":0}}
+{"seq":38,"ts":1788668219.011487,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":32.03956866264343,"pct":0.10679856220881144,"input_tokens":0}}
+{"seq":39,"ts":1788668220.0115325,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":33.03961181640625,"pct":0.11013203938802084,"input_tokens":0}}
+{"seq":40,"ts":1788668221.0119524,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":34.040032625198364,"pct":0.11346677541732789,"input_tokens":0}}
+{"seq":41,"ts":1788668222.013132,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":35.04121232032776,"pct":0.1168040410677592,"input_tokens":0}}
+{"seq":42,"ts":1788668223.0134642,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":36.04154586791992,"pct":0.12013848622639973,"input_tokens":0}}
+{"seq":43,"ts":1788668224.0140002,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":37.04205536842346,"pct":0.12347351789474487,"input_tokens":0}}
+{"seq":44,"ts":1788668225.0149994,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":38.043081283569336,"pct":0.12681027094523112,"input_tokens":0}}
+{"seq":45,"ts":1788668226.0154877,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":39.043567419052124,"pct":0.13014522473017376,"input_tokens":0}}
+{"seq":46,"ts":1788668227.0161288,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":40.044211626052856,"pct":0.13348070542017618,"input_tokens":0}}
+{"seq":47,"ts":1788668228.0169725,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":41.045058250427246,"pct":0.1368168608347575,"input_tokens":0}}
+{"seq":48,"ts":1788668229.0172744,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":42.0453565120697,"pct":0.14015118837356566,"input_tokens":0}}
+{"seq":49,"ts":1788668230.0173793,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":43.04546618461609,"pct":0.14348488728205364,"input_tokens":0}}
+{"seq":50,"ts":1788668231.0177274,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":44.04581308364868,"pct":0.1468193769454956,"input_tokens":0}}
+{"seq":51,"ts":1788668232.0192082,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":45.047287702560425,"pct":0.1501576256752014,"input_tokens":0}}
+{"seq":52,"ts":1788668233.0198996,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":46.04797554016113,"pct":0.1534932518005371,"input_tokens":0}}
+{"seq":53,"ts":1788668234.0207195,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":47.04880404472351,"pct":0.15682934681574504,"input_tokens":0}}
+{"seq":54,"ts":1788668235.0219195,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":48.04999828338623,"pct":0.16016666094462076,"input_tokens":0}}
+{"seq":55,"ts":1788668236.0229447,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":49.051023960113525,"pct":0.16350341320037842,"input_tokens":0}}
+{"seq":56,"ts":1788668237.0237694,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":50.05184030532837,"pct":0.1668394676844279,"input_tokens":0}}
+{"seq":57,"ts":1788668238.0247602,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":51.05283975601196,"pct":0.17017613252003988,"input_tokens":0}}
+{"seq":58,"ts":1788668239.025759,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":52.05384111404419,"pct":0.17351280371348063,"input_tokens":0}}
+{"seq":59,"ts":1788668240.0265539,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":53.05462694168091,"pct":0.1768487564722697,"input_tokens":0}}
+{"seq":60,"ts":1788668241.0265493,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":54.054627418518066,"pct":0.18018209139506022,"input_tokens":0}}
+{"seq":61,"ts":1788668242.027089,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":55.055163621902466,"pct":0.18351721207300822,"input_tokens":0}}
+{"seq":62,"ts":1788668243.0281355,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":56.05621886253357,"pct":0.1868540628751119,"input_tokens":0}}
+{"seq":63,"ts":1788668244.0291536,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":57.057230949401855,"pct":0.1901907698313395,"input_tokens":0}}
+{"seq":64,"ts":1788668245.029546,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":58.05762481689453,"pct":0.1935254160563151,"input_tokens":0}}
+{"seq":65,"ts":1788668246.0294027,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":59.05747699737549,"pct":0.19685825665791828,"input_tokens":0}}
+{"seq":66,"ts":1788668247.0293016,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":60.057384729385376,"pct":0.2001912824312846,"input_tokens":0}}
+{"seq":67,"ts":1788668248.0301373,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":61.05821132659912,"pct":0.20352737108866373,"input_tokens":0}}
+{"seq":68,"ts":1788668249.0313537,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":62.05943298339844,"pct":0.20686477661132813,"input_tokens":0}}
+{"seq":69,"ts":1788668250.0318315,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":63.059911012649536,"pct":0.21019970337549845,"input_tokens":0}}
+{"seq":70,"ts":1788668251.0324695,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":64.06055068969727,"pct":0.21353516896565755,"input_tokens":0}}
+{"seq":71,"ts":1788668252.03271,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":65.06078839302063,"pct":0.2168692946434021,"input_tokens":0}}
+{"seq":72,"ts":1788668253.034121,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":66.0621988773346,"pct":0.2202073295911153,"input_tokens":0}}
+{"seq":73,"ts":1788668254.0351188,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":67.06319546699524,"pct":0.22354398488998414,"input_tokens":0}}
+{"seq":74,"ts":1788668255.0359802,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":68.06406283378601,"pct":0.22688020944595336,"input_tokens":0}}
+{"seq":75,"ts":1788668256.0372634,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":69.06534337997437,"pct":0.23021781126658122,"input_tokens":0}}
+{"seq":76,"ts":1788668257.0372977,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":70.0653772354126,"pct":0.23355125745137534,"input_tokens":0}}
+{"seq":77,"ts":1788668258.037397,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":71.06547927856445,"pct":0.23688493092854818,"input_tokens":0}}
+{"seq":78,"ts":1788668259.0380666,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":72.06613874435425,"pct":0.2402204624811808,"input_tokens":0}}
+{"seq":79,"ts":1788668260.038717,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":73.06679606437683,"pct":0.2435559868812561,"input_tokens":0}}
+{"seq":80,"ts":1788668261.0393713,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":74.0674524307251,"pct":0.246891508102417,"input_tokens":0}}
+{"seq":81,"ts":1788668262.040078,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":75.06815075874329,"pct":0.25022716919581095,"input_tokens":0}}
+{"seq":82,"ts":1788668263.0407748,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":76.06885600090027,"pct":0.2535628533363342,"input_tokens":0}}
+{"seq":83,"ts":1788668264.0420861,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":77.07016634941101,"pct":0.2569005544980367,"input_tokens":0}}
+{"seq":84,"ts":1788668265.0430257,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":78.07110071182251,"pct":0.2602370023727417,"input_tokens":0}}
+{"seq":85,"ts":1788668266.0442843,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":79.07236123085022,"pct":0.2635745374361674,"input_tokens":0}}
+{"seq":86,"ts":1788668267.0451226,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":80.0731930732727,"pct":0.26691064357757566,"input_tokens":0}}
+{"seq":87,"ts":1788668268.0461614,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":81.07423377037048,"pct":0.27024744590123495,"input_tokens":0}}
+{"seq":88,"ts":1788668269.0470705,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":82.07514905929565,"pct":0.2735838301976522,"input_tokens":0}}
+{"seq":89,"ts":1788668270.0478735,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":83.07595372200012,"pct":0.2769198457400004,"input_tokens":0}}
+{"seq":90,"ts":1788668271.0488927,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":84.07696604728699,"pct":0.28025655349095663,"input_tokens":0}}
+{"seq":91,"ts":1788668272.0497823,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":85.07786083221436,"pct":0.28359286944071455,"input_tokens":0}}
+{"seq":92,"ts":1788668273.0504618,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":86.07854223251343,"pct":0.2869284741083781,"input_tokens":0}}
+{"seq":93,"ts":1788668274.050706,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":87.07878851890564,"pct":0.29026262839635214,"input_tokens":0}}
+{"seq":94,"ts":1788668275.051583,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":88.07966375350952,"pct":0.2935988791783651,"input_tokens":0}}
+{"seq":95,"ts":1788668276.0522442,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":89.08032488822937,"pct":0.2969344162940979,"input_tokens":0}}
+{"seq":96,"ts":1788668277.0528746,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":90.08095645904541,"pct":0.3002698548634847,"input_tokens":0}}
+{"seq":97,"ts":1788668278.053794,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":91.08187317848206,"pct":0.3036062439282735,"input_tokens":0}}
+{"seq":98,"ts":1788668279.0544412,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":92.08252334594727,"pct":0.30694174448649086,"input_tokens":0}}
+{"seq":99,"ts":1788668280.055008,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":93.08308720588684,"pct":0.31027695735295613,"input_tokens":0}}
+{"seq":100,"ts":1788668281.0556307,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":94.08370804786682,"pct":0.31361236015955607,"input_tokens":0}}
+{"seq":101,"ts":1788668282.056257,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":95.08433723449707,"pct":0.3169477907816569,"input_tokens":0}}
+{"seq":102,"ts":1788668283.0567737,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":96.08485794067383,"pct":0.3202828598022461,"input_tokens":0}}
+{"seq":103,"ts":1788668284.0582457,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":97.08632588386536,"pct":0.32362108627955116,"input_tokens":0}}
+{"seq":104,"ts":1788668285.0588603,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":98.08693885803223,"pct":0.32695646286010743,"input_tokens":0}}
+{"seq":105,"ts":1788668286.059549,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":99.08763003349304,"pct":0.33029210011164345,"input_tokens":0}}
+{"seq":106,"ts":1788668287.0601428,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":100.08822083473206,"pct":0.3336274027824402,"input_tokens":0}}
+{"seq":107,"ts":1788668288.061109,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":101.08918857574463,"pct":0.33696396191914874,"input_tokens":0}}
+{"seq":108,"ts":1788668289.0618563,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":102.08994007110596,"pct":0.34029980023701983,"input_tokens":0}}
+{"seq":109,"ts":1788668290.0628178,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":103.09089732170105,"pct":0.34363632440567016,"input_tokens":0}}
+{"seq":110,"ts":1788668291.0632992,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":104.09138417243958,"pct":0.3469712805747986,"input_tokens":0}}
+{"seq":111,"ts":1788668292.0637758,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":105.09185743331909,"pct":0.35030619144439695,"input_tokens":0}}
+{"seq":112,"ts":1788668293.0646698,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":106.09274768829346,"pct":0.35364249229431155,"input_tokens":0}}
+{"seq":113,"ts":1788668294.065443,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":107.0935206413269,"pct":0.35697840213775633,"input_tokens":0}}
+{"seq":114,"ts":1788668295.0662193,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":108.0943021774292,"pct":0.36031434059143064,"input_tokens":0}}
+{"seq":115,"ts":1788668296.0668144,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":109.09489583969116,"pct":0.36364965279897055,"input_tokens":0}}
+{"seq":116,"ts":1788668297.0675128,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":110.09559154510498,"pct":0.36698530515034994,"input_tokens":0}}
+{"seq":117,"ts":1788668298.0675159,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":111.0956060886383,"pct":0.37031868696212766,"input_tokens":0}}
+{"seq":118,"ts":1788668299.0674772,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":112.0955548286438,"pct":0.3736518494288127,"input_tokens":0}}
+{"seq":119,"ts":1788668300.0678926,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":113.09597516059875,"pct":0.3769865838686625,"input_tokens":0}}
+{"seq":120,"ts":1788668301.0685256,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":114.09660410881042,"pct":0.38032201369603474,"input_tokens":0}}
+{"seq":121,"ts":1788668302.0691977,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":115.09727478027344,"pct":0.3836575826009115,"input_tokens":0}}
+{"seq":122,"ts":1788668303.069932,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":116.09801077842712,"pct":0.38699336926142375,"input_tokens":0}}
+{"seq":123,"ts":1788668304.0710325,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":117.09911227226257,"pct":0.39033037424087524,"input_tokens":0}}
+{"seq":124,"ts":1788668305.0718307,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":118.09990978240967,"pct":0.39366636594136556,"input_tokens":0}}
+{"seq":125,"ts":1788668306.0726802,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":119.10076355934143,"pct":0.39700254519780476,"input_tokens":0}}
+{"seq":126,"ts":1788668307.0739665,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":120.10204458236694,"pct":0.4003401486078898,"input_tokens":0}}
+{"seq":127,"ts":1788668308.0748303,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":121.10290861129761,"pct":0.40367636203765866,"input_tokens":0}}
+{"seq":128,"ts":1788668309.0756216,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":122.10369920730591,"pct":0.4070123306910197,"input_tokens":0}}
+{"seq":129,"ts":1788668310.0774562,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":123.10553407669067,"pct":0.41035178025563557,"input_tokens":0}}
+{"seq":130,"ts":1788668311.0787551,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":124.10683035850525,"pct":0.41368943452835083,"input_tokens":0}}
+{"seq":131,"ts":1788668312.0795176,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":125.10759615898132,"pct":0.41702532052993774,"input_tokens":0}}
+{"seq":132,"ts":1788668313.079392,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":126.10747456550598,"pct":0.42035824855168663,"input_tokens":0}}
+{"seq":133,"ts":1788668314.0800238,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":127.10810375213623,"pct":0.4236936791737874,"input_tokens":0}}
+{"seq":134,"ts":1788668315.0809977,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":128.1090772151947,"pct":0.4270302573839823,"input_tokens":0}}
+{"seq":135,"ts":1788668316.082169,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":129.11024594306946,"pct":0.4303674864768982,"input_tokens":0}}
+{"seq":136,"ts":1788668317.0829556,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":130.11103534698486,"pct":0.43370345115661624,"input_tokens":0}}
+{"seq":137,"ts":1788668318.0841866,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":131.11226892471313,"pct":0.4370408964157104,"input_tokens":0}}
+{"seq":138,"ts":1788668319.0845501,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":132.11263155937195,"pct":0.44037543853123984,"input_tokens":0}}
+{"seq":139,"ts":1788668320.0843658,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":133.11244416236877,"pct":0.4437081472078959,"input_tokens":0}}
+{"seq":140,"ts":1788668321.0843475,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":134.11242389678955,"pct":0.4470414129892985,"input_tokens":0}}
+{"seq":141,"ts":1788668322.085053,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":135.11313009262085,"pct":0.4503771003087362,"input_tokens":0}}
+{"seq":142,"ts":1788668322.2044604,"run_id":"74ee6e450000","pid":149,"kind":"proc.state","data":{"state":"waiting_tool","prev":"running"}}
+{"seq":143,"ts":1788668322.2046223,"run_id":"74ee6e450000","pid":149,"kind":"sys.call","data":{"call_id":"sys15","syscall":"munin_search","args_summary":"query=Ollama lokale KI-Modelle Vorteile Grenzen gehostete Modellen"}}
+{"seq":144,"ts":1788668322.2050817,"run_id":"74ee6e450000","pid":149,"kind":"munin.read","data":{"query":"Ollama lokale KI-Modelle Vorteile Grenzen gehostete Modellen","hits":0}}
+{"seq":145,"ts":1788668322.2051504,"run_id":"74ee6e450000","pid":149,"kind":"sys.result","data":{"call_id":"sys15","ok":true,"result_summary":"hits=[]","ms":0}}
+{"seq":146,"ts":1788668322.2052007,"run_id":"74ee6e450000","pid":149,"kind":"proc.state","data":{"state":"running","prev":"waiting_tool"}}
+{"seq":147,"ts":1788668322.2052374,"run_id":"74ee6e450000","pid":149,"kind":"proc.state","data":{"state":"waiting_tool","prev":"running"}}
+{"seq":148,"ts":1788668322.2052755,"run_id":"74ee6e450000","pid":149,"kind":"sys.call","data":{"call_id":"sys16","syscall":"munin_write","args_summary":"tags=['Ollama', 'KI-Modelle', 'Datenschutz', 'Leistung'], title=Vorteile und Grenzen lokaler Ollama-KI-Modell gegenüber gehosteten Modellen, body=Lokale KI-Mode"}}
+{"seq":149,"ts":1788668322.2056234,"run_id":"74ee6e450000","pid":149,"kind":"munin.write","data":{"memory_id":350,"title":"Vorteile und Grenzen lokaler Ollama-KI-Modell gegenüber gehosteten Modellen"}}
+{"seq":150,"ts":1788668322.205751,"run_id":"74ee6e450000","pid":149,"kind":"sys.result","data":{"call_id":"sys16","ok":true,"result_summary":"id=350","ms":0}}
+{"seq":151,"ts":1788668322.205802,"run_id":"74ee6e450000","pid":149,"kind":"proc.state","data":{"state":"running","prev":"waiting_tool"}}
+{"seq":152,"ts":1788668323.085543,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":1,"output_tokens":376,"seconds":136.11362266540527,"pct":0.4537120755513509,"input_tokens":1113}}
+{"seq":153,"ts":1788668324.0859337,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":1,"output_tokens":376,"seconds":137.11394882202148,"pct":0.457046496073405,"input_tokens":1113}}
+{"seq":154,"ts":1788668325.0868332,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":1,"output_tokens":376,"seconds":138.1149125099182,"pct":0.4603830416997274,"input_tokens":1113}}
+{"seq":155,"ts":1788668326.087429,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":1,"output_tokens":376,"seconds":139.1155092716217,"pct":0.463718364238739,"input_tokens":1113}}
+{"seq":156,"ts":1788668327.0881488,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":1,"output_tokens":376,"seconds":140.116224527359,"pct":0.46705408175786334,"input_tokens":1113}}
+{"seq":157,"ts":1788668328.0889735,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":1,"output_tokens":376,"seconds":141.1170527935028,"pct":0.4703901759783427,"input_tokens":1113}}
+{"seq":158,"ts":1788668329.090113,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":1,"output_tokens":376,"seconds":142.1181936264038,"pct":0.4737273120880127,"input_tokens":1113}}
+{"seq":159,"ts":1788668330.0914314,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":1,"output_tokens":376,"seconds":143.11951231956482,"pct":0.4770650410652161,"input_tokens":1113}}
+{"seq":160,"ts":1788668331.0923002,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":1,"output_tokens":376,"seconds":144.12037825584412,"pct":0.4804012608528137,"input_tokens":1113}}
+{"seq":161,"ts":1788668332.0930228,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":1,"output_tokens":376,"seconds":145.1211040019989,"pct":0.48373701333999636,"input_tokens":1113}}
+{"seq":162,"ts":1788668333.0935717,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":1,"output_tokens":376,"seconds":146.12165594100952,"pct":0.48707218647003175,"input_tokens":1113}}
+{"seq":163,"ts":1788668334.0937338,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":1,"output_tokens":376,"seconds":147.12180924415588,"pct":0.4904060308138529,"input_tokens":1113}}
+{"seq":164,"ts":1788668335.0950823,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":1,"output_tokens":376,"seconds":148.12316036224365,"pct":0.4937438678741455,"input_tokens":1113}}
+{"seq":165,"ts":1788668336.095749,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":1,"output_tokens":376,"seconds":149.12383723258972,"pct":0.49707945744196574,"input_tokens":1113}}
+{"seq":166,"ts":1788668337.0970292,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":1,"output_tokens":376,"seconds":150.1251139640808,"pct":0.5004170465469361,"input_tokens":1113}}
+{"seq":167,"ts":1788668338.097742,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":1,"output_tokens":376,"seconds":151.12582159042358,"pct":0.5037527386347452,"input_tokens":1113}}
+{"seq":168,"ts":1788668339.0984864,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":1,"output_tokens":376,"seconds":152.12656617164612,"pct":0.507088553905487,"input_tokens":1113}}
+{"seq":169,"ts":1788668340.0993261,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":1,"output_tokens":376,"seconds":153.1274037361145,"pct":0.5104246791203817,"input_tokens":1113}}
+{"seq":170,"ts":1788668341.0994153,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":1,"output_tokens":376,"seconds":154.1274962425232,"pct":0.5137583208084107,"input_tokens":1113}}
+{"seq":171,"ts":1788668342.1001537,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":1,"output_tokens":376,"seconds":155.12823486328125,"pct":0.5170941162109375,"input_tokens":1113}}
+{"seq":172,"ts":1788668343.1002905,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":1,"output_tokens":376,"seconds":156.12837290763855,"pct":0.5204279096921285,"input_tokens":1113}}
+{"seq":173,"ts":1788668344.1011908,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":1,"output_tokens":376,"seconds":157.12927174568176,"pct":0.5237642391522725,"input_tokens":1113}}
+{"seq":174,"ts":1788668345.1021023,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":1,"output_tokens":376,"seconds":158.13018035888672,"pct":0.5271006011962891,"input_tokens":1113}}
+{"seq":175,"ts":1788668346.1028218,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":1,"output_tokens":376,"seconds":159.13090300559998,"pct":0.530436343352,"input_tokens":1113}}
+{"seq":176,"ts":1788668347.1043043,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":1,"output_tokens":376,"seconds":160.13238334655762,"pct":0.5337746111551921,"input_tokens":1113}}
+{"seq":177,"ts":1788668348.1050763,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":1,"output_tokens":376,"seconds":161.13313937187195,"pct":0.5371104645729065,"input_tokens":1113}}
+{"seq":178,"ts":1788668349.1055665,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":1,"output_tokens":376,"seconds":162.13364434242249,"pct":0.5404454811414083,"input_tokens":1113}}
+{"seq":179,"ts":1788668350.105331,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":1,"output_tokens":376,"seconds":163.13341069221497,"pct":0.5437780356407166,"input_tokens":1113}}
+{"seq":180,"ts":1788668351.1061294,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":1,"output_tokens":376,"seconds":164.13420963287354,"pct":0.5471140321095784,"input_tokens":1113}}
+{"seq":181,"ts":1788668352.106834,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":1,"output_tokens":376,"seconds":165.13491582870483,"pct":0.5504497194290161,"input_tokens":1113}}
+{"seq":182,"ts":1788668353.1074264,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":1,"output_tokens":376,"seconds":166.13550972938538,"pct":0.5537850324312846,"input_tokens":1113}}
+{"seq":183,"ts":1788668354.1081514,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":1,"output_tokens":376,"seconds":167.13622975349426,"pct":0.5571207658449808,"input_tokens":1113}}
+{"seq":184,"ts":1788668355.1087852,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":1,"output_tokens":376,"seconds":168.13685989379883,"pct":0.5604561996459961,"input_tokens":1113}}
+{"seq":185,"ts":1788668356.1095223,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":1,"output_tokens":376,"seconds":169.13760614395142,"pct":0.563792020479838,"input_tokens":1113}}
+{"seq":186,"ts":1788668357.1094837,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":1,"output_tokens":376,"seconds":170.1375596523285,"pct":0.567125198841095,"input_tokens":1113}}
+{"seq":187,"ts":1788668358.110039,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":1,"output_tokens":376,"seconds":171.1381163597107,"pct":0.5704603878657023,"input_tokens":1113}}
+{"seq":188,"ts":1788668359.1102169,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":1,"output_tokens":376,"seconds":172.1383032798767,"pct":0.5737943442662558,"input_tokens":1113}}
+{"seq":189,"ts":1788668360.110262,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":1,"output_tokens":376,"seconds":173.13835096359253,"pct":0.5771278365453084,"input_tokens":1113}}
+{"seq":190,"ts":1788668361.110504,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":1,"output_tokens":376,"seconds":174.1385841369629,"pct":0.5804619471232096,"input_tokens":1113}}
+{"seq":191,"ts":1788668362.1110067,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":1,"output_tokens":376,"seconds":175.13908505439758,"pct":0.5837969501813253,"input_tokens":1113}}
+{"seq":192,"ts":1788668363.111497,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":1,"output_tokens":376,"seconds":176.13957858085632,"pct":0.5871319286028545,"input_tokens":1113}}
+{"seq":193,"ts":1788668363.4236434,"run_id":"74ee6e450000","pid":149,"kind":"proc.state","data":{"state":"waiting_tool","prev":"running"}}
+{"seq":194,"ts":1788668363.4237978,"run_id":"74ee6e450000","pid":149,"kind":"sys.call","data":{"call_id":"sys17","syscall":"munin_search","args_summary":"query=Ollama lokale KI-Modelle Vorteile Grenzen gehostete Modellen, limit=1"}}
+{"seq":195,"ts":1788668363.4244704,"run_id":"74ee6e450000","pid":149,"kind":"munin.read","data":{"query":"Ollama lokale KI-Modelle Vorteile Grenzen gehostete Modellen","hits":1}}
+{"seq":196,"ts":1788668363.4246664,"run_id":"74ee6e450000","pid":149,"kind":"sys.result","data":{"call_id":"sys17","ok":true,"result_summary":"hits=[{'id': 350, 'title': 'Vorteile und Grenzen lokaler Ollama-KI-Modell gegenüber gehosteten Modellen', 'body': 'Lokale KI-Modelle wie Ollama bieten schnelle ","ms":0}}
+{"seq":197,"ts":1788668363.4247391,"run_id":"74ee6e450000","pid":149,"kind":"proc.state","data":{"state":"running","prev":"waiting_tool"}}
+{"seq":198,"ts":1788668363.4247801,"run_id":"74ee6e450000","pid":149,"kind":"proc.state","data":{"state":"waiting_tool","prev":"running"}}
+{"seq":199,"ts":1788668363.4248269,"run_id":"74ee6e450000","pid":149,"kind":"sys.call","data":{"call_id":"sys18","syscall":"munin_write","args_summary":"body=Lokale KI-Modelle wie Ollama bieten schnelle Antwortzeiten und höhere Datenschutzgarantien. Allerdings sind sie von der Leistung des lokalen Systems abhäng"}}
+{"seq":200,"ts":1788668363.4253018,"run_id":"74ee6e450000","pid":149,"kind":"munin.write","data":{"memory_id":351,"title":"Vorteile und Grenzen lokaler Ollama-KI-Modell gegenüber gehosteten Modellen"}}
+{"seq":201,"ts":1788668363.425368,"run_id":"74ee6e450000","pid":149,"kind":"sys.result","data":{"call_id":"sys18","ok":true,"result_summary":"id=351","ms":0}}
+{"seq":202,"ts":1788668363.4254313,"run_id":"74ee6e450000","pid":149,"kind":"proc.state","data":{"state":"running","prev":"waiting_tool"}}
+{"seq":203,"ts":1788668363.4254804,"run_id":"74ee6e450000","pid":149,"kind":"proc.state","data":{"state":"waiting_tool","prev":"running"}}
+{"seq":204,"ts":1788668363.425519,"run_id":"74ee6e450000","pid":149,"kind":"sys.call","data":{"call_id":"sys19","syscall":"mission_report","args_summary":"summary=Lokale KI-Modelle wie Ollama bieten schnelle Antwortzeiten und höhere Datenschutzgarantien, sind aber von der Leistung des lokalen Systems abhängig. Geh"}}
+{"seq":205,"ts":1788668363.42557,"run_id":"74ee6e450000","pid":149,"kind":"sys.result","data":{"call_id":"sys19","ok":true,"result_summary":"ok=True","ms":0}}
+{"seq":206,"ts":1788668363.4256082,"run_id":"74ee6e450000","pid":149,"kind":"proc.state","data":{"state":"running","prev":"waiting_tool"}}
+{"seq":207,"ts":1788668364.1118884,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":2,"output_tokens":641,"seconds":177.13996529579163,"pct":0.5904665509859721,"input_tokens":1341}}
+{"seq":208,"ts":1788668365.1126063,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":2,"output_tokens":641,"seconds":178.1406855583191,"pct":0.5938022851943969,"input_tokens":1341}}
+{"seq":209,"ts":1788668366.1139655,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":2,"output_tokens":641,"seconds":179.14204335212708,"pct":0.5971401445070903,"input_tokens":1341}}
+{"seq":210,"ts":1788668367.115239,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":2,"output_tokens":641,"seconds":180.1433186531067,"pct":0.600477728843689,"input_tokens":1341}}
+{"seq":211,"ts":1788668368.116076,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":2,"output_tokens":641,"seconds":181.14415168762207,"pct":0.6038138389587402,"input_tokens":1341}}
+{"seq":212,"ts":1788668369.1166322,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":2,"output_tokens":641,"seconds":182.1447196006775,"pct":0.6071490653355917,"input_tokens":1341}}
+{"seq":213,"ts":1788668370.1168358,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":2,"output_tokens":641,"seconds":183.1449191570282,"pct":0.6104830638567607,"input_tokens":1341}}
+{"seq":214,"ts":1788668371.1179967,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":2,"output_tokens":641,"seconds":184.1460452079773,"pct":0.6138201506932577,"input_tokens":1341}}
+{"seq":215,"ts":1788668372.118826,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":2,"output_tokens":641,"seconds":185.14690375328064,"pct":0.6171563458442688,"input_tokens":1341}}
+{"seq":216,"ts":1788668373.1198483,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":2,"output_tokens":641,"seconds":186.14793825149536,"pct":0.6204931275049845,"input_tokens":1341}}
+{"seq":217,"ts":1788668374.1207306,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":2,"output_tokens":641,"seconds":187.14880847930908,"pct":0.623829361597697,"input_tokens":1341}}
+{"seq":218,"ts":1788668375.121632,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":2,"output_tokens":641,"seconds":188.14971041679382,"pct":0.6271657013893127,"input_tokens":1341}}
+{"seq":219,"ts":1788668376.1213381,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":2,"output_tokens":641,"seconds":189.1494164466858,"pct":0.6304980548222859,"input_tokens":1341}}
+{"seq":220,"ts":1788668377.1219318,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":2,"output_tokens":641,"seconds":190.15001153945923,"pct":0.6338333717981974,"input_tokens":1341}}
+{"seq":221,"ts":1788668378.1226969,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":2,"output_tokens":641,"seconds":191.15077567100525,"pct":0.6371692522366842,"input_tokens":1341}}
+{"seq":222,"ts":1788668379.1233692,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":2,"output_tokens":641,"seconds":192.15144896507263,"pct":0.6405048298835755,"input_tokens":1341}}
+{"seq":223,"ts":1788668380.1238732,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":2,"output_tokens":641,"seconds":193.15195608139038,"pct":0.6438398536046346,"input_tokens":1341}}
+{"seq":224,"ts":1788668381.1247172,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":2,"output_tokens":641,"seconds":194.15279984474182,"pct":0.6471759994824727,"input_tokens":1341}}
+{"seq":225,"ts":1788668382.125502,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":2,"output_tokens":641,"seconds":195.15358877182007,"pct":0.6505119625727336,"input_tokens":1341}}
+{"seq":226,"ts":1788668383.1255975,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":2,"output_tokens":641,"seconds":196.15367531776428,"pct":0.6538455843925476,"input_tokens":1341}}
+{"seq":227,"ts":1788668384.1257637,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":2,"output_tokens":641,"seconds":197.15384316444397,"pct":0.6571794772148132,"input_tokens":1341}}
+{"seq":228,"ts":1788668385.1269565,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":2,"output_tokens":641,"seconds":198.15503478050232,"pct":0.6605167826016743,"input_tokens":1341}}
+{"seq":229,"ts":1788668386.1290753,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":2,"output_tokens":641,"seconds":199.1571524143219,"pct":0.6638571747144063,"input_tokens":1341}}
+{"seq":230,"ts":1788668387.1294847,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":2,"output_tokens":641,"seconds":200.15756750106812,"pct":0.6671918916702271,"input_tokens":1341}}
+{"seq":231,"ts":1788668388.1296215,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":2,"output_tokens":641,"seconds":201.15769743919373,"pct":0.6705256581306458,"input_tokens":1341}}
+{"seq":232,"ts":1788668389.1305172,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":2,"output_tokens":641,"seconds":202.15859818458557,"pct":0.6738619939486186,"input_tokens":1341}}
+{"seq":233,"ts":1788668390.1308439,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":2,"output_tokens":641,"seconds":203.1589207649231,"pct":0.6771964025497437,"input_tokens":1341}}
+{"seq":234,"ts":1788668391.1316216,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":2,"output_tokens":641,"seconds":204.15970993041992,"pct":0.680532366434733,"input_tokens":1341}}
+{"seq":235,"ts":1788668392.1318877,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":2,"output_tokens":641,"seconds":205.15996980667114,"pct":0.6838665660222372,"input_tokens":1341}}
+{"seq":236,"ts":1788668393.1326528,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":2,"output_tokens":641,"seconds":206.16073393821716,"pct":0.6872024464607239,"input_tokens":1341}}
+{"seq":237,"ts":1788668394.1342227,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":2,"output_tokens":641,"seconds":207.16229891777039,"pct":0.6905409963925679,"input_tokens":1341}}
+{"seq":238,"ts":1788668394.1744108,"run_id":"74ee6e450000","pid":149,"kind":"proc.state","data":{"state":"waiting_tool","prev":"running"}}
+{"seq":239,"ts":1788668394.174577,"run_id":"74ee6e450000","pid":149,"kind":"sys.call","data":{"call_id":"sys20","syscall":"mission_report","args_summary":"summary=Lokale KI-Modelle wie Ollama bieten schnelle Antwortzeiten und höhere Datenschutzgarantien, sind aber von der Leistung des lokalen Systems abhängig. Geh"}}
+{"seq":240,"ts":1788668394.1746488,"run_id":"74ee6e450000","pid":149,"kind":"sys.result","data":{"call_id":"sys20","ok":true,"result_summary":"ok=True","ms":0}}
+{"seq":241,"ts":1788668394.1746993,"run_id":"74ee6e450000","pid":149,"kind":"proc.state","data":{"state":"running","prev":"waiting_tool"}}
+{"seq":242,"ts":1788668395.1352105,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":3,"output_tokens":720,"seconds":208.16328382492065,"pct":0.6938776127497355,"input_tokens":1824}}
+{"seq":243,"ts":1788668395.7566333,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"mission"}}
+{"seq":244,"ts":1788668395.8795178,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"_report"}}
+{"seq":245,"ts":1788668396.001643,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":":"}}
+{"seq":246,"ts":1788668396.122,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" Lok"}}
+{"seq":247,"ts":1788668396.1357796,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":3,"output_tokens":720,"seconds":209.1638593673706,"pct":0.697212864557902,"input_tokens":1824}}
+{"seq":248,"ts":1788668396.2397754,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"ale"}}
+{"seq":249,"ts":1788668396.3633726,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" K"}}
+{"seq":250,"ts":1788668396.4807026,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"I"}}
+{"seq":251,"ts":1788668396.6066828,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"-"}}
+{"seq":252,"ts":1788668396.7305415,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"Model"}}
+{"seq":253,"ts":1788668396.8586516,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"le"}}
+{"seq":254,"ts":1788668396.979735,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" wie"}}
+{"seq":255,"ts":1788668397.1016905,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" O"}}
+{"seq":256,"ts":1788668397.1363513,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":3,"output_tokens":720,"seconds":210.16443133354187,"pct":0.7005481044451396,"input_tokens":1824}}
+{"seq":257,"ts":1788668397.2171767,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"ll"}}
+{"seq":258,"ts":1788668397.3361175,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"ama"}}
+{"seq":259,"ts":1788668397.4542613,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" bieten"}}
+{"seq":260,"ts":1788668397.5716605,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" schn"}}
+{"seq":261,"ts":1788668397.6993573,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"elle"}}
+{"seq":262,"ts":1788668397.8251095,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" Antwort"}}
+{"seq":263,"ts":1788668397.9470491,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"ze"}}
+{"seq":264,"ts":1788668398.0699298,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"iten"}}
+{"seq":265,"ts":1788668398.1370728,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":3,"output_tokens":720,"seconds":211.16515278816223,"pct":0.7038838426272075,"input_tokens":1824}}
+{"seq":266,"ts":1788668398.1861112,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" und"}}
+{"seq":267,"ts":1788668398.30438,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" hö"}}
+{"seq":268,"ts":1788668398.4241288,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"here"}}
+{"seq":269,"ts":1788668398.5487614,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" Datensch"}}
+{"seq":270,"ts":1788668398.67304,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"utz"}}
+{"seq":271,"ts":1788668398.795965,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"gar"}}
+{"seq":272,"ts":1788668398.9144394,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"ant"}}
+{"seq":273,"ts":1788668399.0405862,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"ien"}}
+{"seq":274,"ts":1788668399.1375582,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":3,"output_tokens":720,"seconds":212.16563987731934,"pct":0.7072187995910645,"input_tokens":1824}}
+{"seq":275,"ts":1788668399.1683993,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":","}}
+{"seq":276,"ts":1788668399.2856305,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" sind"}}
+{"seq":277,"ts":1788668399.40655,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" aber"}}
+{"seq":278,"ts":1788668399.5243175,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" von"}}
+{"seq":279,"ts":1788668399.6452272,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" der"}}
+{"seq":280,"ts":1788668399.7701752,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" Le"}}
+{"seq":281,"ts":1788668399.8947709,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"istung"}}
+{"seq":282,"ts":1788668400.0137336,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" des"}}
+{"seq":283,"ts":1788668400.1376193,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":3,"output_tokens":720,"seconds":213.16570830345154,"pct":0.7105523610115051,"input_tokens":1824}}
+{"seq":284,"ts":1788668400.1398356,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" lok"}}
+{"seq":285,"ts":1788668400.2607944,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"alen"}}
+{"seq":286,"ts":1788668400.3841715,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" Systems"}}
+{"seq":287,"ts":1788668400.5047455,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" ab"}}
+{"seq":288,"ts":1788668400.6262105,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"h"}}
+{"seq":289,"ts":1788668400.7515874,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"äng"}}
+{"seq":290,"ts":1788668400.8780425,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"ig"}}
+{"seq":291,"ts":1788668401.0010638,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"."}}
+{"seq":292,"ts":1788668401.122768,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" Geh"}}
+{"seq":293,"ts":1788668401.137384,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":3,"output_tokens":720,"seconds":214.16546773910522,"pct":0.713884892463684,"input_tokens":1824}}
+{"seq":294,"ts":1788668401.2451582,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"ost"}}
+{"seq":295,"ts":1788668401.3690593,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"ete"}}
+{"seq":296,"ts":1788668401.4919062,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" Model"}}
+{"seq":297,"ts":1788668401.6134117,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"le"}}
+{"seq":298,"ts":1788668401.7389815,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" haben"}}
+{"seq":299,"ts":1788668401.863406,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" mehr"}}
+{"seq":300,"ts":1788668401.9918914,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" Re"}}
+{"seq":301,"ts":1788668402.122169,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"chen"}}
+{"seq":302,"ts":1788668402.137935,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":3,"output_tokens":720,"seconds":215.16601467132568,"pct":0.7172200489044189,"input_tokens":1824}}
+{"seq":303,"ts":1788668402.247996,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"kap"}}
+{"seq":304,"ts":1788668402.3713205,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"az"}}
+{"seq":305,"ts":1788668402.4925158,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"ität"}}
+{"seq":306,"ts":1788668402.6182125,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" und"}}
+{"seq":307,"ts":1788668402.7441592,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" b"}}
+{"seq":308,"ts":1788668402.872219,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"ess"}}
+{"seq":309,"ts":1788668402.9913096,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"ere"}}
+{"seq":310,"ts":1788668403.1140606,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" Ergebn"}}
+{"seq":311,"ts":1788668403.138617,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":3,"output_tokens":720,"seconds":216.16670179367065,"pct":0.7205556726455689,"input_tokens":1824}}
+{"seq":312,"ts":1788668403.2343516,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"isse"}}
+{"seq":313,"ts":1788668403.356725,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":".\n\n"}}
+{"seq":314,"ts":1788668403.483029,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"https"}}
+{"seq":315,"ts":1788668403.6018467,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"://"}}
+{"seq":316,"ts":1788668403.7292378,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"www"}}
+{"seq":317,"ts":1788668403.8545089,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":".he"}}
+{"seq":318,"ts":1788668403.9838626,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"ise"}}
+{"seq":319,"ts":1788668404.1093302,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":".de"}}
+{"seq":320,"ts":1788668404.1389754,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":3,"output_tokens":720,"seconds":217.16705679893494,"pct":0.7238901893297831,"input_tokens":1824}}
+{"seq":321,"ts":1788668404.224864,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"/"}}
+{"seq":322,"ts":1788668404.3453882,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"ct"}}
+{"seq":323,"ts":1788668404.4726357,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"/"}}
+{"seq":324,"ts":1788668404.5983396,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"2"}}
+{"seq":325,"ts":1788668404.7164464,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"0"}}
+{"seq":326,"ts":1788668404.8419223,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"2"}}
+{"seq":327,"ts":1788668404.9629009,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"1"}}
+{"seq":328,"ts":1788668405.0831347,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"/"}}
+{"seq":329,"ts":1788668405.1402318,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":3,"output_tokens":720,"seconds":218.168310880661,"pct":0.7272277029355367,"input_tokens":1824}}
+{"seq":330,"ts":1788668405.210749,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"4"}}
+{"seq":331,"ts":1788668405.3334723,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"6"}}
+{"seq":332,"ts":1788668405.4581947,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"/"}}
+{"seq":333,"ts":1788668405.5847676,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"5"}}
+{"seq":334,"ts":1788668405.7119684,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"8"}}
+{"seq":335,"ts":1788668405.8401077,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"9"}}
+{"seq":336,"ts":1788668405.9680612,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"3"}}
+{"seq":337,"ts":1788668406.0868042,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"7"}}
+{"seq":338,"ts":1788668406.140814,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":3,"output_tokens":720,"seconds":219.16889357566833,"pct":0.7305629785855611,"input_tokens":1824}}
+{"seq":339,"ts":1788668406.2079818,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"2"}}
+{"seq":340,"ts":1788668406.3320704,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"2"}}
+{"seq":341,"ts":1788668406.4505594,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"/k"}}
+{"seq":342,"ts":1788668406.5686884,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"ünst"}}
+{"seq":343,"ts":1788668406.6981118,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"liche"}}
+{"seq":344,"ts":1788668406.8242102,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"-int"}}
+{"seq":345,"ts":1788668406.9516473,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"ell"}}
+{"seq":346,"ts":1788668407.0709462,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"igen"}}
+{"seq":347,"ts":1788668407.1420095,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":3,"output_tokens":720,"seconds":220.1700577735901,"pct":0.7339001925786336,"input_tokens":1824}}
+{"seq":348,"ts":1788668407.1994557,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"z"}}
+{"seq":349,"ts":1788668407.3206146,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"-"}}
+{"seq":350,"ts":1788668407.4403212,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"ai"}}
+{"seq":351,"ts":1788668407.5599744,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"-k"}}
+{"seq":352,"ts":1788668407.6883364,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"om"}}
+{"seq":353,"ts":1788668407.817113,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"ple"}}
+{"seq":354,"ts":1788668407.936657,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"tt"}}
+{"seq":355,"ts":1788668408.0551689,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"-"}}
+{"seq":356,"ts":1788668408.1430988,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":3,"output_tokens":720,"seconds":221.1711757183075,"pct":0.7372372523943583,"input_tokens":1824}}
+{"seq":357,"ts":1788668408.179924,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"lex"}}
+{"seq":358,"ts":1788668408.2990246,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"ikon"}}
+{"seq":359,"ts":1788668408.4192903,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"-he"}}
+{"seq":360,"ts":1788668408.5392363,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"ise"}}
+{"seq":361,"ts":1788668408.662879,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"-de"}}
+{"seq":362,"ts":1788668408.7912357,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"~"}}
+{"seq":363,"ts":1788668408.9177594,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"art"}}
+{"seq":364,"ts":1788668409.0396721,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"ikel"}}
+{"seq":365,"ts":1788668409.1436732,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":3,"output_tokens":720,"seconds":222.17175030708313,"pct":0.7405725010236104,"input_tokens":1824}}
+{"seq":366,"ts":1788668409.1641834,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":".html"}}
+{"seq":367,"ts":1788668409.291537,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"\n"}}
+{"seq":368,"ts":1788668409.4150693,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"https"}}
+{"seq":369,"ts":1788668409.5395792,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"://"}}
+{"seq":370,"ts":1788668409.6650712,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"www"}}
+{"seq":371,"ts":1788668409.7929688,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":".dat"}}
+{"seq":372,"ts":1788668409.9154851,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"ensch"}}
+{"seq":373,"ts":1788668410.0475318,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"utz"}}
+{"seq":374,"ts":1788668410.1446304,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":3,"output_tokens":720,"seconds":223.172709941864,"pct":0.7439090331395467,"input_tokens":1824}}
+{"seq":375,"ts":1788668410.1719325,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"blog"}}
+{"seq":376,"ts":1788668410.2941322,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":".de"}}
+{"seq":377,"ts":1788668410.416621,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"/blog"}}
+{"seq":378,"ts":1788668410.5401754,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"/"}}
+{"seq":379,"ts":1788668410.6680267,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"2"}}
+{"seq":380,"ts":1788668410.7949002,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"0"}}
+{"seq":381,"ts":1788668410.9223995,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"2"}}
+{"seq":382,"ts":1788668411.0577092,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"1"}}
+{"seq":383,"ts":1788668411.1447036,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":3,"output_tokens":720,"seconds":224.17278575897217,"pct":0.7472426191965739,"input_tokens":1824}}
+{"seq":384,"ts":1788668411.1879685,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"/"}}
+{"seq":385,"ts":1788668411.3199027,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"0"}}
+{"seq":386,"ts":1788668411.4490464,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"6"}}
+{"seq":387,"ts":1788668411.5783505,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"/"}}
+{"seq":388,"ts":1788668411.7056215,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"2"}}
+{"seq":389,"ts":1788668411.8334515,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"2"}}
+{"seq":390,"ts":1788668411.958843,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"/d"}}
+{"seq":391,"ts":1788668412.0915883,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"ie"}}
+{"seq":392,"ts":1788668412.145621,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":3,"output_tokens":720,"seconds":225.1737003326416,"pct":0.7505790011088054,"input_tokens":1824}}
+{"seq":393,"ts":1788668412.2207525,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"-v"}}
+{"seq":394,"ts":1788668412.3498418,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"orte"}}
+{"seq":395,"ts":1788668412.4803915,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"ile"}}
+{"seq":396,"ts":1788668412.60798,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"-"}}
+{"seq":397,"ts":1788668412.737098,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"und"}}
+{"seq":398,"ts":1788668412.8675973,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"-n"}}
+{"seq":399,"ts":1788668412.9959729,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"achte"}}
+{"seq":400,"ts":1788668413.126368,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"ile"}}
+{"seq":401,"ts":1788668413.1459296,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":3,"output_tokens":720,"seconds":226.1740119457245,"pct":0.7539133731524149,"input_tokens":1824}}
+{"seq":402,"ts":1788668413.2585862,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"-v"}}
+{"seq":403,"ts":1788668413.3884256,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"on"}}
+{"seq":404,"ts":1788668413.517412,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"-lo"}}
+{"seq":405,"ts":1788668413.6471727,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"kal"}}
+{"seq":406,"ts":1788668413.7787762,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"en"}}
+{"seq":407,"ts":1788668413.908777,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"-"}}
+{"seq":408,"ts":1788668414.035837,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"ka"}}
+{"seq":409,"ts":1788668414.1468983,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":3,"output_tokens":720,"seconds":227.17497444152832,"pct":0.7572499148050944,"input_tokens":1824}}
+{"seq":410,"ts":1788668414.1733508,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"ernen"}}
+{"seq":411,"ts":1788668414.3100464,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"-f"}}
+{"seq":412,"ts":1788668414.4443088,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"uer"}}
+{"seq":413,"ts":1788668414.5745792,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"-"}}
+{"seq":414,"ts":1788668414.7060168,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"ai"}}
+{"seq":415,"ts":1788668414.8362885,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"/\n\n"}}
+{"seq":416,"ts":1788668414.9637027,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"Ich"}}
+{"seq":417,"ts":1788668415.0961344,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" konnte"}}
+{"seq":418,"ts":1788668415.1480706,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":3,"output_tokens":720,"seconds":228.17614436149597,"pct":0.7605871478716533,"input_tokens":1824}}
+{"seq":419,"ts":1788668415.2289364,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" keine"}}
+{"seq":420,"ts":1788668415.3612087,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" zus"}}
+{"seq":421,"ts":1788668415.4931583,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"ätz"}}
+{"seq":422,"ts":1788668415.622881,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"lichen"}}
+{"seq":423,"ts":1788668415.751633,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":","}}
+{"seq":424,"ts":1788668415.880094,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" un"}}
+{"seq":425,"ts":1788668416.010395,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"abhäng"}}
+{"seq":426,"ts":1788668416.1443582,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"igen"}}
+{"seq":427,"ts":1788668416.1490831,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":3,"output_tokens":720,"seconds":229.17716479301453,"pct":0.7639238826433817,"input_tokens":1824}}
+{"seq":428,"ts":1788668416.2732933,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" Qu"}}
+{"seq":429,"ts":1788668416.400685,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"ellen"}}
+{"seq":430,"ts":1788668416.5275156,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" finden"}}
+{"seq":431,"ts":1788668416.6535888,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":","}}
+{"seq":432,"ts":1788668416.7854545,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" um"}}
+{"seq":433,"ts":1788668416.9154453,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" die"}}
+{"seq":434,"ts":1788668417.041963,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" gen"}}
+{"seq":435,"ts":1788668417.150183,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":3,"output_tokens":720,"seconds":230.17826008796692,"pct":0.7672608669598897,"input_tokens":1824}}
+{"seq":436,"ts":1788668417.1760802,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"a"}}
+{"seq":437,"ts":1788668417.3068361,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"ue"}}
+{"seq":438,"ts":1788668417.437223,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" Le"}}
+{"seq":439,"ts":1788668417.568153,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"istung"}}
+{"seq":440,"ts":1788668417.705739,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" und"}}
+{"seq":441,"ts":1788668417.840771,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" Gren"}}
+{"seq":442,"ts":1788668417.9697042,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"zen"}}
+{"seq":443,"ts":1788668418.0986216,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" von"}}
+{"seq":444,"ts":1788668418.150475,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":3,"output_tokens":720,"seconds":231.17855262756348,"pct":0.7705951754252116,"input_tokens":1824}}
+{"seq":445,"ts":1788668418.228183,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" O"}}
+{"seq":446,"ts":1788668418.3556907,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"ll"}}
+{"seq":447,"ts":1788668418.4827144,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"ama"}}
+{"seq":448,"ts":1788668418.610378,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" gegenüber"}}
+{"seq":449,"ts":1788668418.740515,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" geh"}}
+{"seq":450,"ts":1788668418.8683093,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"ost"}}
+{"seq":451,"ts":1788668418.994854,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"eten"}}
+{"seq":452,"ts":1788668419.1208677,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" Mod"}}
+{"seq":453,"ts":1788668419.1507316,"run_id":"74ee6e450000","pid":149,"kind":"budget.tick","data":{"turns":3,"output_tokens":720,"seconds":232.17881155014038,"pct":0.7739293718338013,"input_tokens":1824}}
+{"seq":454,"ts":1788668419.2470276,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"ellen"}}
+{"seq":455,"ts":1788668419.3750498,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" zu"}}
+{"seq":456,"ts":1788668419.5024617,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":" best"}}
+{"seq":457,"ts":1788668419.6324682,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"ät"}}
+{"seq":458,"ts":1788668419.7615683,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"igen"}}
+{"seq":459,"ts":1788668419.8845174,"run_id":"74ee6e450000","pid":149,"kind":"proc.text","data":{"delta":"."}}
+{"seq":460,"ts":1788668420.0136313,"run_id":"74ee6e450000","pid":149,"kind":"proc.exit","data":{"reason":"done","usage":{"turns":4,"input_tokens":1925,"output_tokens":914,"cost_usd_equiv":null},"stderr_tail":null}}
+{"seq":461,"ts":1788668420.0137823,"run_id":"74ee6e450000","pid":149,"kind":"proc.state","data":{"state":"done","prev":"running"}}
+{"seq":462,"ts":1788668420.0139651,"run_id":"74ee6e450000","pid":null,"kind":"run.done","data":{"usage":{"turns":4,"input_tokens":1925,"output_tokens":914,"cost_usd_equiv":null},"artifacts":[],"duration_s":242.02409434318542}}

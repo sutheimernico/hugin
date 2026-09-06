@@ -1,0 +1,9 @@
+{
+  "slug": "simulation-research-brief",
+  "run_id": "74c0de490000",
+  "goal": "Erstelle ein Recherche-Briefing zum Stand der Technik bei Agent-Betriebssystemen 2026",
+  "driver": "scripted",
+  "events": 127,
+  "duration_s": 7.63277792930603,
+  "exported_at": 1788665221.464011
+}

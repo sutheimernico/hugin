@@ -1,0 +1,127 @@
+{"seq":1,"ts":1788665192.0091481,"run_id":"74c0de490000","pid":null,"kind":"run.created","data":{"goal":"Erstelle ein Recherche-Briefing zum Stand der Technik bei Agent-Betriebssystemen 2026","driver":"scripted","template":null}}
+{"seq":2,"ts":1788665192.0102227,"run_id":"74c0de490000","pid":94,"kind":"proc.spawned","data":{"ppid":null,"program":"planner","role":"Orchestrator","driver":"scripted","model":"sonnet","budget":{"max_turns":20,"max_seconds":900,"max_output_tokens":12000},"task":"Erstelle ein Recherche-Briefing zum Stand der Technik bei Agent-Betriebssystemen 2026"}}
+{"seq":3,"ts":1788665192.010584,"run_id":"74c0de490000","pid":94,"kind":"sched.started","data":{}}
+{"seq":4,"ts":1788665192.0106916,"run_id":"74c0de490000","pid":94,"kind":"proc.state","data":{"state":"spawning","prev":"queued"}}
+{"seq":5,"ts":1788665192.011453,"run_id":"74c0de490000","pid":94,"kind":"proc.state","data":{"state":"running","prev":"spawning"}}
+{"seq":6,"ts":1788665192.411447,"run_id":"74c0de490000","pid":94,"kind":"proc.thinking","data":{"on":true}}
+{"seq":7,"ts":1788665193.0111797,"run_id":"74c0de490000","pid":94,"kind":"proc.thinking","data":{"on":false}}
+{"seq":8,"ts":1788665193.0113552,"run_id":"74c0de490000","pid":94,"kind":"proc.text","data":{"delta":"Ziel: ein Recherche-Briefing zu lokalen KI-Agenten. Ich schneide es in drei unabhängige Aufträge."}}
+{"seq":9,"ts":1788665193.0127292,"run_id":"74c0de490000","pid":94,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":1.0020325183868408,"pct":0.0011133694648742677,"input_tokens":0}}
+{"seq":10,"ts":1788665193.2114434,"run_id":"74c0de490000","pid":94,"kind":"sys.call","data":{"call_id":"sys1","syscall":"munin_search","args_summary":"query=lokale KI-Agenten, limit=5"}}
+{"seq":11,"ts":1788665193.2118564,"run_id":"74c0de490000","pid":94,"kind":"munin.read","data":{"query":"lokale KI-Agenten","hits":0}}
+{"seq":12,"ts":1788665193.2119296,"run_id":"74c0de490000","pid":94,"kind":"sys.result","data":{"call_id":"sys1","ok":true,"result_summary":"hits=[]","ms":0}}
+{"seq":13,"ts":1788665193.4130232,"run_id":"74c0de490000","pid":94,"kind":"sys.call","data":{"call_id":"sys2","syscall":"proc_spawn","args_summary":"program=scout, task=Welche offenen Modelle laufen lokal auf 8 GB VRAM?"}}
+{"seq":14,"ts":1788665193.4134436,"run_id":"74c0de490000","pid":95,"kind":"proc.spawned","data":{"ppid":94,"program":"scout","role":"Researcher","driver":"scripted","model":"sonnet","budget":{"max_turns":12,"max_seconds":300,"max_output_tokens":6000},"task":"Welche offenen Modelle laufen lokal auf 8 GB VRAM?"}}
+{"seq":15,"ts":1788665193.4135468,"run_id":"74c0de490000","pid":95,"kind":"sched.started","data":{}}
+{"seq":16,"ts":1788665193.4135926,"run_id":"74c0de490000","pid":95,"kind":"proc.state","data":{"state":"spawning","prev":"queued"}}
+{"seq":17,"ts":1788665193.4136505,"run_id":"74c0de490000","pid":94,"kind":"sys.result","data":{"call_id":"sys2","ok":true,"result_summary":"pid=95","ms":0}}
+{"seq":18,"ts":1788665193.4138439,"run_id":"74c0de490000","pid":95,"kind":"proc.state","data":{"state":"running","prev":"spawning"}}
+{"seq":19,"ts":1788665193.6137333,"run_id":"74c0de490000","pid":94,"kind":"sys.call","data":{"call_id":"sys3","syscall":"proc_spawn","args_summary":"program=scout, task=Wie trennen Agenten-Frameworks Werkzeuge und Rechte voneinander?"}}
+{"seq":20,"ts":1788665193.6144612,"run_id":"74c0de490000","pid":96,"kind":"proc.spawned","data":{"ppid":94,"program":"scout","role":"Researcher","driver":"scripted","model":"sonnet","budget":{"max_turns":12,"max_seconds":300,"max_output_tokens":6000},"task":"Wie trennen Agenten-Frameworks Werkzeuge und Rechte voneinander?"}}
+{"seq":21,"ts":1788665193.6145756,"run_id":"74c0de490000","pid":96,"kind":"sched.started","data":{}}
+{"seq":22,"ts":1788665193.6146388,"run_id":"74c0de490000","pid":96,"kind":"proc.state","data":{"state":"spawning","prev":"queued"}}
+{"seq":23,"ts":1788665193.6147466,"run_id":"74c0de490000","pid":94,"kind":"sys.result","data":{"call_id":"sys3","ok":true,"result_summary":"pid=96","ms":0}}
+{"seq":24,"ts":1788665193.6150453,"run_id":"74c0de490000","pid":96,"kind":"proc.state","data":{"state":"running","prev":"spawning"}}
+{"seq":25,"ts":1788665193.7151144,"run_id":"74c0de490000","pid":95,"kind":"proc.thinking","data":{"on":true}}
+{"seq":26,"ts":1788665193.8147502,"run_id":"74c0de490000","pid":94,"kind":"sys.call","data":{"call_id":"sys4","syscall":"proc_spawn","args_summary":"program=scout, task=Was kostet lokale Inferenz im Vergleich zu gehosteten Modellen?"}}
+{"seq":27,"ts":1788665193.8151321,"run_id":"74c0de490000","pid":97,"kind":"proc.spawned","data":{"ppid":94,"program":"scout","role":"Researcher","driver":"scripted","model":"sonnet","budget":{"max_turns":12,"max_seconds":300,"max_output_tokens":6000},"task":"Was kostet lokale Inferenz im Vergleich zu gehosteten Modellen?"}}
+{"seq":28,"ts":1788665193.8152077,"run_id":"74c0de490000","pid":97,"kind":"sched.started","data":{}}
+{"seq":29,"ts":1788665193.8152328,"run_id":"74c0de490000","pid":97,"kind":"proc.state","data":{"state":"spawning","prev":"queued"}}
+{"seq":30,"ts":1788665193.8152766,"run_id":"74c0de490000","pid":94,"kind":"sys.result","data":{"call_id":"sys4","ok":true,"result_summary":"pid=97","ms":0}}
+{"seq":31,"ts":1788665193.8154402,"run_id":"74c0de490000","pid":97,"kind":"proc.state","data":{"state":"running","prev":"spawning"}}
+{"seq":32,"ts":1788665193.9154718,"run_id":"74c0de490000","pid":96,"kind":"proc.thinking","data":{"on":true}}
+{"seq":33,"ts":1788665193.9156451,"run_id":"74c0de490000","pid":94,"kind":"proc.text","data":{"delta":" Drei scouts laufen. Ich warte auf ihre Berichte."}}
+{"seq":34,"ts":1788665193.9156902,"run_id":"74c0de490000","pid":94,"kind":"sys.call","data":{"call_id":"sys5","syscall":"proc_wait","args_summary":"pids=children, timeout_s=120"}}
+{"seq":35,"ts":1788665193.9157507,"run_id":"74c0de490000","pid":94,"kind":"proc.state","data":{"state":"waiting_tool","prev":"running"}}
+{"seq":36,"ts":1788665194.0137763,"run_id":"74c0de490000","pid":94,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":2.003066301345825,"pct":0.0022256292237175838,"input_tokens":0}}
+{"seq":37,"ts":1788665194.1154916,"run_id":"74c0de490000","pid":97,"kind":"proc.thinking","data":{"on":true}}
+{"seq":38,"ts":1788665194.2152777,"run_id":"74c0de490000","pid":95,"kind":"proc.thinking","data":{"on":false}}
+{"seq":39,"ts":1788665194.2154183,"run_id":"74c0de490000","pid":95,"kind":"proc.text","data":{"delta":"Mein Auftrag: Welche offenen Modelle laufen lokal auf 8 GB VRAM? Zuerst munin — vielleicht steht die Hälfte schon da."}}
+{"seq":40,"ts":1788665194.4143815,"run_id":"74c0de490000","pid":95,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":1.0007789134979248,"pct":0.0033359297116597494,"input_tokens":0}}
+{"seq":41,"ts":1788665194.415833,"run_id":"74c0de490000","pid":96,"kind":"proc.thinking","data":{"on":false}}
+{"seq":42,"ts":1788665194.4159331,"run_id":"74c0de490000","pid":96,"kind":"proc.text","data":{"delta":"Mein Auftrag: Wie trennen Agenten-Frameworks Werkzeuge und Rechte voneinander? Zuerst munin — vielleicht steht die Hälfte schon da."}}
+{"seq":43,"ts":1788665194.4159844,"run_id":"74c0de490000","pid":95,"kind":"sys.call","data":{"call_id":"sys6","syscall":"munin_search","args_summary":"query=Welche offenen Modelle laufen lokal auf 8 GB VRAM?, limit=5"}}
+{"seq":44,"ts":1788665194.4163778,"run_id":"74c0de490000","pid":95,"kind":"munin.read","data":{"query":"Welche offenen Modelle laufen lokal auf 8 GB VRAM?","hits":5}}
+{"seq":45,"ts":1788665194.416457,"run_id":"74c0de490000","pid":95,"kind":"sys.result","data":{"call_id":"sys6","ok":true,"result_summary":"hits=[{'id': 49, 'title': 'Befund: Welche offenen Modelle laufen lokal auf 8 GB VRAM?', 'body': 'SIMULATION — dieser Eintrag stammt aus dem `scripted`-Driver, n","ms":0}}
+{"seq":46,"ts":1788665194.6161125,"run_id":"74c0de490000","pid":96,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":1.0014629364013672,"pct":0.0033382097880045574,"input_tokens":0}}
+{"seq":47,"ts":1788665194.6162927,"run_id":"74c0de490000","pid":97,"kind":"proc.thinking","data":{"on":false}}
+{"seq":48,"ts":1788665194.616343,"run_id":"74c0de490000","pid":97,"kind":"proc.text","data":{"delta":"Mein Auftrag: Was kostet lokale Inferenz im Vergleich zu gehosteten Modellen? Zuerst munin — vielleicht steht die Hälfte schon da."}}
+{"seq":49,"ts":1788665194.6163847,"run_id":"74c0de490000","pid":96,"kind":"sys.call","data":{"call_id":"sys7","syscall":"munin_search","args_summary":"query=Wie trennen Agenten-Frameworks Werkzeuge und Rechte voneinander?, limit=5"}}
+{"seq":50,"ts":1788665194.616733,"run_id":"74c0de490000","pid":96,"kind":"munin.read","data":{"query":"Wie trennen Agenten-Frameworks Werkzeuge und Rechte voneinander?","hits":5}}
+{"seq":51,"ts":1788665194.6168108,"run_id":"74c0de490000","pid":96,"kind":"sys.result","data":{"call_id":"sys7","ok":true,"result_summary":"hits=[{'id': 50, 'title': 'Befund: Wie trennen Agenten-Frameworks Werkzeuge und Rechte voneinander?', 'body': 'SIMULATION — dieser Eintrag stammt aus dem `scrip","ms":0}}
+{"seq":52,"ts":1788665194.6168642,"run_id":"74c0de490000","pid":95,"kind":"tool.call","data":{"call_id":"t1","tool":"WebSearch","input_summary":"Welche offenen Modelle laufen lokal auf 8 GB VRAM?"}}
+{"seq":53,"ts":1788665194.8163288,"run_id":"74c0de490000","pid":97,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":1.0010859966278076,"pct":0.003336953322092692,"input_tokens":0}}
+{"seq":54,"ts":1788665194.816524,"run_id":"74c0de490000","pid":97,"kind":"sys.call","data":{"call_id":"sys8","syscall":"munin_search","args_summary":"query=Was kostet lokale Inferenz im Vergleich zu gehosteten Modellen?, limit=5"}}
+{"seq":55,"ts":1788665194.816842,"run_id":"74c0de490000","pid":97,"kind":"munin.read","data":{"query":"Was kostet lokale Inferenz im Vergleich zu gehosteten Modellen?","hits":5}}
+{"seq":56,"ts":1788665194.8169053,"run_id":"74c0de490000","pid":97,"kind":"sys.result","data":{"call_id":"sys8","ok":true,"result_summary":"hits=[{'id': 51, 'title': 'Befund: Was kostet lokale Inferenz im Vergleich zu gehosteten Modellen?', 'body': 'SIMULATION — dieser Eintrag stammt aus dem `script","ms":0}}
+{"seq":57,"ts":1788665194.8169544,"run_id":"74c0de490000","pid":96,"kind":"tool.call","data":{"call_id":"t1","tool":"WebSearch","input_summary":"Wie trennen Agenten-Frameworks Werkzeuge und Rechte voneinander?"}}
+{"seq":58,"ts":1788665195.0141618,"run_id":"74c0de490000","pid":94,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":3.003467321395874,"pct":0.003337185912662082,"input_tokens":0}}
+{"seq":59,"ts":1788665195.01713,"run_id":"74c0de490000","pid":97,"kind":"tool.call","data":{"call_id":"t1","tool":"WebSearch","input_summary":"Was kostet lokale Inferenz im Vergleich zu gehosteten Modellen?"}}
+{"seq":60,"ts":1788665195.415229,"run_id":"74c0de490000","pid":95,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":2.0016279220581055,"pct":0.006672093073527018,"input_tokens":0}}
+{"seq":61,"ts":1788665195.5164676,"run_id":"74c0de490000","pid":95,"kind":"tool.result","data":{"call_id":"t1","ok":true,"output_summary":"6 Treffer, davon 2 Primärquellen (Modellkarte, Projekt-README)","ms":900}}
+{"seq":62,"ts":1788665195.6168196,"run_id":"74c0de490000","pid":96,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":2.0021708011627197,"pct":0.006673902670542399,"input_tokens":0}}
+{"seq":63,"ts":1788665195.7179,"run_id":"74c0de490000","pid":96,"kind":"tool.result","data":{"call_id":"t1","ok":true,"output_summary":"6 Treffer, davon 2 Primärquellen (Modellkarte, Projekt-README)","ms":900}}
+{"seq":64,"ts":1788665195.8170135,"run_id":"74c0de490000","pid":97,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":2.001769542694092,"pct":0.006672565142313639,"input_tokens":0}}
+{"seq":65,"ts":1788665195.8171926,"run_id":"74c0de490000","pid":95,"kind":"proc.text","data":{"delta":" Zwei unabhängige Primärquellen tragen den Befund, ein Blog widerspricht."}}
+{"seq":66,"ts":1788665195.9178197,"run_id":"74c0de490000","pid":97,"kind":"tool.result","data":{"call_id":"t1","ok":true,"output_summary":"6 Treffer, davon 2 Primärquellen (Modellkarte, Projekt-README)","ms":900}}
+{"seq":67,"ts":1788665196.0148022,"run_id":"74c0de490000","pid":94,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":4.004113674163818,"pct":0.004449015193515354,"input_tokens":0}}
+{"seq":68,"ts":1788665196.017596,"run_id":"74c0de490000","pid":95,"kind":"sys.call","data":{"call_id":"sys9","syscall":"munin_write","args_summary":"title=Befund: Welche offenen Modelle laufen lokal auf 8 GB VRAM?, body=SIMULATION — dieser Eintrag stammt aus dem `scripted`-Driver, nicht aus einem Modell. Pro"}}
+{"seq":69,"ts":1788665196.017897,"run_id":"74c0de490000","pid":95,"kind":"munin.write","data":{"memory_id":323,"title":"Befund: Welche offenen Modelle laufen lokal auf 8 GB VRAM?"}}
+{"seq":70,"ts":1788665196.018199,"run_id":"74c0de490000","pid":95,"kind":"sys.result","data":{"call_id":"sys9","ok":true,"result_summary":"id=323","ms":0}}
+{"seq":71,"ts":1788665196.0183535,"run_id":"74c0de490000","pid":96,"kind":"proc.text","data":{"delta":" Zwei unabhängige Primärquellen tragen den Befund, ein Blog widerspricht."}}
+{"seq":72,"ts":1788665196.2191324,"run_id":"74c0de490000","pid":97,"kind":"proc.text","data":{"delta":" Zwei unabhängige Primärquellen tragen den Befund, ein Blog widerspricht."}}
+{"seq":73,"ts":1788665196.219298,"run_id":"74c0de490000","pid":96,"kind":"sys.call","data":{"call_id":"sys10","syscall":"munin_write","args_summary":"title=Befund: Wie trennen Agenten-Frameworks Werkzeuge und Rechte voneinander?, body=SIMULATION — dieser Eintrag stammt aus dem `scripted`-Driver, nicht aus ein"}}
+{"seq":74,"ts":1788665196.2194552,"run_id":"74c0de490000","pid":96,"kind":"munin.write","data":{"memory_id":324,"title":"Befund: Wie trennen Agenten-Frameworks Werkzeuge und Rechte voneinander?"}}
+{"seq":75,"ts":1788665196.219495,"run_id":"74c0de490000","pid":96,"kind":"sys.result","data":{"call_id":"sys10","ok":true,"result_summary":"id=324","ms":0}}
+{"seq":76,"ts":1788665196.3183296,"run_id":"74c0de490000","pid":95,"kind":"sys.call","data":{"call_id":"sys11","syscall":"mission_report","args_summary":"summary=Auftrag „Welche offenen Modelle laufen lokal auf 8 GB VRAM?“ ist bearbeitet: zwei unabhängige Primärquellen tragen den Befund, ein widersprechender Blog"}}
+{"seq":77,"ts":1788665196.3185341,"run_id":"74c0de490000","pid":95,"kind":"msg.sent","data":{"from_pid":95,"to_pid":94,"preview":"Auftrag „Welche offenen Modelle laufen lokal auf 8 GB VRAM?“ ist bearbeitet: zwe"}}
+{"seq":78,"ts":1788665196.318586,"run_id":"74c0de490000","pid":95,"kind":"sys.result","data":{"call_id":"sys11","ok":true,"result_summary":"ok=True","ms":0}}
+{"seq":79,"ts":1788665196.318903,"run_id":"74c0de490000","pid":95,"kind":"proc.exit","data":{"reason":"done","usage":{"turns":4,"input_tokens":3100,"output_tokens":900,"cost_usd_equiv":null},"stderr_tail":null}}
+{"seq":80,"ts":1788665196.3189826,"run_id":"74c0de490000","pid":95,"kind":"proc.state","data":{"state":"done","prev":"running"}}
+{"seq":81,"ts":1788665196.4201736,"run_id":"74c0de490000","pid":97,"kind":"sys.call","data":{"call_id":"sys12","syscall":"munin_write","args_summary":"title=Befund: Was kostet lokale Inferenz im Vergleich zu gehosteten Modellen?, body=SIMULATION — dieser Eintrag stammt aus dem `scripted`-Driver, nicht aus eine"}}
+{"seq":82,"ts":1788665196.4204464,"run_id":"74c0de490000","pid":97,"kind":"munin.write","data":{"memory_id":325,"title":"Befund: Was kostet lokale Inferenz im Vergleich zu gehosteten Modellen?"}}
+{"seq":83,"ts":1788665196.4204977,"run_id":"74c0de490000","pid":97,"kind":"sys.result","data":{"call_id":"sys12","ok":true,"result_summary":"id=325","ms":0}}
+{"seq":84,"ts":1788665196.51906,"run_id":"74c0de490000","pid":96,"kind":"sys.call","data":{"call_id":"sys13","syscall":"mission_report","args_summary":"summary=Auftrag „Wie trennen Agenten-Frameworks Werkzeuge und Rechte voneinander?“ ist bearbeitet: zwei unabhängige Primärquellen tragen den Befund, ein widersp"}}
+{"seq":85,"ts":1788665196.5192196,"run_id":"74c0de490000","pid":96,"kind":"msg.sent","data":{"from_pid":96,"to_pid":94,"preview":"Auftrag „Wie trennen Agenten-Frameworks Werkzeuge und Rechte voneinander?“ ist b"}}
+{"seq":86,"ts":1788665196.5192547,"run_id":"74c0de490000","pid":96,"kind":"sys.result","data":{"call_id":"sys13","ok":true,"result_summary":"ok=True","ms":0}}
+{"seq":87,"ts":1788665196.51952,"run_id":"74c0de490000","pid":96,"kind":"proc.exit","data":{"reason":"done","usage":{"turns":4,"input_tokens":3100,"output_tokens":900,"cost_usd_equiv":null},"stderr_tail":null}}
+{"seq":88,"ts":1788665196.5195706,"run_id":"74c0de490000","pid":96,"kind":"proc.state","data":{"state":"done","prev":"running"}}
+{"seq":89,"ts":1788665196.7212155,"run_id":"74c0de490000","pid":97,"kind":"sys.call","data":{"call_id":"sys14","syscall":"mission_report","args_summary":"summary=Auftrag „Was kostet lokale Inferenz im Vergleich zu gehosteten Modellen?“ ist bearbeitet: zwei unabhängige Primärquellen tragen den Befund, ein widerspr"}}
+{"seq":90,"ts":1788665196.721413,"run_id":"74c0de490000","pid":97,"kind":"msg.sent","data":{"from_pid":97,"to_pid":94,"preview":"Auftrag „Was kostet lokale Inferenz im Vergleich zu gehosteten Modellen?“ ist be"}}
+{"seq":91,"ts":1788665196.7214627,"run_id":"74c0de490000","pid":97,"kind":"sys.result","data":{"call_id":"sys14","ok":true,"result_summary":"ok=True","ms":0}}
+{"seq":92,"ts":1788665196.7217913,"run_id":"74c0de490000","pid":97,"kind":"proc.exit","data":{"reason":"done","usage":{"turns":4,"input_tokens":3100,"output_tokens":900,"cost_usd_equiv":null},"stderr_tail":null}}
+{"seq":93,"ts":1788665196.7218692,"run_id":"74c0de490000","pid":97,"kind":"proc.state","data":{"state":"done","prev":"running"}}
+{"seq":94,"ts":1788665196.72337,"run_id":"74c0de490000","pid":94,"kind":"proc.state","data":{"state":"running","prev":"waiting_tool"}}
+{"seq":95,"ts":1788665196.7234879,"run_id":"74c0de490000","pid":94,"kind":"sys.result","data":{"call_id":"sys5","ok":true,"result_summary":"results=[{'pid': 95, 'state': 'done', 'report': 'Auftrag „Welche offenen Modelle laufen lokal auf 8 GB VRAM?“ ist bearbeitet: zwei unabhängige Primärquellen tra","ms":2807}}
+{"seq":96,"ts":1788665197.0152516,"run_id":"74c0de490000","pid":94,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":5.004560232162476,"pct":0.0055606224801805285,"input_tokens":0}}
+{"seq":97,"ts":1788665197.024051,"run_id":"74c0de490000","pid":94,"kind":"proc.text","data":{"delta":" Alle drei sind zurück. Der Entwurf geht jetzt an den judge."}}
+{"seq":98,"ts":1788665197.225228,"run_id":"74c0de490000","pid":94,"kind":"sys.call","data":{"call_id":"sys15","syscall":"proc_spawn","args_summary":"program=judge, task=Prüfe den Entwurf des Briefings auf unbelegte Behauptungen und Lücken."}}
+{"seq":99,"ts":1788665197.225678,"run_id":"74c0de490000","pid":98,"kind":"proc.spawned","data":{"ppid":94,"program":"judge","role":"Reviewer","driver":"scripted","model":"sonnet","budget":{"max_turns":6,"max_seconds":240,"max_output_tokens":3000},"task":"Prüfe den Entwurf des Briefings auf unbelegte Behauptungen und Lücken."}}
+{"seq":100,"ts":1788665197.2257786,"run_id":"74c0de490000","pid":98,"kind":"sched.started","data":{}}
+{"seq":101,"ts":1788665197.2258134,"run_id":"74c0de490000","pid":98,"kind":"proc.state","data":{"state":"spawning","prev":"queued"}}
+{"seq":102,"ts":1788665197.2258685,"run_id":"74c0de490000","pid":94,"kind":"sys.result","data":{"call_id":"sys15","ok":true,"result_summary":"pid=98","ms":0}}
+{"seq":103,"ts":1788665197.225907,"run_id":"74c0de490000","pid":94,"kind":"sys.call","data":{"call_id":"sys16","syscall":"proc_wait","args_summary":"pids=children, timeout_s=120"}}
+{"seq":104,"ts":1788665197.2259533,"run_id":"74c0de490000","pid":94,"kind":"proc.state","data":{"state":"waiting_tool","prev":"running"}}
+{"seq":105,"ts":1788665197.2262385,"run_id":"74c0de490000","pid":98,"kind":"proc.state","data":{"state":"running","prev":"spawning"}}
+{"seq":106,"ts":1788665197.5264428,"run_id":"74c0de490000","pid":98,"kind":"proc.thinking","data":{"on":true}}
+{"seq":107,"ts":1788665198.0160863,"run_id":"74c0de490000","pid":94,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":6.005395174026489,"pct":0.0066726613044738765,"input_tokens":0}}
+{"seq":108,"ts":1788665198.02662,"run_id":"74c0de490000","pid":98,"kind":"proc.thinking","data":{"on":false}}
+{"seq":109,"ts":1788665198.0268059,"run_id":"74c0de490000","pid":98,"kind":"proc.text","data":{"delta":"Zwei Einwände: die Durchsatzzahl hängt an einer einzigen Blog-Quelle, und der Kostenvergleich lässt den Stromverbrauch aus."}}
+{"seq":110,"ts":1788665198.2269936,"run_id":"74c0de490000","pid":98,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":1.0011606216430664,"pct":0.004171502590179443,"input_tokens":0}}
+{"seq":111,"ts":1788665198.4273963,"run_id":"74c0de490000","pid":98,"kind":"sys.call","data":{"call_id":"sys17","syscall":"mission_report","args_summary":"summary=1) Die Durchsatzangabe stammt aus einer einzigen Blog-Quelle — als unbestätigt kennzeichnen oder streichen. 2) Der Vergleich lokal gegen Cloud nennt kei"}}
+{"seq":112,"ts":1788665198.4275796,"run_id":"74c0de490000","pid":98,"kind":"msg.sent","data":{"from_pid":98,"to_pid":94,"preview":"1) Die Durchsatzangabe stammt aus einer einzigen Blog-Quelle — als unbestätigt k"}}
+{"seq":113,"ts":1788665198.4276218,"run_id":"74c0de490000","pid":98,"kind":"sys.result","data":{"call_id":"sys17","ok":true,"result_summary":"ok=True","ms":0}}
+{"seq":114,"ts":1788665198.4279096,"run_id":"74c0de490000","pid":98,"kind":"proc.exit","data":{"reason":"done","usage":{"turns":2,"input_tokens":2200,"output_tokens":400,"cost_usd_equiv":null},"stderr_tail":null}}
+{"seq":115,"ts":1788665198.4280038,"run_id":"74c0de490000","pid":98,"kind":"proc.state","data":{"state":"done","prev":"running"}}
+{"seq":116,"ts":1788665198.4397862,"run_id":"74c0de490000","pid":94,"kind":"proc.state","data":{"state":"running","prev":"waiting_tool"}}
+{"seq":117,"ts":1788665198.4399219,"run_id":"74c0de490000","pid":94,"kind":"sys.result","data":{"call_id":"sys16","ok":true,"result_summary":"results=[{'pid': 98, 'state': 'done', 'report': '1) Die Durchsatzangabe stammt aus einer einzigen Blog-Quelle — als unbestätigt kennzeichnen oder streichen. 2) ","ms":1213}}
+{"seq":118,"ts":1788665198.840569,"run_id":"74c0de490000","pid":94,"kind":"proc.thinking","data":{"on":true}}
+{"seq":119,"ts":1788665199.0170805,"run_id":"74c0de490000","pid":94,"kind":"budget.tick","data":{"turns":0,"output_tokens":0,"seconds":7.0063886642456055,"pct":0.007784876293606228,"input_tokens":0}}
+{"seq":120,"ts":1788665199.44029,"run_id":"74c0de490000","pid":94,"kind":"proc.thinking","data":{"on":false}}
+{"seq":121,"ts":1788665199.4404616,"run_id":"74c0de490000","pid":94,"kind":"sys.call","data":{"call_id":"sys18","syscall":"artifact_write","args_summary":"name=report.md, content=# Briefing: Lokale KI-Agenten\n\n> SIMULATION — dieser Bericht stammt aus dem `scripted`-Driver von hugin, nicht aus einem Modell.\n\n**Ziel"}}
+{"seq":122,"ts":1788665199.440849,"run_id":"74c0de490000","pid":94,"kind":"artifact.written","data":{"name":"report.md","bytes":1524}}
+{"seq":123,"ts":1788665199.4409041,"run_id":"74c0de490000","pid":94,"kind":"sys.result","data":{"call_id":"sys18","ok":true,"result_summary":"path=artifacts/report.md, bytes=1524","ms":0}}
+{"seq":124,"ts":1788665199.6412365,"run_id":"74c0de490000","pid":94,"kind":"proc.text","data":{"delta":" report.md steht. Gefragt war ein Briefing zu lokalen KI-Agenten, geliefert sind drei belegte Abschnitte plus die Einwände des judge. Offen bleibt der Stromverbrauch im Dauerbetrieb."}}
+{"seq":125,"ts":1788665199.6416972,"run_id":"74c0de490000","pid":94,"kind":"proc.exit","data":{"reason":"done","usage":{"turns":7,"input_tokens":5400,"output_tokens":1800,"cost_usd_equiv":null},"stderr_tail":null}}
+{"seq":126,"ts":1788665199.6417654,"run_id":"74c0de490000","pid":94,"kind":"proc.state","data":{"state":"done","prev":"running"}}
+{"seq":127,"ts":1788665199.641926,"run_id":"74c0de490000","pid":null,"kind":"run.done","data":{"usage":{"turns":21,"input_tokens":16900,"output_tokens":4900,"cost_usd_equiv":null},"artifacts":["report.md"],"duration_s":7.632687330245972}}
