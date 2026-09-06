@@ -1038,7 +1038,7 @@ Implementation with the official `mcp` package: build a low-level `mcp.server.Se
 
 Integration test: start `uvicorn` for the app on a free port in a background thread (fixture), then use `mcp.client.streamable_http.streamablehttp_client(url, headers={"Authorization": f"Bearer {token}"})` + `ClientSession` to `list_tools()` (scout token → 3 tools: `munin_search`, `munin_write`, `mission_report`; planner token → 6) and `call_tool("munin_write", {...})` → store count increments and a `sys.call` event exists; wrong token → error. If header access proves impossible within 2 hours of trying, implement the spec's fallback (`stdio_bridge.py` + `POST /internal/syscall` with the token in the JSON body; `build_command` switches to a `"type": "stdio"` mcp-config) and document the decision in `docs/adr/0001-mcp-transport.md`.
 
-- [ ] Steps → `git commit -m "feat(syscalls): expose kernel syscalls as MCP tools over HTTP with per-process tokens"`
+- [x] Steps → `git commit -m "feat(syscalls): expose kernel syscalls as MCP tools over HTTP with per-process tokens"`
 
 ---
 
