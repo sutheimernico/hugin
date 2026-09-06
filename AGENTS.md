@@ -37,9 +37,15 @@ Source of truth for spec and decisions: `PROJECT.md`.
 ## Run / build / test
 
 - `uv sync` · `uv run pytest -q` · `uv run ruff check .`
-- Start the API: `scripts/serve.sh` → http://127.0.0.1:8770 (health: `/api/health`).
-- Frontend: `npm --prefix frontend run dev` → http://127.0.0.1:5177 (proxies `/api` to 8770) ·
-  `npm --prefix frontend run check` · `npm --prefix frontend test -- --run`.
+- `npm --prefix frontend ci` · `npm --prefix frontend run check` ·
+  `npm --prefix frontend test -- --run`.
+- **Production:** `npm --prefix frontend run build`, then `scripts/serve.sh` →
+  http://127.0.0.1:8770. The server mounts `frontend/dist` at `/` (after `/api/*` and `/mcp`)
+  and logs "no frontend/dist" if the build is missing — then only the API answers.
+- **Frontend development:** `scripts/serve.sh` for the backend plus
+  `npm --prefix frontend run dev` → http://127.0.0.1:5177, which proxies `/api` to 8770.
+- Health: `/api/health` · subsystems: `/api/system` · event stream:
+  `/api/events/stream?since=boot`.
 
 ## Best first edits
 
