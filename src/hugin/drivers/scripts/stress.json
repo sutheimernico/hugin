@@ -1,0 +1,19 @@
+[
+  {"delay_ms": 200, "op": "thinking", "on": true},
+  {"delay_ms": 300, "op": "thinking", "on": false},
+  {"delay_ms": 0, "op": "text", "delta": "STRESS — Lasttest der Oberfläche, kein Rechercheauftrag. Ich starte sechs Arbeiter in zwei Wellen; der Fan-out-Schutz des Kernels lässt vier gleichzeitig zu."},
+  {"delay_ms": 100, "op": "syscall", "name": "proc_spawn", "args": {"program": "scout", "task": "script:stress_worker"}},
+  {"delay_ms": 100, "op": "syscall", "name": "proc_spawn", "args": {"program": "scout", "task": "script:stress_worker"}},
+  {"delay_ms": 100, "op": "syscall", "name": "proc_spawn", "args": {"program": "scout", "task": "script:stress_worker"}},
+  {"delay_ms": 100, "op": "syscall", "name": "proc_spawn", "args": {"program": "scout", "task": "script:stress_worker"}},
+  {"delay_ms": 0, "op": "text", "delta": " Welle 1 läuft: vier Arbeiter à 25 Textblöcke pro Sekunde."},
+  {"op": "syscall", "name": "proc_wait", "args": {"pids": "children", "timeout_s": 120}},
+  {"delay_ms": 0, "op": "text", "delta": " Welle 1 ist durch. Welle 2 startet."},
+  {"delay_ms": 100, "op": "syscall", "name": "proc_spawn", "args": {"program": "scout", "task": "script:stress_worker"}},
+  {"delay_ms": 100, "op": "syscall", "name": "proc_spawn", "args": {"program": "scout", "task": "script:stress_worker"}},
+  {"op": "syscall", "name": "proc_wait", "args": {"pids": "children", "timeout_s": 120}},
+  {"delay_ms": 0, "op": "syscall", "name": "munin_write", "args": {"title": "STRESS — Lastprobe abgeschlossen", "body": "SIMULATION — sechs Arbeiter haben je 250 Textblöcke, 25 Werkzeugaufrufe und 10 munin-Einträge erzeugt. Reine Lastprobe, kein Befund.", "tags": ["stress", "simulation"]}},
+  {"delay_ms": 0, "op": "text", "delta": " Sechs Arbeiter fertig. Wenn Log und Tabelle das flüssig mitgemacht haben, hält die Oberfläche die Last."},
+  {"op": "usage", "turns": 9, "input_tokens": 6000, "output_tokens": 2000},
+  {"op": "exit", "reason": "done"}
+]
