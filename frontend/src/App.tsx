@@ -5,6 +5,7 @@ import { Toast, type ToastMessage, type ToastTone } from "./components/Toast";
 import { AgentWindow } from "./features/agent/AgentWindow";
 import { AgentGraph } from "./features/graph/AgentGraph";
 import { KernelLog } from "./features/log/KernelLog";
+import { MuninBrowser } from "./features/munin/MuninBrowser";
 import { CommandPalette } from "./features/palette/CommandPalette";
 import { ProcessTable } from "./features/procs/ProcessTable";
 import { Layout } from "./features/shell/Layout";
@@ -22,6 +23,8 @@ export default function App() {
   const replay = useHuginStore((store) => store.replay);
   const selectedPid = useHuginStore((store) => store.selectedPid);
   const setSelectedPid = useHuginStore((store) => store.setSelectedPid);
+  const view = useHuginStore((store) => store.view);
+  const setView = useHuginStore((store) => store.setView);
   const dispatch = useHuginStore((store) => store.dispatch);
 
   useEventStream(dispatch);
@@ -51,6 +54,8 @@ export default function App() {
 
   // A selection survives its process, but not a reload of the run: an unknown pid selects nothing.
   const selected = selectedPid === null ? undefined : state.procs[selectedPid];
+  // Mission control is the only view built from columns; the others take the whole middle row.
+  const control = view === "control";
 
   return (
     // `motion` animates through the Web Animations API, which the global CSS override in
@@ -61,46 +66,55 @@ export default function App() {
           <TopBar
             mode={mode}
             meters={state.meters}
+            view={view}
+            onViewChange={setView}
             onKillAll={onKillAll}
             onOpenPalette={openPalette}
           />
         }
+        main={control ? undefined : view === "munin" ? <MuninBrowser /> : <RunsPlaceholder />}
         left={
-          <ProcessTable
-            procs={selectProcs(state)}
-            now={now}
-            selectedPid={selectedPid}
-            onSelect={setSelectedPid}
-            onKill={onKill}
-          />
-        }
-        center={
-          <Panel title="Graph" className="h-full" bodyClassName="min-h-0 p-0">
-            <AgentGraph
-              state={state}
-              runId={state.activeRunId}
+          control ? (
+            <ProcessTable
+              procs={selectProcs(state)}
+              now={now}
               selectedPid={selectedPid}
               onSelect={setSelectedPid}
+              onKill={onKill}
             />
-          </Panel>
+          ) : undefined
+        }
+        center={
+          control ? (
+            <Panel title="Graph" className="h-full" bodyClassName="min-h-0 p-0">
+              <AgentGraph
+                state={state}
+                runId={state.activeRunId}
+                selectedPid={selectedPid}
+                onSelect={setSelectedPid}
+              />
+            </Panel>
+          ) : undefined
         }
         right={
           // The sheet overlays the log rather than unmounting it, so the ticker keeps its scroll
           // position — and its exit animation has something to slide away from.
-          <div className="relative h-full">
-            <KernelLog lines={state.log} />
-            <AnimatePresence>
-              {selected !== undefined && (
-                <AgentWindow
-                  key={selected.pid}
-                  proc={selected}
-                  now={now}
-                  onClose={closeAgent}
-                  onKill={onKill}
-                />
-              )}
-            </AnimatePresence>
-          </div>
+          control ? (
+            <div className="relative h-full">
+              <KernelLog lines={state.log} />
+              <AnimatePresence>
+                {selected !== undefined && (
+                  <AgentWindow
+                    key={selected.pid}
+                    proc={selected}
+                    now={now}
+                    onClose={closeAgent}
+                    onKill={onKill}
+                  />
+                )}
+              </AnimatePresence>
+            </div>
+          ) : undefined
         }
         bottom={<MissionBar run={run} now={now} />}
       />
@@ -112,6 +126,15 @@ export default function App() {
       />
       <Toast toast={toast} onDone={clearToast} />
     </MotionConfig>
+  );
+}
+
+/** Task 25 builds this view; until then the tab says so rather than pretending to be empty. */
+function RunsPlaceholder() {
+  return (
+    <Panel title="Runs" className="h-full">
+      <p className="text-[13px] text-muted">Runs &amp; Replay folgen</p>
+    </Panel>
   );
 }
 

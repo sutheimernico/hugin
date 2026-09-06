@@ -5,6 +5,7 @@ import type { Tone } from "../../components/Chip";
 import { Kbd } from "../../components/Kbd";
 import { Meter } from "../../components/Meter";
 import { fmtTokens } from "../../lib/format";
+import type { View } from "../../state/store";
 import type { Meters, Mode } from "../../state/types";
 import { ModeChip } from "./ModeChip";
 
@@ -15,14 +16,30 @@ import { ModeChip } from "./ModeChip";
 const PROC_SCALE = 8;
 const TOKENS_PER_MIN_SCALE = 2_000;
 
+/** The three views of the shell, in the order they are offered (spec §2.9). */
+const TABS: { view: View; label: string }[] = [
+  { view: "control", label: "Mission Control" },
+  { view: "munin", label: "Munin" },
+  { view: "runs", label: "Runs" },
+];
+
 type TopBarProps = {
   mode: Mode;
   meters: Meters;
+  view: View;
+  onViewChange: (view: View) => void;
   onKillAll: () => void;
   onOpenPalette: () => void;
 };
 
-export function TopBar({ mode, meters, onKillAll, onOpenPalette }: TopBarProps) {
+export function TopBar({
+  mode,
+  meters,
+  view,
+  onViewChange,
+  onKillAll,
+  onOpenPalette,
+}: TopBarProps) {
   return (
     <header className="flex h-12 items-center gap-4 border-b border-border bg-surface/80 px-4 backdrop-blur">
       <div className="flex min-w-0 items-baseline gap-3">
@@ -38,6 +55,8 @@ export function TopBar({ mode, meters, onKillAll, onOpenPalette }: TopBarProps) 
       <div className="shrink-0">
         <ModeChip mode={mode} />
       </div>
+
+      <ViewTabs view={view} onViewChange={onViewChange} />
 
       <div className="ml-auto flex shrink-0 items-center gap-5">
         {/* One fixed width per meter, so a longer label or readout can never push into its
@@ -79,6 +98,36 @@ export function TopBar({ mode, meters, onKillAll, onOpenPalette }: TopBarProps) 
         <PanicButton onKillAll={onKillAll} />
       </div>
     </header>
+  );
+}
+
+/**
+ * Segmented view switcher. Plain buttons rather than an ARIA tablist: a `role="tab"` promises
+ * arrow-key navigation between the tabs, and three links that also work with Tab are the
+ * smaller promise the shell can actually keep.
+ */
+function ViewTabs({ view, onViewChange }: { view: View; onViewChange: (view: View) => void }) {
+  return (
+    <nav aria-label="Ansicht" className="flex shrink-0 items-center gap-1">
+      {TABS.map((tab) => {
+        const active = tab.view === view;
+        return (
+          <button
+            key={tab.view}
+            type="button"
+            aria-current={active ? "page" : undefined}
+            onClick={() => onViewChange(tab.view)}
+            className={`ease-out-expo h-7 rounded-panel border px-2.5 text-[11px] whitespace-nowrap transition-colors duration-150 ${
+              active
+                ? "border-violet/60 bg-violet/10 text-text"
+                : "border-transparent text-muted hover:bg-surface-2 hover:text-text"
+            }`}
+          >
+            {tab.label}
+          </button>
+        );
+      })}
+    </nav>
   );
 }
 

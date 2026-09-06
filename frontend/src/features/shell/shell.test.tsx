@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { Fragment, type ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { MODE_LABEL } from "../../lib/i18n";
+import type { View } from "../../state/store";
 import type { LogLine, Meters, Mode, Run } from "../../state/types";
 import { KernelLog } from "../log/KernelLog";
 import { Layout } from "./Layout";
@@ -28,7 +29,26 @@ vi.mock("react-virtuoso", () => ({
   ),
 }));
 
-const METERS: Meters = { activeProcs: 2, tokensPerMin: 1234, budgetPct: 0.25, totalTokens: 8000 };
+const METERS: Meters = {
+  activeProcs: 2,
+  tokensPerMin: 1234,
+  budgetPct: 0.25,
+  totalTokens: 8000,
+};
+
+function renderTopBar(over: Partial<Parameters<typeof TopBar>[0]> = {}) {
+  const props = {
+    mode: "idle" as Mode,
+    meters: METERS,
+    view: "control" as View,
+    onViewChange: vi.fn(),
+    onKillAll: vi.fn(),
+    onOpenPalette: vi.fn(),
+    ...over,
+  };
+  render(<TopBar {...props} />);
+  return props;
+}
 
 function makeRun(over: Partial<Run> = {}): Run {
   return {
@@ -39,7 +59,12 @@ function makeRun(over: Partial<Run> = {}): Run {
     createdAt: 1_000,
     doneAt: null,
     artifacts: [],
-    usage: { turns: 3, input_tokens: 100, output_tokens: 50, cost_usd_equiv: null },
+    usage: {
+      turns: 3,
+      input_tokens: 100,
+      output_tokens: 50,
+      cost_usd_equiv: null,
+    },
     ...over,
   };
 }
@@ -69,7 +94,7 @@ describe("ModeChip", () => {
 
 describe("TopBar", () => {
   it("shows the wordmark, the tagline, the mode chip, three meters and the palette hint", () => {
-    render(<TopBar mode="idle" meters={METERS} onKillAll={vi.fn()} onOpenPalette={vi.fn()} />);
+    renderTopBar();
     expect(screen.getByText("hugin")).toBeInTheDocument();
     expect(screen.getByText("Gedanken ausschicken. Wissen zurückholen.")).toBeInTheDocument();
     expect(screen.getByText(MODE_LABEL.idle)).toBeInTheDocument();
@@ -79,20 +104,32 @@ describe("TopBar", () => {
     expect(screen.getByText("⌘K").tagName).toBe("KBD");
   });
 
+  it("offers the three views and marks the active one", () => {
+    renderTopBar({ view: "munin" });
+    expect(screen.getByRole("button", { name: "Mission Control" })).not.toHaveAttribute(
+      "aria-current",
+    );
+    expect(screen.getByRole("button", { name: "Munin" })).toHaveAttribute("aria-current", "page");
+    expect(screen.getByRole("button", { name: "Runs" })).toBeInTheDocument();
+  });
+
+  it("switches the view when a tab is clicked", async () => {
+    const setView = vi.fn();
+    renderTopBar({ onViewChange: setView });
+    await userEvent.click(screen.getByRole("button", { name: "Munin" }));
+    expect(setView).toHaveBeenCalledWith("munin");
+  });
+
   it("opens the palette from the ⌘K hint", async () => {
     const onOpenPalette = vi.fn();
-    render(
-      <TopBar mode="idle" meters={METERS} onKillAll={vi.fn()} onOpenPalette={onOpenPalette} />,
-    );
+    renderTopBar({ onOpenPalette });
     await userEvent.click(screen.getByRole("button", { name: "Befehle öffnen" }));
     expect(onOpenPalette).toHaveBeenCalledTimes(1);
   });
 
   it("asks before killing and only then reports the confirmation", async () => {
     const onKillAll = vi.fn();
-    render(
-      <TopBar mode="scripted" meters={METERS} onKillAll={onKillAll} onOpenPalette={vi.fn()} />,
-    );
+    renderTopBar({ mode: "scripted", onKillAll });
 
     await userEvent.click(screen.getByRole("button", { name: "Panik" }));
     expect(screen.getByText("Alle Prozesse beenden?")).toBeInTheDocument();
@@ -105,9 +142,7 @@ describe("TopBar", () => {
 
   it("closes the confirmation without killing anything", async () => {
     const onKillAll = vi.fn();
-    render(
-      <TopBar mode="scripted" meters={METERS} onKillAll={onKillAll} onOpenPalette={vi.fn()} />,
-    );
+    renderTopBar({ mode: "scripted", onKillAll });
 
     await userEvent.click(screen.getByRole("button", { name: "Panik" }));
     await userEvent.click(screen.getByRole("button", { name: "Abbrechen" }));
@@ -138,9 +173,27 @@ describe("MissionBar", () => {
 
 describe("KernelLog", () => {
   const lines: LogLine[] = [
-    { seq: 1, ts: 1_757_000_000, kind: "run.created", pid: null, text: "Mission gestartet: »Ziel«" },
-    { seq: 2, ts: 1_757_000_001, kind: "proc.spawned", pid: 7, text: "Prozess 7 (scout) gestartet" },
-    { seq: 3, ts: 1_757_000_002, kind: "munin.write", pid: 7, text: "Speicher: »Fund«" },
+    {
+      seq: 1,
+      ts: 1_757_000_000,
+      kind: "run.created",
+      pid: null,
+      text: "Mission gestartet: »Ziel«",
+    },
+    {
+      seq: 2,
+      ts: 1_757_000_001,
+      kind: "proc.spawned",
+      pid: 7,
+      text: "Prozess 7 (scout) gestartet",
+    },
+    {
+      seq: 3,
+      ts: 1_757_000_002,
+      kind: "munin.write",
+      pid: 7,
+      text: "Speicher: »Fund«",
+    },
   ];
 
   it("renders every line with its pid and text", () => {
@@ -179,5 +232,12 @@ describe("Layout", () => {
     for (const slot of ["oben", "links", "mitte", "rechts", "unten"]) {
       expect(screen.getByText(slot)).toBeInTheDocument();
     }
+  });
+
+  it("gives a single view the whole middle row instead of the columns", () => {
+    render(
+      <Layout topBar={<span>oben</span>} main={<span>alles</span>} bottom={<span>unten</span>} />,
+    );
+    expect(screen.getByText("alles")).toBeInTheDocument();
   });
 });
