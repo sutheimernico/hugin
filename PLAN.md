@@ -82,7 +82,7 @@ implementation plan is authoritative — never invent tasks that are not in it.
 
 ## Milestone 5 — Polish, recordings, docs, sweep
 
-- [ ] Task 27: Motion & performance polish pass
+- [x] Task 27: Motion & performance polish pass
 - [ ] Task 28: Live runs + demo recordings (orchestrator-supervised)
 - [ ] Task 29: README, GIF, PROJECT.md status, session doc
 - [ ] Task 30: Privacy & security sweep before any visibility change
