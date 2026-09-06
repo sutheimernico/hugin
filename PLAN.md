@@ -63,7 +63,7 @@ implementation plan is authoritative — never invent tasks that are not in it.
 ## Milestone 3 — Real drivers
 
 - [x] Task 17: stream-json parser
-- [ ] Task 18: ClaudeCodeDriver — command/env builders, isolated config dir, subprocess runner
+- [x] Task 18: ClaudeCodeDriver — command/env builders, isolated config dir, subprocess runner
 - [ ] Task 19: MCP syscall transport at /mcp (bearer → pid)
 - [ ] Task 20: OllamaDriver (tool-calling loop)
 - [ ] Task 21: System status (`/api/system`) + driver gating
