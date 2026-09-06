@@ -12,8 +12,8 @@ import {
   BackgroundVariant,
   ReactFlow,
   ReactFlowProvider,
-  useNodesInitialized,
   useReactFlow,
+  useStore,
   type EdgeTypes,
   type NodeTypes,
 } from "@xyflow/react";
@@ -80,16 +80,14 @@ function Graph({ state, runId, selectedPid, onSelect, panicking }: AgentGraphPro
   const edges = useMemo(() => toEdges(graph.edges, state), [graph, state]);
 
   const { fitView } = useReactFlow();
-  // Flips to false whenever a node joins and back once it has been measured — which is exactly
-  // when a re-fit is both needed and able to measure what it is fitting.
-  const initialized = useNodesInitialized();
   const count = graph.nodes.length;
   const container = useRef<HTMLDivElement>(null);
+  const measured = useMeasuredNodes();
 
   useEffect(() => {
-    if (!initialized || count === 0) return;
+    if (count === 0) return;
     void fitView(FIT);
-  }, [initialized, count, fitView]);
+  }, [measured, count, fitView]);
 
   useEffect(() => {
     const element = container.current;
@@ -155,6 +153,24 @@ function Graph({ state, runId, selectedPid, onSelect, panicking }: AgentGraphPro
       )}
     </div>
   );
+}
+
+/**
+ * A signature of every node xyflow has *measured*, which is the moment a re-fit is both due
+ * and able to measure what it is fitting.
+ *
+ * `useNodesInitialized` would read better but never turns true here — the hook also waits for
+ * handle bounds, and these nodes hide their handles — so a fit gated on it never ran at all.
+ * The measured sizes are the signal that hook is trying to derive, so this reads them directly.
+ */
+function useMeasuredNodes(): string {
+  return useStore((state) => {
+    let key = "";
+    for (const [id, node] of state.nodeLookup) {
+      key += `${id}:${node.measured?.width ?? 0}x${node.measured?.height ?? 0}|`;
+    }
+    return key;
+  });
 }
 
 function toNodes(nodes: GNode[], state: State, selectedPid: number | null): GraphNode[] {
