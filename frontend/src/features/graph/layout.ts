@@ -63,6 +63,23 @@ export function muninEdgeId(pid: number): string {
 }
 
 /**
+ * Everything about a run that changes the *layout*: which processes exist, who spawned whom,
+ * and which of them have written to munin (that is what adds a hub edge).
+ *
+ * Streaming text, usage and state changes rewrite `state.procs` many times a second. Running
+ * dagre on each of them would relayout — and visibly re-fit — the graph while nothing about
+ * its shape moved, so the graph is memoised on this key instead of on the state itself.
+ */
+export function structureKey(state: State, runId: string | null): string {
+  if (runId === null) return "";
+  return Object.values(state.procs)
+    .filter((proc) => proc.runId === runId)
+    .sort((a, b) => a.pid - b.pid)
+    .map((proc) => `${proc.pid}>${proc.ppid ?? "-"}${proc.muninWrites > 0 ? "m" : ""}`)
+    .join("|");
+}
+
+/**
  * The graph of one run: an agent per process, the spawn tree between them, and a link to the
  * memory hub for every process that has written to it.
  *

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { initialState } from "../../state/reducer";
 import type { Proc, State } from "../../state/types";
-import { buildGraph, MUNIN_ID } from "./layout";
+import { buildGraph, MUNIN_ID, structureKey } from "./layout";
 
 const RUN = "r1";
 
@@ -101,5 +101,37 @@ describe("buildGraph", () => {
   it("draws nothing at all while no mission has started", () => {
     expect(buildGraph(initialState, null)).toEqual({ nodes: [], edges: [] });
     expect(buildGraph(mission(), null)).toEqual({ nodes: [], edges: [] });
+  });
+});
+
+describe("structureKey", () => {
+  it("ignores everything a running agent changes while it works", () => {
+    const before = mission();
+    const after = stateOf([
+      proc(1, null, { state: "waiting_tool", usage: { ...before.procs[1].usage, turns: 5 } }),
+      proc(2, 1, { state: "done", transcript: [{ t: "text", text: "viel Text" }] }),
+      proc(3, 1),
+      proc(4, 1, { program: "judge" }),
+    ]);
+
+    expect(structureKey(after, RUN)).toBe(structureKey(before, RUN));
+  });
+
+  it("changes when a node joins, when a parent changes, and on the first munin write", () => {
+    const base = mission();
+    const key = structureKey(base, RUN);
+
+    expect(structureKey(stateOf([...Object.values(base.procs), proc(5, 1)]), RUN)).not.toBe(key);
+    expect(structureKey(stateOf([proc(1, null), proc(2, null), proc(3, 1), proc(4, 1)]), RUN)).not.toBe(key);
+
+    const wrote = stateOf([proc(1, null, { muninWrites: 1 }), proc(2, 1), proc(3, 1), proc(4, 1)]);
+    expect(structureKey(wrote, RUN)).not.toBe(key);
+    // A second write adds no edge, so it must not move the layout either.
+    const wroteTwice = stateOf([proc(1, null, { muninWrites: 7 }), proc(2, 1), proc(3, 1), proc(4, 1)]);
+    expect(structureKey(wroteTwice, RUN)).toBe(structureKey(wrote, RUN));
+  });
+
+  it("is empty without a run", () => {
+    expect(structureKey(initialState, null)).toBe("");
   });
 });

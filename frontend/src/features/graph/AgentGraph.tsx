@@ -18,7 +18,7 @@ import {
   type NodeTypes,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { useCallback, useEffect, useMemo, type MouseEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, type KeyboardEvent, type MouseEvent } from "react";
 import { isAlive } from "../../state/selectors";
 import type { Pulse, State } from "../../state/types";
 import { AgentNode, type AgentNodeType } from "./AgentNode";
@@ -29,6 +29,7 @@ import {
   HANDLE_OUT,
   MUNIN_ID,
   pidOfNode,
+  structureKey,
   treeEdgeId,
   muninEdgeId,
   type GEdge,
@@ -41,6 +42,9 @@ import { PulseEdge, type EdgePulse, type PulseEdgeType } from "./PulseEdge";
 // whole node cache and log a warning.
 const NODE_TYPES: NodeTypes = { proc: AgentNode, munin: MuninNode };
 const EDGE_TYPES: EdgeTypes = { pulse: PulseEdge };
+
+/** The one fit the graph ever performs — on a new node, and on a resized panel. */
+const FIT = { padding: 0.2, maxZoom: 1.1, duration: 400 };
 
 type GraphNode = AgentNodeType | MuninNodeType;
 
@@ -61,7 +65,15 @@ export function AgentGraph(props: AgentGraphProps) {
 }
 
 function Graph({ state, runId, selectedPid, onSelect }: AgentGraphProps) {
-  const graph = useMemo(() => buildGraph(state, runId), [state, runId]);
+  const structure = structureKey(state, runId);
+  const graph = useMemo(
+    () => buildGraph(state, runId),
+    // Deliberately keyed on the *shape* of the run, not on the state object: a state whose
+    // structure key is unchanged always lays out identically, and re-running dagre on every
+    // streamed token would relayout — and visibly re-fit — a graph that never moved.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [structure],
+  );
   const nodes = useMemo(() => toNodes(graph.nodes, state, selectedPid), [graph, state, selectedPid]);
   const edges = useMemo(() => toEdges(graph.edges, state), [graph, state]);
 
@@ -70,11 +82,22 @@ function Graph({ state, runId, selectedPid, onSelect }: AgentGraphProps) {
   // when a re-fit is both needed and able to measure what it is fitting.
   const initialized = useNodesInitialized();
   const count = graph.nodes.length;
+  const container = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!initialized || count === 0) return;
-    void fitView({ duration: 400, padding: 0.28, maxZoom: 1 });
+    void fitView(FIT);
   }, [initialized, count, fitView]);
+
+  useEffect(() => {
+    const element = container.current;
+    // The agent sheet takes the column's width away from the graph, and the window itself can
+    // be resized — both change what "fits" means without changing a single event.
+    if (element === null || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(() => void fitView(FIT));
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [fitView]);
 
   const handleClick = useCallback(
     (_event: MouseEvent, node: { id: string }) => {
@@ -84,32 +107,46 @@ function Graph({ state, runId, selectedPid, onSelect }: AgentGraphProps) {
     [onSelect],
   );
 
-  if (count === 0) {
-    return (
-      <div className="flex h-full items-center justify-center px-6 text-center text-[12px] text-muted">
-        Noch keine Agenten — der Graph wächst mit der Mission.
-      </div>
-    );
-  }
+  // Keyboard parity with the click: xyflow focuses its node wrappers, so the key press bubbles
+  // up here carrying the node's `data-id` — the same id `onNodeClick` would have handed over.
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent<HTMLDivElement>) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      const wrapper = (event.target as HTMLElement).closest<HTMLElement>(".react-flow__node");
+      const pid = wrapper?.dataset.id === undefined ? null : pidOfNode(wrapper.dataset.id);
+      if (pid === null) return;
+      event.preventDefault();
+      onSelect(pid);
+    },
+    [onSelect],
+  );
 
   return (
-    <ReactFlow<GraphNode, PulseEdgeType>
-      className="hugin-graph"
-      colorMode="dark"
-      nodes={nodes}
-      edges={edges}
-      nodeTypes={NODE_TYPES}
-      edgeTypes={EDGE_TYPES}
-      onNodeClick={handleClick}
-      fitView
-      fitViewOptions={{ padding: 0.28, maxZoom: 1 }}
-      panOnScroll
-      nodesDraggable={false}
-      nodesConnectable={false}
-      edgesFocusable={false}
-    >
-      <Background variant={BackgroundVariant.Dots} gap={24} size={1} />
-    </ReactFlow>
+    <div ref={container} className="h-full w-full" onKeyDown={handleKeyDown}>
+      {count === 0 ? (
+        <div className="flex h-full items-center justify-center px-6 text-center text-[12px] text-muted">
+          Noch keine Agenten — der Graph wächst mit der Mission.
+        </div>
+      ) : (
+        <ReactFlow<GraphNode, PulseEdgeType>
+          className="hugin-graph"
+          colorMode="dark"
+          nodes={nodes}
+          edges={edges}
+          nodeTypes={NODE_TYPES}
+          edgeTypes={EDGE_TYPES}
+          onNodeClick={handleClick}
+          fitView
+          fitViewOptions={FIT}
+          panOnScroll
+          nodesDraggable={false}
+          nodesConnectable={false}
+          edgesFocusable={false}
+        >
+          <Background variant={BackgroundVariant.Dots} gap={24} size={1} />
+        </ReactFlow>
+      )}
+    </div>
   );
 }
 
@@ -129,6 +166,8 @@ function toNodes(nodes: GNode[], state: State, selectedPid: number | null): Grap
           type: "proc",
           position: { x: node.x, y: node.y },
           data: { proc: state.procs[node.pid!] },
+          // Read out by a screen reader on focus; the card itself is icons and numbers.
+          ariaLabel: `${state.procs[node.pid!].program} · PID ${node.pid}`,
           selected: node.pid === selectedPid,
           draggable: false,
         } satisfies AgentNodeType),

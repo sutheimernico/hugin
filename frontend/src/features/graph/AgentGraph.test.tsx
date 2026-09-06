@@ -79,6 +79,23 @@ describe("AgentGraph", () => {
     expect(onSelect).toHaveBeenCalledWith(2);
   });
 
+  it("selects the focused process on Enter and on Space", async () => {
+    const onSelect = renderGraph(mission());
+    const card = await screen.findByLabelText("scout · PID 2");
+
+    fireEvent.keyDown(card, { key: "Enter" });
+    fireEvent.keyDown(card, { key: " " });
+
+    expect(onSelect).toHaveBeenNthCalledWith(1, 2);
+    expect(onSelect).toHaveBeenNthCalledWith(2, 2);
+  });
+
+  it("labels every agent card with its program and pid", async () => {
+    renderGraph(mission());
+    expect(await screen.findByLabelText("planner · PID 1")).toBeInTheDocument();
+    expect(screen.getByLabelText("scout · PID 2")).toBeInTheDocument();
+  });
+
   it("says so instead of drawing an empty canvas while nothing runs", () => {
     renderGraph(initialState);
     expect(screen.getByText(/Noch keine Agenten/)).toBeInTheDocument();
