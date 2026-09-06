@@ -34,6 +34,8 @@ implementation plan is authoritative — never invent tasks that are not in it.
   programs, drivers, kernel façade, munin and the capability-gated syscalls
 - [x] **Milestone 2 — API, SSE and the Mission Control shell** (Tasks 12–16): API and SSE,
   frontend state, shell layout, live graph and the ⌘K palette
+- [x] **Milestone 3 — Real drivers** (Tasks 17–21): stream-json parser, Claude Code and Ollama
+  drivers, MCP syscall transport, subsystem status and the driver gate
 
 ## Milestone 0 — Scaffold
 
@@ -66,7 +68,7 @@ implementation plan is authoritative — never invent tasks that are not in it.
 - [x] Task 18: ClaudeCodeDriver — command/env builders, isolated config dir, subprocess runner
 - [x] Task 19: MCP syscall transport at /mcp (bearer → pid)
 - [x] Task 20: OllamaDriver (tool-calling loop)
-- [ ] Task 21: System status (`/api/system`) + driver gating
+- [x] Task 21: System status (`/api/system`) + driver gating
 
 ## Milestone 4 — Agent window, Munin browser, Replay, Boot
 
