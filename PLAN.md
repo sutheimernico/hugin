@@ -84,7 +84,7 @@ implementation plan is authoritative — never invent tasks that are not in it.
 
 - [x] Task 27: Motion & performance polish pass
 - [ ] Task 28: Live runs + demo recordings (orchestrator-supervised)
-- [ ] Task 29: README, GIF, PROJECT.md status, session doc
+- [x] Task 29: README, GIF, PROJECT.md status, session doc
 - [ ] Task 30: Privacy & security sweep before any visibility change
 
 ## Standing mandate (per AUTOPILOT, once per phase — not per iteration)
@@ -95,6 +95,7 @@ implementation plan is authoritative — never invent tasks that are not in it.
 ## Needs Nico (loop cannot do these itself)
 
 - Git remote / public-visibility decision before any first push, plus the publish checklist.
-- Live Claude and Ollama demo runs and their recordings (Task 28) — usage-relevant, supervised.
-- The demo GIF and the visual/motion sign-off (Task 27, Task 29).
-- Windows shortcut that starts `scripts/serve.sh` for the demo.
+- Live Claude and Ollama runs and their recordings (Task 28) — usage-relevant, supervised.
+- Visual/motion sign-off on the README media (`docs/media/`, Task 29).
+- Windows shortcut that starts `scripts/serve.sh` plus `msedge --app=http://127.0.0.1:8770`.
+- Optional Tailscale, if the shell should be reachable from the phone.

@@ -107,11 +107,17 @@ react-virtuoso · zustand · lucide-react · @fontsource fonts · vitest + testi
 
 ## Status
 
-**Phase 0 — Scaffold (in progress, 2026-09-05).** Task 1 of 30 done: Python project (uv,
-hatchling, src-layout), `Settings`, FastAPI app factory with `GET /api/health`, `hugin-serve`
-entry point, `scripts/serve.sh`, house docs, register entry. Gate green (2 tests). Nothing runs
-agents yet — there is no kernel, no driver and no frontend. Work happens on `autopilot/work`;
-no git remote exists.
+**v1 feature-complete 2026-09-06 (Tasks 1–29 of 30).** Kernel, three drivers, capability-gated
+syscalls over MCP, munin FTS5, five programs, missions, replay with recordings and the six views
+all exist and run. Gate: 353 pytest + 234 vitest green, ruff/tsc/eslint clean. A live Claude
+mission ran end-to-end on the subscription (`apiKeySource=none`): planner + 3 scouts with
+WebSearch/WebFetch, 848 events, 51 turns, 231 s, 5 munin writes, one `report.md` — API equivalent
+$1.12, billed 0 €. Simulation runs in 7.6 s / 127 events; Ollama (`qwen2.5:7b`, CPU only, ~5
+tok/s) runs but is slow — one demo mission hit the planner's 900 s budget and was killed with
+`exit_reason=budget:seconds`. The demo recordings live under `demo/recordings/` (Task 28).
+
+Open: Task 30 (privacy & security sweep, ADRs) and the "Needs Nico" items below. Work happens on
+`autopilot/work`; no git remote exists.
 
 ## Roadmap
 
@@ -156,7 +162,9 @@ Superpowers flow (`brainstorming` → `writing-plans` → `executing-plans` /
 - **Publish checklist.** If it goes public: secret scan over the full history, doc sweep for
   personal data and company references, commit e-mails rewritten to the noreply address, MIT
   LICENSE in place, backup bundle before any history rewrite.
-- **Windows shortcut / start entry** for `scripts/serve.sh` (WSL), so the demo starts without a
-  terminal.
-- **Live demo runs.** The Claude and Ollama demo recordings (acceptance criterion 3) need Nico's
-  logged-in Claude Code and a running Ollama; the loop must never spawn live agents on its own.
+- **Windows shortcut / start entry** for `scripts/serve.sh` (WSL) plus
+  `msedge --app=http://127.0.0.1:8770`, so the demo starts without a terminal.
+- **Optional Tailscale** if the shell should also be reachable from the phone.
+- **Live demo runs — done 2026-09-06.** Simulation, Claude and Ollama recordings exist in
+  `demo/recordings/`. Further live runs still need Nico's logged-in Claude Code and a running
+  Ollama; the loop must never spawn live agents on its own.
