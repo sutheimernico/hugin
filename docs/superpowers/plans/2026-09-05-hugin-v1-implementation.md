@@ -1065,7 +1065,7 @@ Loop: messages `[system, user]`; for turn in range(max_turns): `POST {ollama_url
 
 Tests with `httpx.MockTransport` scripted responses (NDJSON bodies): text-only reply → one turn, text forwarded, usage tokens from counts; a tool call → `sink.syscall` invoked with parsed args, second request contains the tool message, exit `done` after 2 turns; connection error → `driver_error`; `to_ollama_tools` shape; `available()` parses `/api/tags`.
 
-- [ ] Steps → `git commit -m "feat(drivers): add Ollama tool-calling driver"`
+- [x] Steps → `git commit -m "feat(drivers): add Ollama tool-calling driver"`
 
 ---
 
