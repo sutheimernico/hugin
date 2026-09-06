@@ -7,7 +7,9 @@ through `ProcessSink`; the API, missions and syscalls only through the methods b
 
 import asyncio
 import contextlib
+import hmac
 import logging
+import secrets
 import time
 from collections import deque
 from collections.abc import Callable
@@ -31,6 +33,7 @@ logger = logging.getLogger(__name__)
 
 FAN_OUT_LIMIT = 4
 RUN_ID_LENGTH = 12
+TOKEN_BYTES = 16  # 32 hex characters
 _WAIT_POLL_S = 0.02
 
 
@@ -203,6 +206,7 @@ class Kernel:
             capabilities=set(spec.capabilities),
             allowed_tools=list(spec.tools),
             budget=budget or spec.budget,
+            token=secrets.token_hex(TOKEN_BYTES),
         )
         self.procs.add(proc)
         run = self.runs.get(run_id)
@@ -225,6 +229,24 @@ class Kernel:
         self._queue.append(pid)
         await self._pump()
         return pid
+
+    def token_for(self, pid: int) -> str:
+        """The bearer token that identifies this process to the MCP syscall transport."""
+        return self.procs.get(pid).token
+
+    def pid_for(self, token: str) -> int | None:
+        """The process a bearer token belongs to, or `None`.
+
+        Every process is a candidate, exited ones included: an agent may still be finishing a
+        syscall while the kernel already recorded its exit, and a token that stops working mid
+        call would look like a kernel bug to the agent. The comparison runs over the whole
+        table in constant time, so a wrong guess learns nothing from how long the answer took.
+        """
+        found: int | None = None
+        for proc in self.procs.all():
+            if proc.token and hmac.compare_digest(proc.token, token):
+                found = proc.pid
+        return found
 
     def system_prompt_for(self, pid: int) -> str:
         proc = self.procs.get(pid)

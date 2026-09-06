@@ -331,3 +331,37 @@ async def test_shutdown_cancels_everything(make_kernel):
     await kernel.spawn(run_id, "scout", HELLO, driver="scripted")
     await kernel.shutdown()
     assert kernel.procs.alive() == []
+
+
+async def test_every_process_gets_its_own_token_that_resolves_back_to_the_pid(kernel):
+    run_id = await kernel.create_run("Token", driver="scripted")
+    first = await kernel.spawn(run_id, "planner", HELLO, driver="scripted")
+    second = await kernel.spawn(run_id, "scout", HELLO, driver="scripted", ppid=first)
+
+    tokens = {kernel.token_for(first), kernel.token_for(second)}
+    assert len(tokens) == 2
+    assert all(len(token) == 32 for token in tokens)
+    assert kernel.pid_for(kernel.token_for(first)) == first
+    assert kernel.pid_for(kernel.token_for(second)) == second
+
+
+async def test_an_unknown_token_resolves_to_nothing(kernel):
+    run_id = await kernel.create_run("Token", driver="scripted")
+    await kernel.spawn(run_id, "planner", HELLO, driver="scripted")
+    for candidate in ("", "not-a-token", "0" * 32):
+        assert kernel.pid_for(candidate) is None
+
+
+async def test_a_token_still_resolves_after_the_process_exited(kernel, until):
+    run_id = await kernel.create_run("Token", driver="scripted")
+    pid = await kernel.spawn(run_id, "scout", HELLO, driver="scripted")
+    await until(lambda: not kernel.procs.get(pid).alive)
+    assert kernel.pid_for(kernel.token_for(pid)) == pid
+
+
+async def test_a_token_never_reaches_the_event_log(kernel, until):
+    run_id = await kernel.create_run("Token", driver="scripted")
+    pid = await kernel.spawn(run_id, "planner", HELLO, driver="scripted")
+    await until(lambda: not kernel.procs.get(pid).alive)
+    token = kernel.token_for(pid)
+    assert token not in json.dumps([event.model_dump(mode="json") for event in kernel.collected])

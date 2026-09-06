@@ -57,6 +57,9 @@ class AgentProcess:
     exit_reason: str | None = None
     mailbox: list[Message] = field(default_factory=list)
     report: str | None = None  # final mission_report text (workers)
+    # The bearer token this process authenticates its syscalls with. Never logged, never
+    # part of an event: the event log names processes by pid, and only by pid.
+    token: str = ""
 
     def transition(self, new: ProcState) -> ProcState:
         """Move to `new` and return the previous state; raise `InvalidTransition` if illegal."""

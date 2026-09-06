@@ -21,6 +21,7 @@ from hugin.kernel.log import EventLog
 from hugin.munin.store import MuninStore
 from hugin.programs.loader import load_programs
 from hugin.settings import Settings
+from hugin.syscalls.mcp_server import mount_syscall_mcp
 
 logger = logging.getLogger(__name__)
 
@@ -57,7 +58,10 @@ def create_app(
         await kernel.boot()
         app.state.kernel = kernel
         try:
-            yield
+            # The MCP session manager owns a task group of its own, so `/mcp` is only alive
+            # between these two lines — exactly as long as the kernel it speaks for.
+            async with app.state.mcp.run():
+                yield
         finally:
             app.state.kernel = None
             await kernel.shutdown()
@@ -69,12 +73,14 @@ def create_app(
     app.state.kernel = None
     for module in ROUTERS:
         app.include_router(module.router)
+    # Before the shell: the static mount at `/` swallows every path that reaches it.
+    app.state.mcp = mount_syscall_mcp(app)
     _mount_shell(app, settings)
     return app
 
 
 def _mount_shell(app: FastAPI, settings: Settings) -> None:
-    """Serve the built shell at `/` — mounted after the routers, so every `/api/*` route wins."""
+    """Serve the built shell at `/` — mounted last, so `/api/*` and `/mcp` win."""
     dist = settings.repo_root / "frontend" / "dist"
     if not dist.is_dir():
         logger.info("no frontend/dist — serving the API only (npm --prefix frontend run build)")

@@ -1,15 +1,17 @@
 """API fixtures: the real app on tmp dirs, driven through ASGI without a socket.
 
-Two things need care here. First, `httpx.ASGITransport` never runs the lifespan, so the kernel
-is booted explicitly through `app.router.lifespan_context`. Second, that transport buffers the
-whole response body before it returns — fine for JSON, useless for a stream that never ends —
-so SSE is driven through the raw ASGI callable by `_SseStream` below.
+Three things need care here. First, `httpx.ASGITransport` never runs the lifespan, so the
+kernel is booted explicitly — and by a task of its own (`_lifespan`), because the lifespan
+holds task-affine resources (the MCP session manager's task group) that must be entered and
+exited in the same task, which a pytest fixture's setup and teardown are not. Second, that
+transport buffers the whole response body before it returns — fine for JSON, useless for a
+stream that never ends — so SSE is driven through the raw ASGI callable by `_SseStream` below.
 """
 
 import asyncio
 import contextlib
 import json
-from collections.abc import Awaitable, Callable
+from collections.abc import AsyncIterator, Awaitable, Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -40,6 +42,33 @@ class Api:
         return self.app.state.kernel
 
 
+@contextlib.asynccontextmanager
+async def _lifespan(app) -> AsyncIterator[None]:
+    """Run the app's lifespan start-to-finish inside one task, the way a real server does.
+
+    `AsyncExitStack.enter_async_context` would enter it in the fixture's setup task and leave
+    it in the teardown task; anyio task groups (the MCP session manager owns one) refuse that.
+    """
+    started, stop = asyncio.Event(), asyncio.Event()
+
+    async def _drive() -> None:
+        async with app.router.lifespan_context(app):
+            started.set()
+            await stop.wait()
+
+    task = asyncio.create_task(_drive(), name="hugin-test-lifespan")
+    waiter = asyncio.ensure_future(started.wait())
+    await asyncio.wait([task, waiter], return_when=asyncio.FIRST_COMPLETED)
+    waiter.cancel()
+    if task.done():  # startup failed — surface its exception instead of hanging
+        await task
+    try:
+        yield
+    finally:
+        stop.set()
+        await task
+
+
 @pytest.fixture
 async def make_api(tmp_path: Path):
     """Factory for booted apps, each on its own tmp dirs; all are torn down afterwards."""
@@ -59,7 +88,7 @@ async def make_api(tmp_path: Path):
             max_concurrent=limits if limits is not None else {"scripted": 8},
         )
         app = create_app(settings, drivers={"scripted": ScriptedDriver(clock_sleep=clock_sleep)})
-        await stack.enter_async_context(app.router.lifespan_context(app))
+        await stack.enter_async_context(_lifespan(app))
         client = await stack.enter_async_context(
             httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url=BASE_URL)
         )
