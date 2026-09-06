@@ -344,7 +344,7 @@ async def test_the_root_process_writes_the_artifact_and_announces_it(parked):
     }
 
 
-@pytest.mark.parametrize("name", ["../escape.md", "..", "sub/report.md", "", "a" * 65])
+@pytest.mark.parametrize("name", ["../escape.md", "..", "sub/report.md", "a" * 65])
 async def test_artifact_names_that_leave_the_directory_are_refused(parked, name):
     kernel, run_id, spawn = parked
     planner = await spawn("planner")
@@ -387,3 +387,20 @@ async def test_the_simulation_runs_a_whole_mission_end_to_end(kernel, until):
     assert _of_kind(kernel, EventKind.RUN_DONE)[-1].data["artifacts"] == ["report.md"]
     assert [e.data["ok"] for e in _of_kind(kernel, EventKind.SYS_RESULT)].count(False) == 0
     assert elapsed < 3.0
+
+
+async def test_proc_wait_accepts_the_children_keyword_wrapped_in_a_list(kernel):
+    run_id = await kernel.create_run("g", "scripted")
+    root = await kernel.spawn(run_id, "planner", "script:hello", driver="scripted")
+    kernel.procs.get(root).transition("spawning")
+    kernel.procs.get(root).transition("running")
+    result = await kernel.syscalls.call(root, "proc_wait", {"pids": ["children"], "timeout_s": 5})
+    assert result == {"results": []}
+
+
+async def test_artifact_write_defaults_the_name_to_report_md(kernel):
+    run_id = await kernel.create_run("g", "scripted")
+    root = await kernel.spawn(run_id, "planner", "script:hello", driver="scripted")
+    result = await kernel.syscalls.call(root, "artifact_write", {"content": "# Bericht"})
+    assert result["path"] == "artifacts/report.md"
+    assert (kernel.settings.runs_dir / run_id / "artifacts" / "report.md").read_text() == "# Bericht"

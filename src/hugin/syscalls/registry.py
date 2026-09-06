@@ -154,6 +154,8 @@ SYSCALLS: tuple[SyscallDef, ...] = (
                     "anyOf": [
                         {"type": "array", "items": {"type": "integer"}, "maxItems": 8},
                         {"type": "string", "enum": ["children"]},
+                        # Small models tend to wrap the keyword in a list; accept that too.
+                        {"type": "array", "items": {"type": "string", "enum": ["children"]}, "maxItems": 1},
                     ]
                 },
                 "timeout_s": {
@@ -193,10 +195,11 @@ SYSCALLS: tuple[SyscallDef, ...] = (
         schema={
             "type": "object",
             "properties": {
-                "name": {"type": "string", "maxLength": 64},
+                # Defaulted so a model that forgets the name still lands its one report.
+                "name": {"type": "string", "maxLength": 64, "default": "report.md"},
                 "content": {"type": "string", "maxLength": 200000},
             },
-            "required": ["name", "content"],
+            "required": ["content"],
             "additionalProperties": False,
         },
         handler=artifact_write,

@@ -107,7 +107,7 @@ async def proc_wait(kernel: "Kernel", pid: int, args: dict) -> dict:
     """
     proc = kernel.procs.get(pid)
     requested = args["pids"]
-    if requested == ALL_CHILDREN:
+    if requested == ALL_CHILDREN or requested == [ALL_CHILDREN]:
         pids = [child.pid for child in kernel.procs.children(pid) if child.alive]
     else:
         pids = [_in_same_run(kernel, proc, target, "proc_wait").pid for target in requested]
@@ -136,7 +136,7 @@ async def artifact_write(kernel: "Kernel", pid: int, args: dict) -> dict:
     run = kernel.runs.get(proc.run_id)
     if run is None or run.root_pid != pid:
         raise SyscallError("single-writer: only the root process may write artifacts")
-    name = args["name"]
+    name = args.get("name") or "report.md"
     if ".." in name or ARTIFACT_NAME.fullmatch(name) is None:
         raise SyscallError(
             f"artifact_write: invalid name {name!r} — 1 to 64 characters of A-Z a-z 0-9 . _ -,"
