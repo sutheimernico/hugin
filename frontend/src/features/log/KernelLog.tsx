@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { Virtuoso, type VirtuosoHandle } from "react-virtuoso";
 import { Panel } from "../../components/Panel";
 import type { LogLine } from "../../state/types";
@@ -85,7 +85,12 @@ function LogList({ lines }: { lines: LogLine[] }) {
   );
 }
 
-function LogRow({ line }: { line: LogLine }) {
+/**
+ * Memoised: the ticker grows by hundreds of lines a second under the stress script, and a
+ * `LogLine` never changes after the reducer appended it — so every already-rendered row can
+ * be skipped instead of re-rendered on each batch.
+ */
+const LogRow = memo(function LogRow({ line }: { line: LogLine }) {
   return (
     <div
       data-testid="log-line"
@@ -99,7 +104,7 @@ function LogRow({ line }: { line: LogLine }) {
       <span className="min-w-0 break-words">{line.text}</span>
     </div>
   );
-}
+});
 
 function colorOf(kind: string): string {
   for (const [prefix, color] of KIND_COLOR) {

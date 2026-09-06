@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Kbd } from "../../components/Kbd";
 import { Panel } from "../../components/Panel";
 import { StateRing } from "../../components/StateRing";
@@ -83,7 +84,9 @@ export function ProcessTable({
               <ProcessRow
                 key={proc.pid}
                 proc={proc}
-                now={now}
+                // Not `now`: an exited process has a fixed end, and passing the ticking clock
+                // would invalidate every finished row once a second for nothing.
+                end={proc.exitedAt ?? now}
                 selected={proc.pid === selectedPid}
                 onSelect={onSelect}
                 onKill={onKill}
@@ -98,13 +101,20 @@ export function ProcessTable({
 
 type RowProps = {
   proc: Proc;
-  now: number;
+  /** When this process's clock stops: its exit, or the wall clock while it lives. */
+  end: number;
   selected: boolean;
   onSelect: (pid: number) => void;
   onKill: (pid: number) => void;
 };
 
-function ProcessRow({ proc, now, selected, onSelect, onKill }: RowProps) {
+/**
+ * Memoised on purpose: a streaming mission rewrites one `Proc` object per event while the
+ * others keep their identity, so without this every token would re-render the whole table.
+ * Every prop is stable per row — the reducer hands out frozen objects, `end` only moves for a
+ * living process, and the two callbacks come from `useCallback` in `App`.
+ */
+const ProcessRow = memo(function ProcessRow({ proc, end, selected, onSelect, onKill }: RowProps) {
   const living = isAlive(proc);
   return (
     <tr
@@ -142,7 +152,7 @@ function ProcessRow({ proc, now, selected, onSelect, onKill }: RowProps) {
         {fmtTokens(proc.usage.output_tokens)}
       </td>
       <td className="text-right font-mono text-[11px] text-muted tabular-nums">
-        {elapsed(proc, now)}
+        {elapsed(proc, end)}
       </td>
       <td className="py-1.5 pr-3 text-right">
         {living && (
@@ -163,10 +173,10 @@ function ProcessRow({ proc, now, selected, onSelect, onKill }: RowProps) {
       </td>
     </tr>
   );
-}
+});
 
 /** A process that has exited keeps the time it took; only a living one follows the clock. */
-function elapsed(proc: Proc, now: number): string {
+function elapsed(proc: Proc, end: number): string {
   if (proc.startedAt === null) return "–";
-  return fmtDuration((proc.exitedAt ?? now) - proc.startedAt);
+  return fmtDuration(end - proc.startedAt);
 }
