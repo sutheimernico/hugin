@@ -103,6 +103,20 @@ describe("connectEvents", () => {
     expect(FakeEventSource.last().url).toContain("run_id=r1");
   });
 
+  it("asks for the kernel boot on the first connection and the last seq after a reconnect", () => {
+    connectEvents({ since: "boot", onBatch: vi.fn(), onStatus: vi.fn(), EventSourceImpl: FakeEventSource });
+
+    const first = FakeEventSource.last();
+    expect(first.url).toContain("since=boot");
+
+    first.emit("proc.text", event(7));
+    flushFrame();
+    first.emit("error");
+    vi.advanceTimersByTime(1000);
+
+    expect(FakeEventSource.last().url).toContain("since=7");
+  });
+
   it("reports open and error status", () => {
     const onStatus = vi.fn();
     connectEvents({ since: 0, onBatch: vi.fn(), onStatus, EventSourceImpl: FakeEventSource });

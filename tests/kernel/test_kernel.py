@@ -6,8 +6,11 @@ import json
 import pytest
 
 from hugin.drivers.base import ExitInfo
+from hugin.kernel.bus import EventBus
 from hugin.kernel.events import BudgetSpec, EventKind, Usage
+from hugin.kernel.kernel import Kernel
 from hugin.kernel.process import AgentProcess
+from hugin.munin.store import MuninStore
 
 HELLO = "script:hello"
 
@@ -110,6 +113,32 @@ async def test_spawn_runs_a_scripted_program_end_to_end(kernel, until):
     done = _of_kind(kernel, EventKind.RUN_DONE)[0]
     assert done.data["usage"]["output_tokens"] == 120
     assert done.data["artifacts"] == []
+
+
+async def test_a_restarted_kernel_hands_out_pids_above_the_logged_ones(kernel, until):
+    """A second kernel over the same log must never reuse a pid the log already names."""
+    run_id = await kernel.create_run("Erster Start", driver="scripted")
+    first_pid = await kernel.spawn(run_id, "scout", HELLO, driver="scripted")
+    await until(lambda: kernel.runs[run_id].state == "done")
+
+    restarted = Kernel(
+        kernel.settings,
+        kernel.log,
+        EventBus(kernel.log),
+        kernel.programs,
+        kernel.drivers,
+        MuninStore(kernel.settings.db_path),
+        tick_s=0.01,
+    )
+    await restarted.boot()
+    second_run = await restarted.create_run("Zweiter Start", driver="scripted")
+    second_pid = await restarted.spawn(second_run, "scout", HELLO, driver="scripted")
+    await until(lambda: restarted.runs[second_run].state == "done")
+    await restarted.shutdown()
+
+    assert second_pid > first_pid
+    boots = [e for e in kernel.log.since(0) if e.kind == EventKind.KERNEL_BOOT]
+    assert boots[-1].data["pid_counter"] == first_pid + 1
 
 
 async def test_run_ids_are_unique_and_sort_by_creation_time(kernel):

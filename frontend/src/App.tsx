@@ -162,7 +162,8 @@ function useEventStream(dispatch: (events: HEvent[]) => void): void {
     if (connected.current) return;
     connected.current = true;
     const disconnect = connectEvents({
-      since: 0,
+      // A fresh shell wants this kernel's life, not every run the database ever stored.
+      since: "boot",
       onBatch: dispatch,
       // Task 21 gives the shell a visible place for subsystem trouble; until then the kernel
       // log is the evidence of what arrived and what did not.

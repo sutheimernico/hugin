@@ -76,6 +76,23 @@ class EventLog:
         row = self._conn.execute("SELECT COALESCE(MAX(seq), 0) FROM events").fetchone()
         return int(row[0])
 
+    def max_pid(self) -> int:
+        """The highest pid this log has ever seen — 0 when it has seen none.
+
+        A restarted kernel reads it so a new process can never reuse a pid an old event
+        already names: the log is one timeline, and a pid in it must mean one process.
+        """
+        row = self._conn.execute("SELECT COALESCE(MAX(pid), 0) FROM events").fetchone()
+        return int(row[0])
+
+    def last_boot_seq(self) -> int:
+        """The seq of the most recent `kernel.boot` event — 0 when the kernel never booted."""
+        row = self._conn.execute(
+            "SELECT COALESCE(MAX(seq), 0) FROM events WHERE kind = ?",
+            (EventKind.KERNEL_BOOT.value,),
+        ).fetchone()
+        return int(row[0])
+
     def close(self) -> None:
         self._conn.close()
 

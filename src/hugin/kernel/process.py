@@ -86,6 +86,14 @@ class ProcessTable:
         """The pid the next `next_pid()` call will hand out."""
         return self._next_pid
 
+    def seed(self, pid: int) -> None:
+        """Make sure the next pid handed out is above `pid`.
+
+        A restarted kernel calls this with the highest pid the event log knows, so pids stay
+        unique across restarts — the log is one timeline and a pid in it must mean one process.
+        """
+        self._next_pid = max(self._next_pid, pid + 1)
+
     def next_pid(self) -> int:
         pid = self._next_pid
         self._next_pid += 1

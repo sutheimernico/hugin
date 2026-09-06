@@ -77,3 +77,26 @@ async def test_the_stream_unsubscribes_when_the_client_disconnects(api, sse):
         assert len(api.kernel.bus._subscribers) == before + 1
 
     assert len(api.kernel.bus._subscribers) == before
+
+
+async def test_since_boot_backfills_from_this_kernels_boot_event(
+    api, start_mission, wait_for_run, sse
+):
+    run_id = await start_mission(api)
+    await wait_for_run(api, run_id)
+
+    async with sse("/api/events/stream?since=boot") as stream:
+        first = await stream.message()
+        created = await stream.until(lambda message: message["event"] == "run.created")
+
+    # The boot event itself is included — it is what tells the shell which kernel life this is.
+    assert first["event"] == "kernel.boot"
+    assert payload(created)["run_id"] == run_id
+
+
+async def test_since_rejects_anything_that_is_neither_a_number_nor_boot(api):
+    response = await api.client.get("/api/events/stream?since=gestern")
+    assert response.status_code == 422
+
+    negative = await api.client.get("/api/events/stream?since=-1")
+    assert negative.status_code == 422

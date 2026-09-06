@@ -112,6 +112,9 @@ class Kernel:
 
     async def boot(self) -> None:
         self.booted_at = self.clock()
+        # The log outlives the process: continue the pid sequence instead of restarting it,
+        # or a second kernel would hand out pids that older events already claim.
+        self.procs.seed(self.log.max_pid())
         self.settings.data_dir.mkdir(parents=True, exist_ok=True)
         self.settings.runs_dir.mkdir(parents=True, exist_ok=True)
         await self.emit(

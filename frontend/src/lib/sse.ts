@@ -22,9 +22,16 @@ export interface EventSourceLike {
 
 export type EventSourceCtor = new (url: string) => EventSourceLike;
 
+/**
+ * Where the backfill starts. `"boot"` asks the kernel for everything since its own boot —
+ * what a freshly loaded shell wants, so it sees this kernel's life and not every run the
+ * database ever stored. A reconnect always uses the numeric last seq instead.
+ */
+export type Since = number | "boot";
+
 export interface ConnectOptions {
   runId?: string;
-  since: number;
+  since: Since;
   onBatch: (events: HEvent[]) => void;
   onStatus: (status: SseStatus) => void;
   EventSourceImpl?: EventSourceCtor;
@@ -37,7 +44,10 @@ export function connectEvents(options: ConnectOptions): () => void {
   const { runId, onBatch, onStatus } = options;
   const Impl = options.EventSourceImpl ?? (globalThis.EventSource as unknown as EventSourceCtor);
 
-  let lastSeq = options.since;
+  let lastSeq = typeof options.since === "number" ? options.since : 0;
+  // Only the first connection may ask for `"boot"`; a reconnect must resume at `lastSeq`,
+  // or the reducer would replay the whole kernel life on every dropped connection.
+  let firstConnect = true;
   let pending: HEvent[] = [];
   let frameScheduled = false;
   let reconnectTimer: ReturnType<typeof setTimeout> | undefined;
@@ -80,7 +90,8 @@ export function connectEvents(options: ConnectOptions): () => void {
 
   function open(): void {
     if (stopped) return;
-    const params = new URLSearchParams({ since: String(lastSeq) });
+    const params = new URLSearchParams({ since: String(firstConnect ? options.since : lastSeq) });
+    firstConnect = false;
     if (runId !== undefined) params.set("run_id", runId);
     source = new Impl(`/api/events/stream?${params.toString()}`);
     source.addEventListener("open", () => onStatus("open"));

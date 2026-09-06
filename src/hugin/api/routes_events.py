@@ -19,6 +19,7 @@ from hugin.kernel.kernel import Kernel
 from hugin.replay.player import SPEEDS, Player
 
 HEARTBEAT_S = 15
+BOOT_SINCE = "boot"
 
 router = APIRouter(prefix="/api", tags=["events"])
 
@@ -40,12 +41,34 @@ def replay_speed(speed: int = Query(default=1)) -> int:
 SpeedDep = Annotated[int, Depends(replay_speed)]
 
 
+def resolve_since(kernel: Kernel, since: str) -> int:
+    """Turn the `since` query into a seq to backfill after.
+
+    `since=boot` is what a freshly loaded shell asks for: everything this kernel did since its
+    own boot, and the boot event itself — so the shell knows which run belongs to this life of
+    the kernel without replaying every run the database ever stored.
+    """
+    if since == BOOT_SINCE:
+        return max(kernel.log.last_boot_seq() - 1, 0)
+    try:
+        seq = int(since)
+    except ValueError:
+        raise HTTPException(
+            status_code=422,
+            detail=f"„since={since}“ ist weder eine Sequenznummer noch „{BOOT_SINCE}“.",
+        ) from None
+    if seq < 0:
+        raise HTTPException(status_code=422, detail="„since“ darf nicht negativ sein.")
+    return seq
+
+
 @router.get("/events/stream")
 async def stream_events(
     kernel: KernelDep,
     run_id: str | None = None,
-    since: int = Query(default=0, ge=0),
+    since: str = Query(default="0"),
 ) -> EventSourceResponse:
+    backfill_after = resolve_since(kernel, since)
     queue: asyncio.Queue[Event] = asyncio.Queue()
 
     async def on_event(event: Event) -> None:
@@ -54,7 +77,7 @@ async def stream_events(
 
     unsubscribe = kernel.bus.subscribe(on_event)
     return EventSourceResponse(
-        _stream(kernel, queue, unsubscribe, run_id, since), ping=HEARTBEAT_S
+        _stream(kernel, queue, unsubscribe, run_id, backfill_after), ping=HEARTBEAT_S
     )
 
 

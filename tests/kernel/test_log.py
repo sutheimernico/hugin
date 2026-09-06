@@ -75,6 +75,33 @@ def test_events_table_has_an_index_on_run_id(tmp_path):
     assert "run_id" in columns
 
 
+def test_max_pid_is_zero_without_events_and_follows_appends(tmp_path):
+    log = EventLog(tmp_path / "hugin.db")
+    assert log.max_pid() == 0
+
+    log.append(_event(pid=1))
+    log.append(_event(pid=7))
+    log.append(_event(pid=3))
+    log.append(_event(pid=None))
+
+    assert log.max_pid() == 7
+    log.close()
+
+
+def test_last_boot_seq_points_at_the_latest_boot_event(tmp_path):
+    log = EventLog(tmp_path / "hugin.db")
+    assert log.last_boot_seq() == 0
+
+    boot = {"version": "0.1.0", "pid_counter": 1}
+    log.append(_event(kind=EventKind.KERNEL_BOOT, run_id=None, pid=None, data=boot))
+    log.append(_event())
+    second_boot = log.append(_event(kind=EventKind.KERNEL_BOOT, run_id=None, pid=None, data=boot))
+    log.append(_event())
+
+    assert log.last_boot_seq() == second_boot.seq
+    log.close()
+
+
 def test_ten_thousand_appends_stay_under_two_seconds(tmp_path):
     log = EventLog(tmp_path / "hugin.db")
     event = _event()
