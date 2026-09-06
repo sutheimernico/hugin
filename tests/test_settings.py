@@ -7,7 +7,7 @@ def test_defaults_bind_localhost_and_port_8770(monkeypatch, tmp_path):
     assert s.host == "127.0.0.1"
     assert s.port == 8770
     assert s.data_dir == tmp_path / "data"
-    assert s.max_concurrent == {"claude": 3, "ollama": 1, "scripted": 8}
+    assert s.max_concurrent == {"claude": 3, "ollama": 3, "scripted": 8}
     assert s.ollama_url == "http://127.0.0.1:11434"
     assert s.ollama_model == "qwen2.5:7b"
     assert s.claude_bin == "claude"

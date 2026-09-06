@@ -21,7 +21,9 @@ class Settings(BaseSettings):
     claude_bin: str = "claude"
     ollama_url: str = "http://127.0.0.1:11434"
     ollama_model: str = "qwen2.5:7b"
-    max_concurrent: dict[str, int] = {"claude": 3, "ollama": 1, "scripted": 8}
+    # Ollama serialises requests itself; the kernel slot only has to let a waiting planner
+    # coexist with its workers (limit 1 would park every child behind the parent).
+    max_concurrent: dict[str, int] = {"claude": 3, "ollama": 3, "scripted": 8}
     log_ring: int = 5000
 
     @property
