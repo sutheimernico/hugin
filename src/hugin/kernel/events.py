@@ -179,6 +179,8 @@ class BudgetTick(Strict):
     output_tokens: int
     seconds: float
     pct: float
+    # Additive with a default, so recordings written before this field stay valid.
+    input_tokens: int = 0
 
 
 class BudgetExceeded(Strict):

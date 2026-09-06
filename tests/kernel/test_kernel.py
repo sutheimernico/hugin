@@ -235,6 +235,8 @@ async def test_budget_ticker_reports_progress(kernel, until):
     tick = _of_kind(kernel, EventKind.BUDGET_TICK)[0]
     assert tick.pid == pid
     assert tick.data["turns"] == 1
+    # The context meter in the UI reads this: how full the model's input window already is.
+    assert tick.data["input_tokens"] == 10
     assert 0.0 < tick.data["pct"] < 1.0
 
     slow.release.set()

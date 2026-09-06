@@ -471,6 +471,7 @@ class Kernel:
                 data={
                     "turns": proc.usage.turns,
                     "output_tokens": proc.usage.output_tokens,
+                    "input_tokens": proc.usage.input_tokens,
                     "seconds": elapsed,
                     "pct": BudgetWatcher.pct(proc, now),
                 },
