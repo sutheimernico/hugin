@@ -53,6 +53,8 @@ type AgentGraphProps = {
   runId: string | null;
   selectedPid: number | null;
   onSelect: (pid: number) => void;
+  /** True for 300 ms after "Panik": the graph loses its colour while the kills propagate. */
+  panicking: boolean;
 };
 
 export function AgentGraph(props: AgentGraphProps) {
@@ -64,7 +66,7 @@ export function AgentGraph(props: AgentGraphProps) {
   );
 }
 
-function Graph({ state, runId, selectedPid, onSelect }: AgentGraphProps) {
+function Graph({ state, runId, selectedPid, onSelect, panicking }: AgentGraphProps) {
   const structure = structureKey(state, runId);
   const graph = useMemo(
     () => buildGraph(state, runId),
@@ -122,7 +124,12 @@ function Graph({ state, runId, selectedPid, onSelect }: AgentGraphProps) {
   );
 
   return (
-    <div ref={container} className="h-full w-full" onKeyDown={handleKeyDown}>
+    <div
+      ref={container}
+      data-testid="graph-surface"
+      className={`h-full w-full ${panicking ? "hugin-panic" : ""}`}
+      onKeyDown={handleKeyDown}
+    >
       {count === 0 ? (
         <div className="flex h-full items-center justify-center px-6 text-center text-[12px] text-muted">
           Noch keine Agenten — der Graph wächst mit der Mission.

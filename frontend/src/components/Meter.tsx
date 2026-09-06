@@ -1,3 +1,5 @@
+import { animate, motion, useMotionValue, useTransform } from "motion/react";
+import { useEffect } from "react";
 import type { Tone } from "./Chip";
 
 const FILL_CLASS: Record<Tone, string> = {
@@ -10,6 +12,10 @@ const FILL_CLASS: Record<Tone, string> = {
   muted: "bg-muted",
 };
 
+/** House easing and the UI transition length (spec §2.9 motion rules). */
+const EASE_OUT_EXPO = [0.16, 1, 0.3, 1] as const;
+const TICK_S = 0.4;
+
 type MeterProps = {
   label: string;
   value: number;
@@ -18,8 +24,14 @@ type MeterProps = {
   format?: (value: number) => string;
 };
 
-/** Labelled 4 px bar with a mono readout; the bar animates its width, never its value. */
+/** Labelled bar with a mono readout: the bar animates its width, the readout counts up to it. */
 export function Meter({ label, value, max, tone, format }: MeterProps) {
+  const ticked = useTicker(value);
+  const readout = useTransform(ticked, (current) => {
+    const rounded = Math.round(current);
+    return format ? format(rounded) : String(rounded);
+  });
+
   return (
     <div className="flex flex-col gap-1">
       <div className="flex items-baseline justify-between gap-2">
@@ -27,9 +39,9 @@ export function Meter({ label, value, max, tone, format }: MeterProps) {
         <span className="truncate text-[11px] tracking-[0.12em] whitespace-nowrap text-muted uppercase">
           {label}
         </span>
-        <span className="font-mono text-[11px] whitespace-nowrap text-text">
-          {format ? format(value) : String(value)}
-        </span>
+        <motion.span className="font-mono text-[11px] whitespace-nowrap text-text">
+          {readout}
+        </motion.span>
       </div>
       <div
         role="progressbar"
@@ -46,6 +58,23 @@ export function Meter({ label, value, max, tone, format }: MeterProps) {
       </div>
     </div>
   );
+}
+
+/**
+ * Counts the readout from where it stood to where it is now, over 400 ms.
+ *
+ * The animation hangs off the effect's dependency on `value`, so it starts on a real change
+ * and on nothing else — a re-render with the same number never re-triggers it.
+ */
+function useTicker(value: number) {
+  const current = useMotionValue(value);
+
+  useEffect(() => {
+    const controls = animate(current, value, { duration: TICK_S, ease: EASE_OUT_EXPO });
+    return () => controls.stop();
+  }, [value, current]);
+
+  return current;
 }
 
 function percent(value: number, max: number): number {

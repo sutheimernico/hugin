@@ -24,6 +24,8 @@ import { selectVisibleState, useHuginStore } from "./state/store";
 
 /** How often the shell re-asks `/api/system` while the tab is visible. */
 const SYSTEM_POLL_MS = 30_000;
+/** How long the graph stays desaturated after "Panik" (spec §2.9 motion rules). */
+const PANIC_FLASH_MS = 300;
 
 /** Mission Control (spec §2.9, view 2): the shell is a pure projection of the event stream. */
 export default function App() {
@@ -80,7 +82,16 @@ export default function App() {
   const now = useNow(mode !== "replay", tsAtSeq(replay.events, replay.cursorSeq));
   const run = visible.activeRunId === null ? undefined : visible.runs[visible.activeRunId];
 
+  const [panicking, setPanicking] = useState(false);
+  const panicTimer = useRef<number | undefined>(undefined);
+  useEffect(() => () => window.clearTimeout(panicTimer.current), []);
+
   const onKillAll = useCallback(() => {
+    // The flash is the button's own feedback: the kills take a moment to reach the drivers,
+    // and a control that looks inert until they do reads as broken.
+    setPanicking(true);
+    window.clearTimeout(panicTimer.current);
+    panicTimer.current = window.setTimeout(() => setPanicking(false), PANIC_FLASH_MS);
     void killAll().catch(report);
   }, []);
   const onKill = useCallback((pid: number) => {
@@ -131,6 +142,7 @@ export default function App() {
                 runId={visible.activeRunId}
                 selectedPid={selectedPid}
                 onSelect={setSelectedPid}
+                panicking={panicking}
               />
             </Panel>
           ) : undefined

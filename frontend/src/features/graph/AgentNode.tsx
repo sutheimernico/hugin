@@ -13,6 +13,7 @@ import { ROLE_LABEL } from "../../lib/i18n";
 import { CONTEXT_WINDOW, FALLBACK_ICON, PROGRAM_ICON, programAccent } from "../../lib/programs";
 import type { Proc, ProcState } from "../../state/types";
 import { HANDLE_IN, HANDLE_MEM, HANDLE_OUT, NODE_H, NODE_W } from "./layout";
+import { BLOOM } from "./motion";
 
 /** Glow is reserved for live elements (spec §2.9): a waiting or finished agent does not shine. */
 const GLOWING: ProcState[] = ["running", "waiting_tool"];
@@ -43,7 +44,7 @@ export function AgentNode({ data, selected }: NodeProps<AgentNodeType>) {
         layoutId={`proc-${proc.pid}`}
         initial={{ scale: 0.6, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ type: "spring", stiffness: 380, damping: 26 }}
+        transition={BLOOM}
         style={{
           width: NODE_W,
           height: NODE_H,

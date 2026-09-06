@@ -273,6 +273,22 @@ describe("applyEvent — pulses", () => {
     const stale = applyEvent(stillFresh, ev("sched.queued", {}, { pid: 1, ts: 2_001.5 }));
     expect(stale.pulses).toHaveLength(0);
   });
+
+  it("keeps at most 60 particles in flight and drops the oldest", () => {
+    const ev = makeFeed(1_000);
+    // 80 messages inside one TTL window: more than any browser should animate at once.
+    const state = run(initialState, [
+      spawn(ev, 1),
+      ...Array.from({ length: 80 }, (_, index) =>
+        ev("msg.sent", { from_pid: 1, to_pid: 1, preview: `m${index}` }, { pid: 1, ts: 2_000 }),
+      ),
+    ]);
+
+    expect(state.pulses).toHaveLength(60);
+    // The survivors are the newest ones — the spawn pulse and the first messages are gone.
+    expect(state.pulses.every((pulse) => pulse.kind === "msg")).toBe(true);
+    expect(state.pulses.at(-1)?.id).toBe(`p${state.lastSeq}`);
+  });
 });
 
 describe("applyEvent — kernel log", () => {

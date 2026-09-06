@@ -24,6 +24,46 @@ body {
   animation: hugin-glow 2.4s var(--ease-out-expo) infinite;
 }
 
+/*
+ * Panic: the graph loses its colour for a moment while the kills propagate, so the button is
+ * visibly connected to what it does even before the first process reports back.
+ */
+@keyframes hugin-desaturate {
+  0% {
+    filter: saturate(1);
+  }
+  30% {
+    filter: saturate(0.3);
+  }
+  100% {
+    filter: saturate(1);
+  }
+}
+
+.hugin-panic {
+  animation: hugin-desaturate 300ms var(--ease-out-expo);
+}
+
+/*
+ * Keyboard focus is always visible. The type selectors outrank Tailwind's `outline-none`
+ * utility, which stays the opt-out for the two elements that show focus another way (the
+ * palette input, whose dialog is the only thing on screen, and the process rows, which
+ * highlight instead).
+ */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--color-cyan);
+  outline-offset: 2px;
+}
+
+.outline-none:focus-visible {
+  outline: none;
+}
+
 @keyframes hugin-ring-spin {
   to {
     transform: rotate(360deg);

@@ -7,9 +7,7 @@ import { Handle, Position, type Node, type NodeProps } from "@xyflow/react";
 import { motion, useAnimationControls } from "motion/react";
 import { useEffect } from "react";
 import { HANDLE_IN, HUB_SIZE } from "./layout";
-
-/** The house easing (spec §2.9 motion rules). */
-const EASE_OUT_EXPO = [0.16, 1, 0.3, 1] as const;
+import { EASE_OUT_EXPO, HUB_BLOOM } from "./motion";
 
 export type MuninNodeType = Node<{ writes: number }, "munin">;
 
@@ -21,7 +19,7 @@ export function MuninNode({ data }: NodeProps<MuninNodeType>) {
     // One run per counter value: the bloom when the hub appears, a flash on every write after.
     void controls.start(
       writes === 0
-        ? { opacity: 1, scale: 1, transition: { type: "spring", stiffness: 380, damping: 26 } }
+        ? { opacity: 1, scale: 1, transition: HUB_BLOOM }
         : { opacity: 1, scale: [1, 1.15, 1], transition: { duration: 0.6, ease: EASE_OUT_EXPO } },
     );
   }, [writes, controls]);

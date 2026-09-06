@@ -31,6 +31,12 @@ import type {
 const LOG_RING = 5_000;
 /** A pulse is one travelling particle; it lives 1.2 s of event time (spec §2.9 motion rules). */
 const PULSE_TTL_S = 1.2;
+/**
+ * Ceiling on particles in flight. Event time is not wall time: a replay at 8× or a burst of
+ * backfill can put a whole minute of traffic inside one 1.2 s window, and every particle is an
+ * SVG element the browser animates. The newest are the ones worth showing, so the oldest go.
+ */
+const MAX_PULSES = 60;
 const TOKEN_WINDOW_S = 60;
 /** High-frequency noise: the log would be nothing else if these two were in it. */
 const UNLOGGED = new Set(["proc.text", "budget.tick"]);
@@ -391,7 +397,7 @@ function patchRun(next: State, runId: string | null, patch: (run: Run) => Run): 
 }
 
 function addPulse(next: State, pulse: Pulse): void {
-  next.pulses = [...next.pulses, pulse];
+  next.pulses = [...next.pulses, pulse].slice(-MAX_PULSES);
 }
 
 /** One event creates at most one pulse, so its seq is a stable, replay-safe key. */

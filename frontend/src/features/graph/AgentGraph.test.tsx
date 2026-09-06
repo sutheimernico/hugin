@@ -43,10 +43,16 @@ function mission(): State {
 }
 
 /** xyflow measures its container; in jsdom that measurement comes from the inline style. */
-function renderGraph(state: State, onSelect = vi.fn()) {
+function renderGraph(state: State, onSelect = vi.fn(), panicking = false) {
   render(
     <div style={{ width: "800px", height: "600px" }}>
-      <AgentGraph state={state} runId={state.activeRunId} selectedPid={null} onSelect={onSelect} />
+      <AgentGraph
+        state={state}
+        runId={state.activeRunId}
+        selectedPid={null}
+        onSelect={onSelect}
+        panicking={panicking}
+      />
     </div>,
   );
   return onSelect;
@@ -94,6 +100,11 @@ describe("AgentGraph", () => {
     renderGraph(mission());
     expect(await screen.findByLabelText("planner · PID 1")).toBeInTheDocument();
     expect(screen.getByLabelText("scout · PID 2")).toBeInTheDocument();
+  });
+
+  it("desaturates the whole surface while a panic is propagating", () => {
+    renderGraph(mission(), vi.fn(), true);
+    expect(screen.getByTestId("graph-surface")).toHaveClass("hugin-panic");
   });
 
   it("says so instead of drawing an empty canvas while nothing runs", () => {

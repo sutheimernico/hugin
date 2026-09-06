@@ -7,8 +7,10 @@
  */
 
 import { BaseEdge, getSmoothStepPath, type Edge, type EdgeProps } from "@xyflow/react";
+import { useReducedMotion } from "motion/react";
 import { useCallback } from "react";
 import type { Pulse } from "../../state/types";
+import { PARTICLE_S } from "./motion";
 
 /** One pulse as this edge sees it: `reverse` when it travels target → source (a child's report). */
 export interface EdgePulse {
@@ -48,7 +50,10 @@ export function PulseEdge({
   });
   const kind = data?.kind ?? "tree";
   const alive = data?.alive ?? false;
-  const pulses = data?.pulses ?? [];
+  // Travelling dots are the one effect a reader who asked for less motion cannot opt out of
+  // through CSS — SMIL ignores `prefers-reduced-motion` — so they are not rendered at all.
+  const still = useReducedMotion();
+  const pulses = still === true ? [] : (data?.pulses ?? []);
 
   return (
     <>
@@ -87,11 +92,15 @@ function Particle({ pulse, path }: { pulse: EdgePulse; path: string }) {
     (element as SVGAnimateMotionElement | null)?.beginElement?.();
   }, []);
 
+  const motionId = `pulse-${pulse.id}`;
+  const dur = `${PARTICLE_S}s`;
+
   return (
     <circle r={3} style={{ fill: PARTICLE_COLOR[pulse.kind] }}>
       <animateMotion
+        id={motionId}
         ref={start}
-        dur="0.8s"
+        dur={dur}
         begin="indefinite"
         // Freeze at the end: the dot comes to rest under the node it reached and disappears
         // with the pulse when the reducer prunes it.
@@ -101,6 +110,17 @@ function Particle({ pulse, path }: { pulse: EdgePulse; path: string }) {
         calcMode="linear"
         keyPoints={pulse.reverse ? "1;0" : "0;1"}
         keyTimes="0;1"
+      />
+      {/* Arrival is a fade, not a disappearance: the dot dims over the last quarter of its
+          journey, so the frame in which the reducer prunes it is already empty. `begin` is
+          chained to the motion above, which is what keeps the two in step. */}
+      <animate
+        attributeName="opacity"
+        begin={`${motionId}.begin`}
+        dur={dur}
+        values="1;1;0"
+        keyTimes="0;0.75;1"
+        fill="freeze"
       />
     </circle>
   );

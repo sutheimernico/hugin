@@ -63,6 +63,15 @@ describe("Meter", () => {
     expect(screen.getByText("3")).toBeInTheDocument();
   });
 
+  it("counts the readout over to a new value and lands on it exactly", async () => {
+    const { rerender } = render(<Meter label="Prozesse" value={0} max={8} tone="violet" />);
+    expect(screen.getByText("0")).toBeInTheDocument();
+
+    rerender(<Meter label="Prozesse" value={6} max={8} tone="violet" />);
+
+    expect(await screen.findByText("6")).toBeInTheDocument();
+  });
+
   it("clamps the bar between empty and full", () => {
     render(<Meter label="Budget" value={150} max={100} tone="red" />);
     render(<Meter label="Leer" value={5} max={0} tone="muted" />);
