@@ -173,6 +173,8 @@ einen frischen Lauf.
 - Jeder Agent arbeitet in seinem eigenen Verzeichnis unterhalb von `runs/<run>/p<pid>/`, und
   `artifact_write` nimmt nur einen reinen Dateinamen (1–64 Zeichen aus `A-Z a-z 0-9 . _ -`) —
   ein Artefakt kann das Lauf-Verzeichnis nicht verlassen.
+- **Absolute Pfade im Missionsziel** müssen unter `~/private` liegen, sonst 422
+  („Pfade müssen unter ~/private liegen.“).
 - **Werkzeug-Whitelist pro Programm** (`--tools` + `--allowedTools`, `--permission-mode
   dontAsk`), dazu `--strict-mcp-config`, damit ein Agent nur die Syscalls des Kernels sieht und
   nicht die MCP-Server des Benutzers.
