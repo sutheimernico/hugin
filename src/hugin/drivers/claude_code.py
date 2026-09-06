@@ -16,6 +16,7 @@ import json
 import os
 import time
 from collections.abc import Callable, Mapping
+from contextlib import suppress
 from pathlib import Path
 
 from hugin.drivers.base import EventSink, ExitInfo
@@ -34,6 +35,10 @@ STDERR_TAIL_LIMIT = 500
 TERMINATE_GRACE_S = 3.0
 EXIT_GRACE_S = 5.0
 STDERR_READ_TIMEOUT_S = 1.0
+# One stream-json line carries a whole tool result, far past the reader's 64 KiB default.
+STREAM_LIMIT = 8 * 1024 * 1024
+STDERR_TAIL_BYTES = 4096
+STDERR_CHUNK = 4096
 
 
 def build_command(
@@ -180,6 +185,43 @@ class _Progress:
         return True
 
 
+class _StderrTail:
+    """Reads the child's stderr in the background and keeps only the last few KiB of it.
+
+    Draining concurrently is not a nicety: with `--verbose` the CLI can fill the pipe buffer,
+    and a child blocked on writing stderr stops writing stdout — the run would hang with
+    nobody at fault. Because the tail lives in memory, reading it after the exit costs nothing.
+    """
+
+    def __init__(self, stream) -> None:
+        self._buffer = bytearray()
+        self._task = asyncio.create_task(self._drain(stream))
+
+    async def _drain(self, stream) -> None:
+        if stream is None:
+            return
+        try:
+            while True:
+                chunk = await stream.read(STDERR_CHUNK)
+                if not chunk:
+                    return
+                self._buffer.extend(chunk)
+                del self._buffer[:-STDERR_TAIL_BYTES]
+        except Exception:
+            return  # a broken stderr must never be the thing that ends a run
+
+    async def settle(self) -> str:
+        """The child is gone: let the drain reach EOF, then hand out what it kept."""
+        with suppress(TimeoutError, asyncio.CancelledError):
+            await asyncio.wait_for(self._task, timeout=STDERR_READ_TIMEOUT_S)
+        return self._buffer.decode("utf-8", errors="replace")[-STDERR_TAIL_LIMIT:]
+
+    async def close(self) -> None:
+        self._task.cancel()
+        with suppress(asyncio.CancelledError):
+            await self._task
+
+
 class ClaudeCodeDriver:
     """Runs one `claude -p` subprocess per process and translates its stream into sink calls."""
 
@@ -231,44 +273,60 @@ class ClaudeCodeDriver:
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
             env=build_env(os.environ, config_dir),
+            limit=STREAM_LIMIT,
         )
         self._children[proc.pid] = child
+        progress = _Progress()
+        stderr = _StderrTail(child.stderr)
         try:
-            return await self._pump(proc, child, sink)
+            return await self._pump(proc, child, sink, progress, stderr)
+        except Exception as exc:
+            # A driver may fail; it may never leave a `claude` process behind. Whatever the
+            # pump raises — a sink error, an unreadable stream — becomes a reported exit.
+            return ExitInfo(
+                "driver_error", progress.usage(), stderr_tail=repr(exc)[:STDERR_TAIL_LIMIT]
+            )
         finally:
+            await self._force_stop(child)
+            await stderr.close()
             self._children.pop(proc.pid, None)
+            self._killed.discard(proc.pid)
 
     async def kill(self, proc: AgentProcess) -> None:
         """SIGTERM, 3 s of grace, then SIGKILL. Safe to call twice, or after the run ended."""
+        # Flagged unconditionally: a kill can land before `run` has a child to signal, and the
+        # pump checks the flag before it forwards anything. `run` prunes it on the way out.
         self._killed.add(proc.pid)
         child = self._children.get(proc.pid)
-        if child is None or child.returncode is not None:
-            return
-        child.terminate()
-        try:
-            await asyncio.wait_for(child.wait(), timeout=TERMINATE_GRACE_S)
-        except TimeoutError:
-            child.kill()
-            await child.wait()
+        if child is not None:
+            await self._force_stop(child)
 
-    async def _pump(self, proc: AgentProcess, child, sink: EventSink) -> ExitInfo:
-        progress = _Progress()
+    async def _pump(
+        self,
+        proc: AgentProcess,
+        child,
+        sink: EventSink,
+        progress: _Progress,
+        stderr: _StderrTail,
+    ) -> ExitInfo:
         started: dict[str, float] = {}
-        async for raw in child.stdout:
-            for op in parse_line(raw.decode("utf-8", errors="replace")):
+        while True:
+            line = await _readline(child.stdout)
+            if line is None:
+                break
+            for op in parse_line(line):
                 if proc.pid in self._killed:
-                    await self._reap(proc, child)
+                    await self._reap(child)
                     return ExitInfo("killed", progress.usage())
                 exit_info = await self._apply(op, proc, sink, progress, started)
                 if exit_info is not None:
-                    await self._reap(proc, child)
+                    await self._reap(child)
                     return exit_info
-        await self._reap(proc, child)
+        await self._reap(child)
         if proc.pid in self._killed:
             return ExitInfo("killed", progress.usage())
         # stdout closed without a `result` line: the CLI crashed, was cut off, or never started.
-        tail = await self._stderr_tail(child)
-        return ExitInfo("driver_error", progress.usage(), stderr_tail=tail)
+        return ExitInfo("driver_error", progress.usage(), stderr_tail=await stderr.settle())
 
     async def _apply(
         self,
@@ -312,23 +370,42 @@ class ClaudeCodeDriver:
         # thinking text is never stored, and assistant text was already streamed as deltas.
         return None
 
-    async def _reap(self, proc: AgentProcess, child) -> None:
-        """Wait for the child so no zombie outlives the run; kill it if it overstays."""
+    async def _reap(self, child) -> None:
+        """Wait for the child so no zombie outlives the run; force it down if it overstays."""
         try:
             await asyncio.wait_for(child.wait(), timeout=EXIT_GRACE_S)
         except TimeoutError:
-            await self.kill(proc)
+            await self._force_stop(child)
 
-    async def _stderr_tail(self, child) -> str:
-        if child.stderr is None:
-            return ""
+    async def _force_stop(self, child) -> None:
+        """SIGTERM, grace, SIGKILL, reap — the one path that guarantees no live child."""
+        if child.returncode is not None:
+            return
+        with suppress(ProcessLookupError):  # it may have exited between the check and the signal
+            child.terminate()
         try:
-            # The child is gone by now, so this returns at once; the timeout only guards
-            # against a grandchild holding the pipe open forever.
-            data = await asyncio.wait_for(child.stderr.read(), timeout=STDERR_READ_TIMEOUT_S)
+            await asyncio.wait_for(child.wait(), timeout=TERMINATE_GRACE_S)
         except TimeoutError:
-            return ""
-        return data.decode("utf-8", errors="replace")[-STDERR_TAIL_LIMIT:]
+            with suppress(ProcessLookupError):
+                child.kill()
+            await child.wait()
+
+
+async def _readline(stdout) -> str | None:
+    """One decoded line, `None` at EOF. An unreadable line is skipped, never fatal.
+
+    `readline` raises `ValueError` for a line past the reader's limit and has already dropped
+    the offending bytes by then, so the next call resumes with the following line. Letting
+    that error escape would abandon a running child, which is the worse failure by far.
+    """
+    while True:
+        try:
+            raw = await stdout.readline()
+        except (ValueError, asyncio.LimitOverrunError):
+            continue  # `ValueError` covers `UnicodeDecodeError` too
+        if not raw:
+            return None
+        return raw.decode("utf-8", errors="replace")
 
 
 def _result_exit(data: dict) -> ExitInfo:

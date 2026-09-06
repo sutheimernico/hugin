@@ -5,11 +5,13 @@ replays a captured stream-json fixture, so the driver's stdout loop is exercised
 while the machine stays offline and the subscription stays untouched.
 """
 
+import asyncio
 import json
 from pathlib import Path
 
 import pytest
 
+from hugin.drivers import claude_code
 from hugin.drivers.claude_code import (
     ClaudeCodeDriver,
     build_command,
@@ -29,51 +31,95 @@ TOKEN = "0123456789abcdef0123456789abcdef"
 
 
 class _Lines:
-    """Stands in for `asyncio.StreamReader`: yields the fixture's lines as bytes."""
+    """Stands in for `asyncio.StreamReader`: hands the fixture out one `readline()` at a time.
 
-    def __init__(self, lines: list[bytes]) -> None:
+    `readline` yields to the event loop the way a real reader does — without that, nothing
+    else (the concurrent stderr drain) would ever get a turn while stdout is being consumed.
+    """
+
+    def __init__(self, lines: list[bytes], *, raise_after: int | None = None) -> None:
         self._lines = list(lines)
+        self._raise_after = raise_after
+        self.served = 0
 
-    def __aiter__(self) -> "_Lines":
-        return self
-
-    async def __anext__(self) -> bytes:
+    async def readline(self) -> bytes:
+        await asyncio.sleep(0)
+        if self._raise_after is not None and self.served == self._raise_after:
+            self._raise_after = None
+            self._lines.pop(0)  # a real reader drops the oversized line before it raises
+            raise ValueError("Separator is not found, and chunk exceed the limit")
         if not self._lines:
-            raise StopAsyncIteration
+            return b""
+        self.served += 1
         return self._lines.pop(0)
+
+    @property
+    def pending(self) -> int:
+        return len(self._lines)
 
 
 class _Stderr:
-    def __init__(self, data: bytes) -> None:
-        self._data = data
+    """Chunked stderr, so a test can tell whether the driver drains it *while* stdout runs."""
 
-    async def read(self) -> bytes:
-        return self._data
+    def __init__(self, data: bytes, *, chunk: int = 64, watch: _Lines | None = None) -> None:
+        self._data = data
+        self._chunk = chunk
+        self._watch = watch
+        self.reads_while_stdout_pending = 0
+
+    async def read(self, n: int = -1) -> bytes:
+        await asyncio.sleep(0)
+        if self._watch is not None and self._watch.pending:
+            self.reads_while_stdout_pending += 1
+        size = self._chunk if n < 0 else min(n, self._chunk)
+        chunk, self._data = self._data[:size], self._data[size:]
+        return chunk
 
 
 class FakeProcess:
-    """A subprocess that only knows how to hand out fixture lines and record signals."""
+    """A subprocess that only knows how to hand out fixture lines and record signals.
 
-    def __init__(self, lines: list[bytes], *, stderr: bytes = b"", exit_code: int = 0) -> None:
-        self.stdout = _Lines(lines)
-        self.stderr = _Stderr(stderr)
+    `stays_alive` models the case the driver must survive: a child that keeps running after
+    its stdout ended, and only goes away because we signalled it.
+    """
+
+    def __init__(
+        self,
+        lines: list[bytes],
+        *,
+        stderr: bytes | _Stderr = b"",
+        exit_code: int = 0,
+        stdout: _Lines | None = None,
+        stays_alive: bool = False,
+        ignores_terminate: bool = False,
+    ) -> None:
+        self.stdout = stdout if stdout is not None else _Lines(lines)
+        self.stderr = stderr if isinstance(stderr, _Stderr) else _Stderr(stderr)
         self.pid = 4242
         self.returncode: int | None = None
         self.terminate_calls = 0
         self.kill_calls = 0
         self.wait_calls = 0
         self._exit_code = exit_code
+        self._ignores_terminate = ignores_terminate
+        self._exited = asyncio.Event()
+        if not stays_alive:
+            self._exited.set()
 
     async def wait(self) -> int:
         self.wait_calls += 1
+        await self._exited.wait()
         self.returncode = self._exit_code
         return self._exit_code
 
     def terminate(self) -> None:
         self.terminate_calls += 1
+        if not self._ignores_terminate:
+            self._exited.set()
 
     def kill(self) -> None:
         self.kill_calls += 1
+        self._exited.set()
 
 
 class SpawnSpy:
@@ -459,6 +505,8 @@ async def test_kill_mid_stream_stops_forwarding_and_is_idempotent(
     assert spawn.process.terminate_calls == 1
     assert spawn.process.kill_calls == 0  # the fake exits on terminate, no SIGKILL needed
 
+    assert driver._killed == set()  # the finished run leaves no per-pid flag behind
+
     await driver.kill(proc)  # a second kill is a no-op, not a crash
     assert spawn.process.terminate_calls == 1
 
@@ -480,3 +528,94 @@ async def test_run_maps_an_error_result_to_failed_with_the_result_text(
     assert exit_info.reason == "failed"
     assert exit_info.stderr_tail == "Reached max turns before finishing."
     assert exit_info.usage.cost_usd_equiv == 0.0042
+
+
+async def test_run_spawns_the_reader_with_a_large_line_limit(tmp_path: Path, sink: RecordingSink):
+    spawn = SpawnSpy(FakeProcess(_fixture_lines("haiku_ok_isolated.jsonl")))
+    driver = _driver(tmp_path, spawn)
+
+    await driver.run(_proc(tmp_path), "Say OK.", sink)
+
+    # One stream-json line carries a whole tool result; the 64 KiB default would make the
+    # reader raise on it, so the limit is part of the contract, not a tuning knob.
+    assert spawn.kwargs["limit"] == 8 * 1024 * 1024
+
+
+async def test_run_skips_an_oversized_stdout_line_and_never_leaves_the_child_running(
+    tmp_path: Path, sink: RecordingSink, monkeypatch: pytest.MonkeyPatch
+):
+    monkeypatch.setattr(claude_code, "EXIT_GRACE_S", 0.01)
+    lines = _fixture_lines("synthetic_tool_use.jsonl")[:9]  # no `result` line
+    stdout = _Lines(lines, raise_after=3)  # the thinking block_start is the line that is lost
+    spawn = SpawnSpy(FakeProcess([], stdout=stdout, stays_alive=True, exit_code=1))
+    driver = _driver(tmp_path, spawn)
+
+    exit_info = await driver.run(_proc(tmp_path), "Store the note.", sink)
+
+    # The unreadable line emits nothing (no "denkt…" that never ends), the rest still streams.
+    assert sink.kinds == ["text"]
+    assert exit_info.reason == "driver_error"
+    # A child whose stdout ended but which keeps running is signalled down, never abandoned.
+    assert spawn.process.terminate_calls == 1
+    assert spawn.process.wait_calls >= 2
+    assert spawn.process.returncode is not None
+
+
+async def test_run_reports_a_sink_failure_instead_of_leaking_the_child(tmp_path: Path):
+    class ExplodingSink(RecordingSink):
+        async def text(self, delta: str) -> None:
+            raise RuntimeError("boom")
+
+    spawn = SpawnSpy(
+        FakeProcess(_fixture_lines("synthetic_tool_use.jsonl"), stays_alive=True, exit_code=1)
+    )
+    driver = _driver(tmp_path, spawn)
+
+    exit_info = await driver.run(_proc(tmp_path), "Store the note.", ExplodingSink())
+
+    assert exit_info.reason == "driver_error"
+    assert "boom" in exit_info.stderr_tail
+    assert len(exit_info.stderr_tail) <= 500
+    assert spawn.process.terminate_calls == 1
+    assert spawn.process.returncode is not None
+
+
+async def test_run_sigkills_a_child_that_ignores_terminate(
+    tmp_path: Path, sink: RecordingSink, monkeypatch: pytest.MonkeyPatch
+):
+    monkeypatch.setattr(claude_code, "EXIT_GRACE_S", 0.01)
+    monkeypatch.setattr(claude_code, "TERMINATE_GRACE_S", 0.01)
+    spawn = SpawnSpy(
+        FakeProcess(
+            _fixture_lines("haiku_ok_isolated.jsonl")[:2],
+            stays_alive=True,
+            ignores_terminate=True,
+            exit_code=1,
+        )
+    )
+    driver = _driver(tmp_path, spawn)
+
+    exit_info = await driver.run(_proc(tmp_path), "Say OK.", sink)
+
+    assert exit_info.reason == "driver_error"
+    assert spawn.process.terminate_calls == 1
+    assert spawn.process.kill_calls == 1
+    assert spawn.process.returncode is not None
+
+
+async def test_run_drains_stderr_while_stdout_is_still_streaming(
+    tmp_path: Path, sink: RecordingSink
+):
+    noise = b"boot noise\n" * 40 + b"final warning: mcp handshake slow\n"
+    stdout = _Lines(_fixture_lines("synthetic_tool_use.jsonl")[:9])  # no `result` line
+    stderr = _Stderr(noise, watch=stdout)
+    spawn = SpawnSpy(FakeProcess([], stdout=stdout, stderr=stderr, exit_code=1))
+    driver = _driver(tmp_path, spawn)
+
+    exit_info = await driver.run(_proc(tmp_path), "Store the note.", sink)
+
+    # Draining only after the exit would let a chatty child fill the pipe and stall stdout.
+    assert stderr.reads_while_stdout_pending >= 1
+    assert exit_info.reason == "driver_error"
+    assert exit_info.stderr_tail.endswith("final warning: mcp handshake slow\n")
+    assert len(exit_info.stderr_tail) <= 500
