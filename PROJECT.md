@@ -107,17 +107,21 @@ react-virtuoso · zustand · lucide-react · @fontsource fonts · vitest + testi
 
 ## Status
 
-**v1 feature-complete 2026-09-06 (Tasks 1–29 of 30).** Kernel, three drivers, capability-gated
-syscalls over MCP, munin FTS5, five programs, missions, replay with recordings and the six views
-all exist and run. Gate: 353 pytest + 234 vitest green, ruff/tsc/eslint clean. A live Claude
-mission ran end-to-end on the subscription (`apiKeySource=none`): planner + 3 scouts with
-WebSearch/WebFetch, 848 events, 51 turns, 231 s, 5 munin writes, one `report.md` — API equivalent
-$1.12, billed 0 €. Simulation runs in 7.6 s / 127 events; Ollama (`qwen2.5:7b`, CPU only, ~5
-tok/s) runs but is slow — one demo mission hit the planner's 900 s budget and was killed with
-`exit_reason=budget:seconds`. The demo recordings live under `demo/recordings/` (Task 28).
+**v1 COMPLETE 2026-09-06 (Tasks 1–30).** Kernel, three drivers, capability-gated syscalls over
+MCP, munin FTS5, five programs, missions, replay with recordings and the six views all exist
+and run. Gate: 354 pytest + 234 vitest green, ruff/tsc/eslint clean, `npm audit --omit=dev`
+0 vulnerabilities. A live Claude mission ran end-to-end on the subscription
+(`apiKeySource=none`): planner + 3 scouts with WebSearch/WebFetch, 848 events, 51 turns, 231 s,
+5 munin writes, one `report.md` — API equivalent $1.12, billed 0 €. Simulation runs in 7.6 s /
+127 events; Ollama (`qwen2.5:7b`, CPU only, ~5 tok/s) runs but is slow — one demo mission hit
+the planner's 900 s budget and was killed with `exit_reason=budget:seconds`. The demo
+recordings live under `demo/recordings/` (Task 28). Task 30's privacy & security sweep found
+no real path/secret leaks (only the intended `/home/user/…` scrub placeholder and the guard
+code's own pattern definitions); ADR 0002 and 0003 record the isolation and small-model
+decisions.
 
-Open: Task 30 (privacy & security sweep, ADRs) and the "Needs Nico" items below. Work happens on
-`autopilot/work`; no git remote exists.
+Open: only the "Needs Nico" items below. Work happens on `autopilot/work`; no git remote
+exists.
 
 ## Roadmap
 
@@ -158,13 +162,17 @@ Superpowers flow (`brainstorming` → `writing-plans` → `executing-plans` /
 ## §Open inputs (living — external facts Nico owns → "Needs Nico")
 
 - **Git remote and visibility.** No remote exists. Before any first push: decide the remote and
-  whether the repo goes public.
-- **Publish checklist.** If it goes public: secret scan over the full history, doc sweep for
-  personal data and company references, commit e-mails rewritten to the noreply address, MIT
-  LICENSE in place, backup bundle before any history rewrite.
+  whether the repo goes public. Publish checklist status (Task 30): secret scan over the
+  tracked tree passed (only the `/home/user/…` scrub placeholder and the guard code's own
+  pattern definitions match), commit e-mails already the noreply address (all commits), MIT
+  LICENSE already in place — still needed before any public push: a secret scan over the
+  **full git history** (not just the tracked tree) and a backup bundle before any history
+  rewrite.
 - **Windows shortcut / start entry** for `scripts/serve.sh` (WSL) plus
   `msedge --app=http://127.0.0.1:8770`, so the demo starts without a terminal.
 - **Optional Tailscale** if the shell should also be reachable from the phone.
+- **Optional GPU for Ollama.** `qwen2.5:7b` runs CPU-only today (~5 tok/s); a GPU would make
+  the Ollama lane fast enough to reconsider as more than a single-program worker.
 - **Live demo runs — done 2026-09-06.** Simulation, Claude and Ollama recordings exist in
   `demo/recordings/`. Further live runs still need Nico's logged-in Claude Code and a running
   Ollama; the loop must never spawn live agents on its own.

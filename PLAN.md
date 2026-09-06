@@ -38,6 +38,9 @@ implementation plan is authoritative — never invent tasks that are not in it.
   drivers, MCP syscall transport, subsystem status and the driver gate
 - [x] **Milestone 4 — Agent window, Munin browser, Replay, Boot** (Tasks 22–26): agent sheet,
   munin browser, replay backend and cursor, and the boot sequence
+- [x] **Milestone 5 — Polish, recordings, docs, sweep** (Tasks 27–30): motion polish, live
+  Claude/Ollama recordings, README/session docs, and the privacy & security sweep — **v1
+  complete**
 
 ## Milestone 0 — Scaffold
 
@@ -85,7 +88,7 @@ implementation plan is authoritative — never invent tasks that are not in it.
 - [x] Task 27: Motion & performance polish pass
 - [x] Task 28: Live runs + demo recordings (orchestrator-supervised)
 - [x] Task 29: README, GIF, PROJECT.md status, session doc
-- [ ] Task 30: Privacy & security sweep before any visibility change
+- [x] Task 30: Privacy & security sweep before any visibility change
 
 ## Standing mandate (per AUTOPILOT, once per phase — not per iteration)
 
