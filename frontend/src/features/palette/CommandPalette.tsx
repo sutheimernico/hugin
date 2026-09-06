@@ -111,15 +111,6 @@ export function CommandPalette({ open, onOpen, onClose, onToast }: CommandPalett
     return () => window.removeEventListener("keydown", onKey);
   }, [open, close]);
 
-  // The palette borrows the keyboard, it does not keep it: whatever had focus gets it back.
-  useEffect(() => {
-    if (!open) return;
-    const previous = document.activeElement;
-    return () => {
-      if (previous instanceof HTMLElement) previous.focus();
-    };
-  }, [open]);
-
   const actions: CommandActions = useMemo(
     () => ({
       async startMission(goal: string, missionDriver: Driver) {
@@ -239,15 +230,15 @@ export function CommandPalette({ open, onOpen, onClose, onToast }: CommandPalett
 
                 {!loaded && <p className="mono px-3 py-6 text-[12px] text-muted">Lade Befehle …</p>}
 
-                {loaded && freeText !== null && (
-                  <Cmdk.Group heading="Mission" className={GROUP_CLASS}>
-                    <CommandItem command={freeText} onSelect={select} />
-                  </Cmdk.Group>
-                )}
-
                 {loaded &&
                   GROUPS.map((group) => {
-                    const inGroup = commands.filter((command) => command.group === group);
+                    // What the reader typed *is* a mission, so it heads the Mission group
+                    // rather than opening a second one with the same heading.
+                    const typed = group === "Mission" && freeText !== null ? [freeText] : [];
+                    const inGroup = [
+                      ...typed,
+                      ...commands.filter((command) => command.group === group),
+                    ];
                     if (inGroup.length === 0) return null;
                     return (
                       <Cmdk.Group key={group} heading={group} className={GROUP_CLASS}>

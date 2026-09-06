@@ -52,8 +52,20 @@ export default function App() {
 
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [toast, setToast] = useState<ToastMessage | null>(null);
-  const openPalette = useCallback(() => setPaletteOpen(true), []);
-  const closePalette = useCallback(() => setPaletteOpen(false), []);
+  // The palette borrows the keyboard, it does not keep it. Captured here, in the open handler
+  // both the ⌘K hotkey and the top bar's button run through — an effect inside the palette
+  // would already see cmdk's own auto-focused input as "the element that had focus".
+  const focusBeforePalette = useRef<HTMLElement | null>(null);
+  const openPalette = useCallback(() => {
+    const active = document.activeElement;
+    focusBeforePalette.current = active instanceof HTMLElement ? active : null;
+    setPaletteOpen(true);
+  }, []);
+  const closePalette = useCallback(() => {
+    setPaletteOpen(false);
+    focusBeforePalette.current?.focus();
+    focusBeforePalette.current = null;
+  }, []);
   // A fresh id per message, so two identical texts still read as two events.
   const showToast = useCallback((text: string, tone: ToastTone) => {
     setToast({ id: Date.now(), text, tone });

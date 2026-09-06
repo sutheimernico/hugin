@@ -1,4 +1,4 @@
-import { act, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import App from "./App";
 import { BOOTED_KEY } from "./features/palette/commands";
@@ -67,6 +67,23 @@ describe("App", () => {
     render(<App />);
     expect(screen.queryByRole("status", { name: "Startsequenz" })).not.toBeInTheDocument();
     await settle();
+  });
+
+  it("gives the keyboard back to whatever had it when the palette closes", async () => {
+    render(<App />);
+    await settle();
+
+    const trigger = screen.getByRole("button", { name: /Befehle/ });
+    trigger.focus();
+    await act(async () => {
+      fireEvent.keyDown(window, { key: "k", metaKey: true });
+    });
+    expect(await screen.findByPlaceholderText("Was soll hugin tun?")).toHaveFocus();
+
+    await act(async () => {
+      fireEvent.keyDown(window, { key: "Escape" });
+    });
+    expect(trigger).toHaveFocus();
   });
 
   it("plays the boot sequence on the first load of a session", async () => {

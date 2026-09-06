@@ -115,6 +115,8 @@ describe("CommandPalette", () => {
     const input = await openPalette();
     await userEvent.type(input, "Finde drei Optionen");
     expect(await screen.findByText("Mission starten: »Finde drei Optionen«")).toBeInTheDocument();
+    // What the reader typed joins the Mission group instead of opening a second one.
+    expect(screen.getAllByText("Mission")).toHaveLength(1);
 
     await userEvent.keyboard("{Enter}");
     await waitFor(() =>
