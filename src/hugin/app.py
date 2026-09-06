@@ -12,7 +12,14 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from hugin.api import routes_events, routes_munin, routes_procs, routes_runs, routes_system
+from hugin.api import (
+    routes_events,
+    routes_munin,
+    routes_procs,
+    routes_recordings,
+    routes_runs,
+    routes_system,
+)
 from hugin.drivers.base import AgentDriver
 from hugin.drivers.claude_code import ClaudeCodeDriver
 from hugin.drivers.ollama import OllamaDriver
@@ -29,7 +36,14 @@ from hugin.system.status import SystemStatusService, subsystem_lines
 
 logger = logging.getLogger(__name__)
 
-ROUTERS = (routes_system, routes_runs, routes_procs, routes_munin, routes_events)
+ROUTERS = (
+    routes_system,
+    routes_runs,
+    routes_procs,
+    routes_munin,
+    routes_events,
+    routes_recordings,
+)
 
 
 def build_drivers(settings: Settings) -> dict[str, AgentDriver]:

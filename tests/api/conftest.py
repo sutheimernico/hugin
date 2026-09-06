@@ -92,6 +92,8 @@ async def make_api(tmp_path: Path):
         settings = Settings(
             data_dir=root / "data",
             runs_dir=root / "runs",
+            # Never the repo's own `demo/recordings/`: a test must not write into the checkout.
+            recordings_dir=root / "recordings",
             max_concurrent=limits if limits is not None else {"scripted": 8},
         )
         app = create_app(

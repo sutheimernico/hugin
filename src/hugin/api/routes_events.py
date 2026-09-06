@@ -1,4 +1,4 @@
-"""The live event stream.
+"""The live event stream — and the same events again, replayed from the log.
 
 A client that reconnects with `since=<last seq>` must miss nothing, so the order here matters:
 subscribe to the bus *first*, then read the backfill out of the log. Anything published in
@@ -8,17 +8,36 @@ lose it silently.
 
 import asyncio
 from collections.abc import AsyncIterator, Callable
+from typing import Annotated
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sse_starlette import EventSourceResponse
 
 from hugin.api.deps import KernelDep
 from hugin.kernel.events import Event
 from hugin.kernel.kernel import Kernel
+from hugin.replay.player import SPEEDS, Player
 
 HEARTBEAT_S = 15
 
 router = APIRouter(prefix="/api", tags=["events"])
+
+
+def replay_speed(speed: int = Query(default=1)) -> int:
+    """The playback speeds the shell offers — anything else is a client bug, not a 500.
+
+    A `Literal` annotation would look tidier but pydantic refuses to coerce the query string
+    to an int for it, so every request would be a 422.
+    """
+    if speed not in SPEEDS:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Tempo {speed}× gibt es nicht — erlaubt sind 1×, 2×, 4× und 8×.",
+        )
+    return speed
+
+
+SpeedDep = Annotated[int, Depends(replay_speed)]
 
 
 @router.get("/events/stream")
@@ -56,16 +75,39 @@ async def _stream(
     try:
         for event in kernel.log.since(since, run_id):
             last_seq = event.seq or last_seq
-            yield _message(event)
+            yield sse_message(event)
         while True:
             event = await queue.get()
             if event.seq is not None and event.seq <= last_seq:
                 continue  # the backfill already delivered it
             last_seq = event.seq or last_seq
-            yield _message(event)
+            yield sse_message(event)
     finally:
         unsubscribe()
 
 
-def _message(event: Event) -> dict:
+def sse_message(event: Event) -> dict:
+    """One SSE frame. Live and replay use it alike, so a client cannot tell them apart."""
     return {"id": str(event.seq), "event": event.kind.value, "data": event.model_dump_json()}
+
+
+async def replay_messages(events: AsyncIterator[Event]) -> AsyncIterator[dict]:
+    """Wrap a paced event stream into SSE frames; it ends when the replay is over."""
+    async for event in events:
+        yield sse_message(event)
+
+
+@router.get("/runs/{run_id}/replay/stream")
+async def stream_replay(
+    run_id: str,
+    kernel: KernelDep,
+    speed: SpeedDep,
+    from_seq: int = Query(default=0, ge=0),
+) -> EventSourceResponse:
+    """Replay a stored run: the same frames as the live stream, only paced by the player."""
+    if run_id not in kernel.runs:
+        raise HTTPException(status_code=404, detail=f"Run „{run_id}“ ist unbekannt.")
+    player = Player(kernel.log)
+    return EventSourceResponse(
+        replay_messages(player.stream(run_id, speed, from_seq)), ping=HEARTBEAT_S
+    )
