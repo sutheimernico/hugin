@@ -135,6 +135,22 @@ describe("applyEvent — runs", () => {
 });
 
 describe("applyEvent — processes", () => {
+  it("takes the context size from a budget tick that reports it", () => {
+    const ev = makeFeed();
+    const state = run(initialState, [
+      spawn(ev, 1),
+      ev(
+        "budget.tick",
+        { turns: 1, output_tokens: 10, input_tokens: 4_200, seconds: 1, pct: 0.1 },
+        { pid: 1 },
+      ),
+      // A tick from an older recording carries no context size; the last known one stands.
+      ev("budget.tick", { turns: 2, output_tokens: 20, seconds: 2, pct: 0.2 }, { pid: 1 }),
+    ]);
+
+    expect(state.procs[1].usage.input_tokens).toBe(4_200);
+  });
+
   it("builds a Proc through its lifecycle", () => {
     const ev = makeFeed();
     const state = run(initialState, [

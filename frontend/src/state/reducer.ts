@@ -333,6 +333,9 @@ function budgetTick(next: State, e: HEvent): void {
     usage: {
       ...proc.usage,
       turns: Math.max(proc.usage.turns, num(d.turns)),
+      // The kernel added `input_tokens` to the tick (Task 24); a recording written before that
+      // has none, and then the last known context size is the truthful one.
+      input_tokens: Math.max(proc.usage.input_tokens, num(d.input_tokens)),
       output_tokens: Math.max(proc.usage.output_tokens, num(d.output_tokens)),
     },
   }));

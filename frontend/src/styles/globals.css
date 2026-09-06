@@ -72,3 +72,38 @@ body {
 .hugin-graph .react-flow__node {
   transition: transform 400ms var(--ease-out-expo);
 }
+
+/*
+ * The replay scrubber. The input carries no track of its own — the hairline and the fill are
+ * drawn behind it (see `features/replay/Timeline.tsx`), so only the thumb is styled here, once
+ * per engine because the two pseudo-elements cannot be selected together.
+ */
+.hugin-scrubber::-webkit-slider-thumb {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 9999px;
+  background: var(--color-violet);
+  box-shadow: 0 0 10px -2px var(--color-violet);
+  cursor: grab;
+}
+
+.hugin-scrubber::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border: none;
+  border-radius: 9999px;
+  background: var(--color-violet);
+  box-shadow: 0 0 10px -2px var(--color-violet);
+  cursor: grab;
+}
+
+.hugin-scrubber:focus-visible::-webkit-slider-thumb {
+  outline: 2px solid var(--color-cyan);
+  outline-offset: 2px;
+}
+
+.hugin-scrubber:focus-visible::-moz-range-thumb {
+  outline: 2px solid var(--color-cyan);
+  outline-offset: 2px;
+}

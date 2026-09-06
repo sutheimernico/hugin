@@ -61,6 +61,18 @@ export interface ApiArtifact {
   bytes: number;
 }
 
+/** A recording's manifest, exactly as `replay/recorder.py` writes it. */
+export interface ApiRecording {
+  slug: string;
+  run_id: string;
+  goal: string;
+  /** The manifest copies the driver out of `run.created`; an empty string means it had none. */
+  driver: string;
+  events: number;
+  duration_s: number;
+  exported_at: number;
+}
+
 interface ApiRun {
   id: string;
   goal: string;
@@ -96,6 +108,18 @@ export async function getRun(runId: string): Promise<Run> {
 
 export async function getRunEvents(runId: string, since = 0): Promise<HEvent[]> {
   return request<HEvent[]>(`/api/runs/${encodeURIComponent(runId)}/events?since=${since}`);
+}
+
+export async function getRecordings(): Promise<ApiRecording[]> {
+  return request<ApiRecording[]>("/api/recordings");
+}
+
+/**
+ * A recording's events, renumbered from 1 by the recorder — which is why replaying one needs
+ * no run id: the file *is* the run.
+ */
+export async function getRecordingEvents(slug: string): Promise<HEvent[]> {
+  return request<HEvent[]>(`/api/recordings/${encodeURIComponent(slug)}/events`);
 }
 
 export async function getArtifacts(runId: string): Promise<ApiArtifact[]> {

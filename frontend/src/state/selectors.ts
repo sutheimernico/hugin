@@ -17,11 +17,18 @@ export function selectMode(input: ModeInput): Mode {
   return run === undefined ? "idle" : run.driver;
 }
 
-/** The mission the shell is following: the newest run, but only while it is still running. */
-export function selectActiveRun(state: State): Run | undefined {
+/**
+ * The mission the shell is following: the newest run, but only while it is still running.
+ *
+ * Pass the replay slice and the rule flips: a replayed run stays the active one past its own
+ * `run.done`, because the run being replayed is finished by definition — dropping it at the
+ * end of the cursor would leave the shell mid-replay without a mission.
+ */
+export function selectActiveRun(state: State, replay?: { runId: string | null }): Run | undefined {
   if (state.activeRunId === null) return undefined;
   const run = state.runs[state.activeRunId];
-  return run?.state === "running" ? run : undefined;
+  if (run === undefined) return undefined;
+  return replay?.runId != null || run.state === "running" ? run : undefined;
 }
 
 /** The process table's order: by pid, which is also the order they were spawned in. */

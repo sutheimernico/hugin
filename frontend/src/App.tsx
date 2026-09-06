@@ -8,6 +8,9 @@ import { KernelLog } from "./features/log/KernelLog";
 import { MuninBrowser } from "./features/munin/MuninBrowser";
 import { CommandPalette } from "./features/palette/CommandPalette";
 import { ProcessTable } from "./features/procs/ProcessTable";
+import { tsAtSeq } from "./features/replay/replayMath";
+import { RunsView } from "./features/replay/RunsView";
+import { Timeline } from "./features/replay/Timeline";
 import { Layout } from "./features/shell/Layout";
 import { MissionBar } from "./features/shell/MissionBar";
 import { TopBar } from "./features/shell/TopBar";
@@ -15,7 +18,7 @@ import { killAll, killProc } from "./lib/api";
 import { connectEvents } from "./lib/sse";
 import { selectMode, selectProcs } from "./state/selectors";
 import type { HEvent } from "./state/types";
-import { useHuginStore } from "./state/store";
+import { selectVisibleState, useHuginStore } from "./state/store";
 
 /** Mission Control (spec §2.9, view 2): the shell is a pure projection of the event stream. */
 export default function App() {
@@ -40,9 +43,12 @@ export default function App() {
   const clearToast = useCallback(() => setToast(null), []);
 
   const mode = selectMode({ state, replay });
+  // The one place that decides which projection is on screen: the live one, or the replayed
+  // run as it stood at the cursor. Every view below reads this and never `state` directly.
+  const visible = selectVisibleState({ state, replay });
   // Live runs follow the wall clock; a replay follows the events it is replaying.
-  const now = useNow(mode !== "replay", state.log.at(-1)?.ts ?? 0);
-  const run = state.activeRunId === null ? undefined : state.runs[state.activeRunId];
+  const now = useNow(mode !== "replay", tsAtSeq(replay.events, replay.cursorSeq));
+  const run = visible.activeRunId === null ? undefined : visible.runs[visible.activeRunId];
 
   const onKillAll = useCallback(() => {
     void killAll().catch(report);
@@ -53,7 +59,7 @@ export default function App() {
   const closeAgent = useCallback(() => setSelectedPid(null), [setSelectedPid]);
 
   // A selection survives its process, but not a reload of the run: an unknown pid selects nothing.
-  const selected = selectedPid === null ? undefined : state.procs[selectedPid];
+  const selected = selectedPid === null ? undefined : visible.procs[selectedPid];
   // Mission control is the only view built from columns; the others take the whole middle row.
   const control = view === "control";
 
@@ -65,18 +71,18 @@ export default function App() {
         topBar={
           <TopBar
             mode={mode}
-            meters={state.meters}
+            meters={visible.meters}
             view={view}
             onViewChange={setView}
             onKillAll={onKillAll}
             onOpenPalette={openPalette}
           />
         }
-        main={control ? undefined : view === "munin" ? <MuninBrowser /> : <RunsPlaceholder />}
+        main={control ? undefined : view === "munin" ? <MuninBrowser /> : <RunsView />}
         left={
           control ? (
             <ProcessTable
-              procs={selectProcs(state)}
+              procs={selectProcs(visible)}
               now={now}
               selectedPid={selectedPid}
               onSelect={setSelectedPid}
@@ -88,8 +94,8 @@ export default function App() {
           control ? (
             <Panel title="Graph" className="h-full" bodyClassName="min-h-0 p-0">
               <AgentGraph
-                state={state}
-                runId={state.activeRunId}
+                state={visible}
+                runId={visible.activeRunId}
                 selectedPid={selectedPid}
                 onSelect={setSelectedPid}
               />
@@ -101,7 +107,7 @@ export default function App() {
           // position — and its exit animation has something to slide away from.
           control ? (
             <div className="relative h-full">
-              <KernelLog lines={state.log} />
+              <KernelLog lines={visible.log} />
               <AnimatePresence>
                 {selected !== undefined && (
                   <AgentWindow
@@ -116,7 +122,7 @@ export default function App() {
             </div>
           ) : undefined
         }
-        bottom={<MissionBar run={run} now={now} />}
+        bottom={mode === "replay" ? <Timeline /> : <MissionBar run={run} now={now} />}
       />
       <CommandPalette
         open={paletteOpen}
@@ -126,15 +132,6 @@ export default function App() {
       />
       <Toast toast={toast} onDone={clearToast} />
     </MotionConfig>
-  );
-}
-
-/** Task 25 builds this view; until then the tab says so rather than pretending to be empty. */
-function RunsPlaceholder() {
-  return (
-    <Panel title="Runs" className="h-full">
-      <p className="text-[13px] text-muted">Runs &amp; Replay folgen</p>
-    </Panel>
   );
 }
 
