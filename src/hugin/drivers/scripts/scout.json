@@ -1,13 +1,13 @@
 [
   {"delay_ms": 300, "op": "thinking", "on": true},
   {"delay_ms": 500, "op": "thinking", "on": false},
-  {"delay_ms": 0, "op": "text", "delta": "Zuerst munin: vielleicht steht die Hälfte schon da."},
-  {"delay_ms": 200, "op": "syscall", "name": "munin_search", "args": {"query": "lokale Inferenz VRAM", "limit": 5}},
-  {"delay_ms": 200, "op": "tool_call", "call_id": "t1", "tool": "WebSearch", "input_summary": "lokale LLM-Inferenz 8 GB VRAM Quantisierung"},
+  {"delay_ms": 0, "op": "text", "delta": "Mein Auftrag: {task} Zuerst munin — vielleicht steht die Hälfte schon da."},
+  {"delay_ms": 200, "op": "syscall", "name": "munin_search", "args": {"query": "{task}", "limit": 5}},
+  {"delay_ms": 200, "op": "tool_call", "call_id": "t1", "tool": "WebSearch", "input_summary": "{task}"},
   {"delay_ms": 900, "op": "tool_result", "call_id": "t1", "ok": true, "output_summary": "6 Treffer, davon 2 Primärquellen (Modellkarte, Projekt-README)", "ms": 900},
-  {"delay_ms": 300, "op": "text", "delta": " Zwei unabhängige Primärquellen bestätigen die Zahl, ein Blog widerspricht."},
-  {"delay_ms": 200, "op": "syscall", "name": "munin_write", "args": {"title": "7B-Modelle brauchen 4-Bit-Quantisierung für 8 GB VRAM", "body": "Ein Modell mit sieben Milliarden Parametern belegt in 16 Bit rund 14 GB und passt erst als 4-Bit-Quantisierung (etwa 4,5 GB) auf eine 8-GB-Karte. Belegt durch Modellkarte und Projekt-README.", "tags": ["inferenz", "vram", "quantisierung"]}},
-  {"delay_ms": 300, "op": "syscall", "name": "mission_report", "args": {"summary": "Lokale 7B-Modelle laufen auf 8 GB VRAM nur quantisiert (4 Bit, rund 4,5 GB Gewichte); in 16 Bit sind es etwa 14 GB. Belegt durch zwei unabhängige Primärquellen. Nicht bestätigt: die Durchsatzangaben, die nur ein Blog nennt."}},
+  {"delay_ms": 300, "op": "text", "delta": " Zwei unabhängige Primärquellen tragen den Befund, ein Blog widerspricht."},
+  {"delay_ms": 200, "op": "syscall", "name": "munin_write", "args": {"title": "Befund: {task}", "body": "SIMULATION — dieser Eintrag stammt aus dem `scripted`-Driver, nicht aus einem Modell. Prozess {pid} hat zu „{task}“ zwei unabhängige Primärquellen gefunden (Modellkarte und Projekt-README); ein Blogbeitrag widerspricht ihnen und bleibt hier unbestätigt.", "tags": ["simulation", "recherche"]}},
+  {"delay_ms": 300, "op": "syscall", "name": "mission_report", "args": {"summary": "Auftrag „{task}“ ist bearbeitet: zwei unabhängige Primärquellen tragen den Befund, ein widersprechender Blogbeitrag bleibt unbestätigt. Prozess {pid}, Simulation."}},
   {"op": "usage", "turns": 4, "input_tokens": 3100, "output_tokens": 900},
   {"op": "exit", "reason": "done"}
 ]

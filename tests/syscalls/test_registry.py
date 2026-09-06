@@ -375,6 +375,15 @@ async def test_the_simulation_runs_a_whole_mission_end_to_end(kernel, until):
     assert artifact.is_file()
     assert len(artifact.read_text(encoding="utf-8").splitlines()) >= 20
     assert kernel.syscalls.munin.count() >= 3
+    # Three scouts run the same script — only the task interpolation keeps their findings apart.
+    scout_titles = [
+        memory.title
+        for memory in kernel.syscalls.munin.recent(limit=20)
+        if memory.program == "scout"
+    ]
+    assert len(scout_titles) == 3
+    assert len(set(scout_titles)) == 3
+    assert all(title.startswith("Befund: ") for title in scout_titles)
     assert _of_kind(kernel, EventKind.RUN_DONE)[-1].data["artifacts"] == ["report.md"]
     assert [e.data["ok"] for e in _of_kind(kernel, EventKind.SYS_RESULT)].count(False) == 0
     assert elapsed < 3.0

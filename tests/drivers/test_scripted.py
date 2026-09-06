@@ -168,3 +168,49 @@ async def test_unknown_op_ends_the_run_as_driver_error(sink: RecordingSink, tmp_
     assert sink.calls == []
     assert exit_info.reason == "driver_error"
     assert "teleport" in (exit_info.stderr_tail or "")
+
+
+async def test_task_and_pid_are_interpolated_into_text_and_nested_args(
+    sink: RecordingSink, tmp_path: Path
+):
+    _write_script(
+        tmp_path,
+        "hello",
+        [
+            {"op": "text", "delta": "Auftrag: {task}"},
+            {"op": "tool_call", "call_id": "t1", "tool": "WebSearch", "input_summary": "{task}"},
+            {"op": "tool_result", "call_id": "t1", "ok": True, "output_summary": "{task} ✓",
+             "ms": 5},
+            {
+                "op": "syscall",
+                "name": "munin_write",
+                "args": {"title": "Befund: {task}", "body": "Prozess {pid}", "tags": ["{task}"]},
+            },
+        ],
+    )
+    driver = ScriptedDriver(scripts_dir=tmp_path, clock_sleep=_SleepSpy())
+
+    await driver.run(_proc(tmp_path, task="VRAM-Grenzen"), "prompt", sink)
+
+    assert sink.calls == [
+        ("text", "Auftrag: VRAM-Grenzen"),
+        ("tool_call", "t1", "WebSearch", "VRAM-Grenzen"),
+        ("tool_result", "t1", True, "VRAM-Grenzen ✓", 5),
+        (
+            "syscall",
+            "munin_write",
+            {"title": "Befund: VRAM-Grenzen", "body": "Prozess 1", "tags": ["VRAM-Grenzen"]},
+        ),
+    ]
+
+
+async def test_a_script_without_placeholders_is_left_untouched(
+    sink: RecordingSink, tmp_path: Path
+):
+    """Braces in Markdown or JSON bodies must survive — this is not `str.format`."""
+    _write_script(tmp_path, "hello", [{"op": "text", "delta": "{ \"a\": 1 } und {unbekannt}"}])
+    driver = ScriptedDriver(scripts_dir=tmp_path, clock_sleep=_SleepSpy())
+
+    await driver.run(_proc(tmp_path, task="egal"), "prompt", sink)
+
+    assert sink.calls == [("text", '{ "a": 1 } und {unbekannt}')]

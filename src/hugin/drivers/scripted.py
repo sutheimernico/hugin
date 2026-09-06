@@ -16,6 +16,8 @@ from hugin.kernel.process import AgentProcess
 
 DEFAULT_SCRIPTS_DIR = Path(__file__).parent / "scripts"
 TASK_SCRIPT_PREFIX = "script:"
+TASK_PLACEHOLDER = "{task}"
+PID_PLACEHOLDER = "{pid}"
 
 
 class ScriptedDriver:
@@ -36,7 +38,10 @@ class ScriptedDriver:
         # The prompt is deliberately ignored: a scripted run must be reproducible.
         ops = json.loads(self._script_path(proc).read_text(encoding="utf-8"))
         usage = Usage()
-        for op in ops:
+        for raw_op in ops:
+            # One script, many processes: without this, three scouts on the same script would
+            # write three identical memories and the graph would show one finding three times.
+            op = interpolate(raw_op, task=proc.task, pid=proc.pid)
             if proc.pid in self._killed:
                 return ExitInfo("killed", usage)
             delay_ms = op.get("delay_ms", 0)
@@ -86,3 +91,22 @@ class ScriptedDriver:
             else proc.program
         )
         return self._scripts_dir / f"{name}.json"
+
+
+def interpolate(op: dict, *, task: str, pid: int) -> dict:
+    """Fill `{task}` and `{pid}` into every string of a script op, however deeply nested.
+
+    Plain `str.format` is not an option: script bodies are Markdown and JSON snippets full of
+    braces that mean nothing to the driver, and formatting them would raise on the first one.
+    """
+    return {key: _fill(value, task, pid) for key, value in op.items()}
+
+
+def _fill(value: object, task: str, pid: int) -> object:
+    if isinstance(value, str):
+        return value.replace(TASK_PLACEHOLDER, task).replace(PID_PLACEHOLDER, str(pid))
+    if isinstance(value, list):
+        return [_fill(item, task, pid) for item in value]
+    if isinstance(value, dict):
+        return {key: _fill(item, task, pid) for key, item in value.items()}
+    return value
