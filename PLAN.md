@@ -36,6 +36,8 @@ implementation plan is authoritative — never invent tasks that are not in it.
   frontend state, shell layout, live graph and the ⌘K palette
 - [x] **Milestone 3 — Real drivers** (Tasks 17–21): stream-json parser, Claude Code and Ollama
   drivers, MCP syscall transport, subsystem status and the driver gate
+- [x] **Milestone 4 — Agent window, Munin browser, Replay, Boot** (Tasks 22–26): agent sheet,
+  munin browser, replay backend and cursor, and the boot sequence
 
 ## Milestone 0 — Scaffold
 
@@ -76,7 +78,7 @@ implementation plan is authoritative — never invent tasks that are not in it.
 - [x] Task 23: Munin browser view
 - [x] Task 24: Replay backend — Player, Recorder (scrub), recordings routes
 - [x] Task 25: Runs & Replay view + timeline scrubber (REPLAY mode)
-- [ ] Task 26: Boot sequence
+- [x] Task 26: Boot sequence
 
 ## Milestone 5 — Polish, recordings, docs, sweep
 
