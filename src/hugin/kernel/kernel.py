@@ -401,8 +401,8 @@ class Kernel:
                 run_id=run.id,
                 pid=None,
                 data={
-                    "usage": self._run_usage(run.id),
-                    "artifacts": self._artifacts(run.id),
+                    "usage": self.run_usage(run.id),
+                    "artifacts": self.artifacts(run.id),
                     "duration_s": run.done_at - run.created_at,
                 },
             )
@@ -412,7 +412,7 @@ class Kernel:
                 EventKind.RUN_FAILED, run_id=run.id, pid=None, data={"reason": reason}
             )
 
-    def _run_usage(self, run_id: str) -> Usage:
+    def run_usage(self, run_id: str) -> Usage:
         procs = self.procs.for_run(run_id)
         costs = [p.usage.cost_usd_equiv for p in procs if p.usage.cost_usd_equiv is not None]
         return Usage(
@@ -422,7 +422,7 @@ class Kernel:
             cost_usd_equiv=sum(costs) if costs else None,
         )
 
-    def _artifacts(self, run_id: str) -> list[str]:
+    def artifacts(self, run_id: str) -> list[str]:
         directory = self.settings.runs_dir / run_id / "artifacts"
         if not directory.is_dir():
             return []

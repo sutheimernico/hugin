@@ -104,6 +104,6 @@ def _run_json(kernel: Kernel, run: RunInfo) -> dict:
         "root_pid": run.root_pid,
         # The kernel's own aggregation on purpose: a run summary in the API and the one in the
         # `run.done` event must never disagree, and the kernel is where that sum is defined.
-        "usage": kernel._run_usage(run.id).model_dump(),
-        "artifacts": kernel._artifacts(run.id),
+        "usage": kernel.run_usage(run.id).model_dump(),
+        "artifacts": kernel.artifacts(run.id),
     }

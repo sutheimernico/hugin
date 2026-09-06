@@ -171,6 +171,34 @@ async def test_proc_spawn_creates_a_child_with_ppid_and_the_callers_driver(parke
     assert _of_kind(kernel, EventKind.PROC_SPAWNED)[-1].data["task"].startswith("Recherchiere")
 
 
+async def test_proc_spawn_applies_a_partial_budget_and_defaults_the_rest(parked):
+    kernel, _run_id, spawn = parked
+    planner = await spawn("planner")
+
+    result = await kernel.syscalls.call(
+        planner,
+        "proc_spawn",
+        {"program": "scout", "task": "Recherchiere kurz.", "budget": {"max_turns": 3}},
+    )
+    budget = kernel.procs.get(result["pid"]).budget
+    assert budget.max_turns == 3
+    # The caller named one limit; the other two are the model's defaults, not the program's.
+    assert (budget.max_seconds, budget.max_output_tokens) == (300, 6000)
+
+
+@pytest.mark.parametrize("budget", [{"max_turns": 0}, {"max_turns": "x"}])
+async def test_proc_spawn_refuses_an_invalid_budget(parked, budget):
+    kernel, _run_id, spawn = parked
+    planner = await spawn("planner")
+
+    with pytest.raises(SyscallError, match="budget"):
+        await kernel.syscalls.call(
+            planner, "proc_spawn", {"program": "scout", "task": "egal", "budget": budget}
+        )
+    assert kernel.procs.children(planner) == []
+    assert _of_kind(kernel, EventKind.SYS_RESULT)[-1].data["ok"] is False
+
+
 async def test_proc_spawn_refuses_a_second_planner(parked):
     kernel, _run_id, spawn = parked
     planner = await spawn("planner")
