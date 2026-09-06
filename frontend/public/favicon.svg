@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="hugin">
+  <!-- A raven's head in the violet accent, on transparent: the mask carves the eye out of the
+       silhouette instead of painting it, so the mark works on a light and a dark tab strip. -->
+  <mask id="raven">
+    <rect width="32" height="32" fill="#000"/>
+    <circle cx="13" cy="14.5" r="9" fill="#fff"/>
+    <path d="M20 10.6 L31 15 L20 19.4 Z" fill="#fff"/>
+    <circle cx="16.4" cy="11.8" r="2" fill="#000"/>
+  </mask>
+  <rect width="32" height="32" fill="#6E5BFF" mask="url(#raven)"/>
+</svg>

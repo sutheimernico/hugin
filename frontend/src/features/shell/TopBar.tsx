@@ -46,8 +46,9 @@ export function TopBar({
         <span className="font-display shrink-0 text-[17px] leading-none font-bold tracking-[0.16em] text-text">
           hugin
         </span>
-        {/* Decoration, so it is the first thing to go when the window gets narrow. */}
-        <span className="hidden truncate text-[11px] text-muted xl:inline">
+        {/* Decoration, so it is the first thing to go when the window gets narrow. Below
+            1440 px the meters need its width more than the bar needs a subtitle. */}
+        <span className="hidden truncate text-[11px] text-muted min-[1440px]:inline">
           Gedanken ausschicken. Wissen zurückholen.
         </span>
       </div>
@@ -60,12 +61,13 @@ export function TopBar({
 
       <div className="ml-auto flex shrink-0 items-center gap-5">
         {/* One fixed width per meter, so a longer label or readout can never push into its
-            neighbour — the bars are a HUD row and must stay on one line. */}
+            neighbour — the bars are a HUD row and must stay on one line. They give up a
+            quarter of that width below 1440 px so ⌘K and Panik never leave the bar. */}
         <div className="hidden items-center gap-6 lg:flex">
-          <div className="w-40 shrink-0">
+          <div className="w-32 shrink-0 min-[1440px]:w-40">
             <Meter label="Prozesse" value={meters.activeProcs} max={PROC_SCALE} tone="violet" />
           </div>
-          <div className="w-40 shrink-0">
+          <div className="w-32 shrink-0 min-[1440px]:w-40">
             <Meter
               label="Tokens/min"
               value={meters.tokensPerMin}
@@ -74,7 +76,7 @@ export function TopBar({
               format={fmtTokens}
             />
           </div>
-          <div className="w-40 shrink-0">
+          <div className="w-32 shrink-0 min-[1440px]:w-40">
             <Meter
               label="Budget"
               value={Math.round(meters.budgetPct * 100)}
@@ -85,12 +87,13 @@ export function TopBar({
           </div>
         </div>
 
-        {/* The hint is the button: the shortcut and the way to find it without one. */}
+        {/* The hint is the button: the shortcut and the way to find it without one. It and
+            Panik are the two controls a demo always needs — they never hide. */}
         <button
           type="button"
           aria-label="Befehle öffnen"
           onClick={onOpenPalette}
-          className="ease-out-expo hidden h-7 items-center gap-2 rounded-panel border border-border px-2 text-[11px] text-muted transition-colors duration-150 hover:bg-surface-2 hover:text-text sm:inline-flex"
+          className="ease-out-expo inline-flex h-7 shrink-0 items-center gap-2 rounded-panel border border-border px-2 text-[11px] text-muted transition-colors duration-150 hover:bg-surface-2 hover:text-text"
         >
           <Kbd>⌘K</Kbd>
           <span className="hidden md:inline">Befehle</span>
