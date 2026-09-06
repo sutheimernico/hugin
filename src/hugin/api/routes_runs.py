@@ -11,7 +11,7 @@ from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel
 
-from hugin.api.deps import KernelDep
+from hugin.api.deps import KernelDep, SystemDep
 from hugin.kernel.events import Event
 from hugin.kernel.kernel import Kernel, RunInfo
 from hugin.missions.service import start_mission
@@ -28,8 +28,10 @@ class MissionRequest(BaseModel):
 
 
 @router.post("/missions", status_code=201)
-async def create_mission(body: MissionRequest, kernel: KernelDep) -> dict[str, str]:
-    run_id = await start_mission(kernel, body.goal, body.driver, body.template)
+async def create_mission(
+    body: MissionRequest, kernel: KernelDep, system: SystemDep
+) -> dict[str, str]:
+    run_id = await start_mission(kernel, system, body.goal, body.driver, body.template)
     return {"run_id": run_id}
 
 

@@ -33,6 +33,7 @@ from hugin.drivers.scripted import ScriptedDriver
 from hugin.kernel.events import EventKind
 from hugin.kernel.kernel import Kernel
 from hugin.settings import Settings
+from tests.conftest import FakeSystem
 
 HELLO = "script:hello"
 TIMEOUT_S = 10.0
@@ -102,7 +103,11 @@ async def server(tmp_path: Path) -> AsyncIterator[Server]:
     settings = Settings(
         data_dir=tmp_path / "data", runs_dir=tmp_path / "runs", max_concurrent={"scripted": 8}
     )
-    app = create_app(settings, drivers={"scripted": ScriptedDriver(clock_sleep=_no_sleep)})
+    app = create_app(
+        settings,
+        drivers={"scripted": ScriptedDriver(clock_sleep=_no_sleep)},
+        system=FakeSystem(),
+    )
     port = _free_port()
     uvicorn_server = uvicorn.Server(
         uvicorn.Config(app, host="127.0.0.1", port=port, log_level="warning")

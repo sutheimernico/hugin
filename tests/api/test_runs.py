@@ -126,10 +126,12 @@ async def test_a_url_in_the_goal_is_not_a_path(api, start_mission):
     await start_mission(api, "Recherchiere https://example.com/docs/agents und fasse zusammen.")
 
 
-async def test_unknown_driver_is_rejected(api):
+async def test_a_driver_this_kernel_does_not_have_is_rejected(api):
+    # The gate's other half — a driver that *is* registered but unavailable — is a 409 and
+    # lives in `tests/api/test_system.py`, next to the subsystem report it reads.
     response = await api.client.post("/api/missions", json={"goal": "Test", "driver": "claude"})
 
-    assert response.status_code == 409
+    assert response.status_code == 422
     assert "claude" in response.json()["detail"]
 
 

@@ -92,6 +92,8 @@ class Kernel:
         self.clock = clock
         self.procs = ProcessTable()
         self.runs: dict[str, RunInfo] = {}
+        # Set by `boot()`; until then the kernel has no uptime to report, only an age.
+        self.booted_at: float | None = None
         # The registry imports the kernel for type checking only, so this direction is safe.
         self.syscalls = SyscallRegistry(self, munin)
         self._scheduler = Scheduler(settings.max_concurrent)
@@ -109,6 +111,7 @@ class Kernel:
     # --- lifecycle ---------------------------------------------------------------------
 
     async def boot(self) -> None:
+        self.booted_at = self.clock()
         self.settings.data_dir.mkdir(parents=True, exist_ok=True)
         self.settings.runs_dir.mkdir(parents=True, exist_ok=True)
         await self.emit(

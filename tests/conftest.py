@@ -2,6 +2,9 @@
 
 The kernel is built exactly as production builds it — real event log, real bus, real programs —
 only the clock the scripted driver sleeps on is a no-op, so a scripted run costs no wall time.
+
+`FakeSystem` lives here too: every app a test builds must carry one, because the real status
+service probes the real machine (the `claude` CLI, a real Ollama) — which no test may do.
 """
 
 import asyncio
@@ -24,6 +27,37 @@ TEST_TICK_S = 0.01
 
 async def _no_sleep(_seconds: float) -> None:
     """Scripted pacing is free in tests: the driver awaits this instead of the clock."""
+
+
+def fake_snapshot(*, claude_ok: bool = False, ollama_ok: bool = False) -> dict:
+    """A subsystem report with no machine behind it — the shape the routes and the gate read."""
+    return {
+        "claude": {
+            "ok": claude_ok,
+            "version": "2.1.261" if claude_ok else None,
+            "detail": "Abo-Login erkannt" if claude_ok else "Nicht angemeldet",
+        },
+        "ollama": {
+            "ok": ollama_ok,
+            "models": ["qwen2.5:7b"] if ollama_ok else [],
+            "detail": "1 Modell" if ollama_ok else "Nicht erreichbar",
+        },
+        "munin": {"count": 0},
+        "programs": ["planner"],
+        "kernel": {"uptime_s": 0.0, "procs": 0, "version": "0.1.0"},
+    }
+
+
+class FakeSystem:
+    """Stands in for `SystemStatusService`: no subprocess, no socket, no surprises."""
+
+    def __init__(self, snapshot: dict | None = None) -> None:
+        self._snapshot = snapshot if snapshot is not None else fake_snapshot()
+        self.calls = 0
+
+    async def snapshot(self) -> dict:
+        self.calls += 1
+        return self._snapshot
 
 
 @pytest.fixture

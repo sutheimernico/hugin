@@ -11,9 +11,12 @@ from pathlib import Path
 from fastapi import HTTPException
 
 from hugin.kernel.kernel import Kernel
+from hugin.system.status import SystemStatusService
 
 ROOT_PROGRAM = "planner"
 PRIVATE_ROOT = Path.home() / "private"
+# The two drivers that need something outside hugin to work, and how the refusal names them.
+LIVE_DRIVERS = {"claude": "Claude", "ollama": "Ollama"}
 
 # URLs are stripped first: the "//host/path" of a URL would otherwise read as an absolute path.
 _URL = re.compile(r"\b[a-z][a-z0-9+.-]*://\S+", re.IGNORECASE)
@@ -23,14 +26,18 @@ _PATH = re.compile(r"(?<![\w:.])(?:~/|/)[\w.~-]+(?:/[\w.~-]*)*")
 
 
 async def start_mission(
-    kernel: Kernel, goal: str, driver: str = "scripted", template: str | None = None
+    kernel: Kernel,
+    system: SystemStatusService,
+    goal: str,
+    driver: str = "scripted",
+    template: str | None = None,
 ) -> str:
     """Validate the mission, create its run and spawn the planner as the run's root process."""
     goal = goal.strip()
     if not goal:
         raise HTTPException(status_code=422, detail="Ziel darf nicht leer sein.")
     _reject_foreign_paths(goal)
-    _require_available_driver(kernel, driver)
+    await _require_available_driver(kernel, system, driver)
     run_id = await kernel.create_run(goal, driver, template)
     await kernel.spawn(run_id, ROOT_PROGRAM, goal, driver=driver)
     return run_id
@@ -45,10 +52,22 @@ def _reject_foreign_paths(goal: str) -> None:
             raise HTTPException(status_code=422, detail="Pfade müssen unter ~/private liegen.")
 
 
-def _require_available_driver(kernel: Kernel, driver: str) -> None:
-    """Whether a driver can run at all. Task 21 replaces this with the live subsystem check
-    (Claude logged in, Ollama reachable); the 409 contract it answers with is already here."""
+async def _require_available_driver(
+    kernel: Kernel, system: SystemStatusService, driver: str
+) -> None:
+    """Whether this machine can really run the driver the mission asks for.
+
+    A name the kernel does not know is a bad request (422). A known driver whose subsystem is
+    down is a conflict (409) carrying the same German reason the boot screen shows — read from
+    the live snapshot, so a Claude login or an Ollama restart takes effect without a restart.
+    """
     if driver not in kernel.drivers:
+        raise HTTPException(status_code=422, detail=f"Driver „{driver}“ ist unbekannt.")
+    if driver not in LIVE_DRIVERS:
+        return  # the simulation needs nothing but the kernel itself
+    subsystem = (await system.snapshot())[driver]
+    if not subsystem["ok"]:
         raise HTTPException(
-            status_code=409, detail=f"Driver „{driver}“ ist auf diesem Rechner nicht verfügbar."
+            status_code=409,
+            detail=f"{LIVE_DRIVERS[driver]} nicht verfügbar: {subsystem['detail']}",
         )

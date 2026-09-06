@@ -23,6 +23,7 @@ from hugin.app import create_app
 from hugin.drivers.scripted import ScriptedDriver
 from hugin.kernel.kernel import Kernel
 from hugin.settings import Settings
+from tests.conftest import FakeSystem
 
 DEFAULT_GOAL = "Erstelle ein Recherche-Briefing zu lokalen KI-Agenten."
 BASE_URL = "http://hugin.test"
@@ -40,6 +41,10 @@ class Api:
     @property
     def kernel(self) -> Kernel:
         return self.app.state.kernel
+
+    @property
+    def system(self) -> FakeSystem:
+        return self.app.state.system
 
 
 @contextlib.asynccontextmanager
@@ -78,6 +83,8 @@ async def make_api(tmp_path: Path):
     async def _make(
         clock_sleep: Callable[[float], Awaitable[None]] = _no_sleep,
         limits: dict[str, int] | None = None,
+        drivers: dict | None = None,
+        system: FakeSystem | None = None,
     ) -> Api:
         nonlocal built
         root = tmp_path / f"api{built}"
@@ -87,7 +94,13 @@ async def make_api(tmp_path: Path):
             runs_dir=root / "runs",
             max_concurrent=limits if limits is not None else {"scripted": 8},
         )
-        app = create_app(settings, drivers={"scripted": ScriptedDriver(clock_sleep=clock_sleep)})
+        app = create_app(
+            settings,
+            # Never the real table: a test app runs the simulation and reads a fake report, so
+            # nothing here can start `claude` or reach for Ollama.
+            drivers=drivers or {"scripted": ScriptedDriver(clock_sleep=clock_sleep)},
+            system=system or FakeSystem(),
+        )
         await stack.enter_async_context(_lifespan(app))
         client = await stack.enter_async_context(
             httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url=BASE_URL)

@@ -10,6 +10,7 @@ from fastapi import Depends, Request
 
 from hugin.kernel.kernel import Kernel
 from hugin.munin.store import MuninStore
+from hugin.system.status import SystemStatusService
 
 
 def get_kernel(request: Request) -> Kernel:
@@ -20,5 +21,10 @@ def get_munin(request: Request) -> MuninStore:
     return request.app.state.kernel.syscalls.munin
 
 
+def get_system(request: Request) -> SystemStatusService:
+    return request.app.state.system
+
+
 KernelDep = Annotated[Kernel, Depends(get_kernel)]
 MuninDep = Annotated[MuninStore, Depends(get_munin)]
+SystemDep = Annotated[SystemStatusService, Depends(get_system)]
