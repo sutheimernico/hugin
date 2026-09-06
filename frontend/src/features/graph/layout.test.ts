@@ -21,6 +21,7 @@ function proc(pid: number, ppid: number | null, over: Partial<Proc> = {}): Proc 
     startedAt: 0,
     exitedAt: null,
     exitReason: null,
+    stderrTail: null,
     thinking: false,
     budgetPct: 0,
     transcript: [],

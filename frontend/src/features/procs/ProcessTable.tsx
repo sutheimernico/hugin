@@ -96,7 +96,9 @@ function ProcessRow({ proc, now, selected, onSelect, onKill }: RowProps) {
       className="ease-out-expo cursor-pointer border-t border-border/60 transition-colors duration-150 outline-none hover:bg-surface-2 focus-visible:bg-surface-2 data-[selected=true]:bg-violet/12"
     >
       <td className="py-1.5 pl-3 font-mono text-[11px] text-muted tabular-nums">{proc.pid}</td>
-      <td title={`${ROLE_LABEL[proc.role] ?? proc.role} — ${proc.task}`}>
+      {/* `ROLE_LABEL` is keyed by program name; the kernel's own `role` is English prose
+          and only stands in for a program the shell does not know. */}
+      <td title={`${ROLE_LABEL[proc.program] ?? proc.role} — ${proc.task}`}>
         <span className="block max-w-24 truncate font-mono text-text">{proc.program}</span>
       </td>
       <td>

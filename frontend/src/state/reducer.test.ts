@@ -149,7 +149,7 @@ describe("applyEvent — processes", () => {
         {
           reason: "done",
           usage: { turns: 3, input_tokens: 700, output_tokens: 500, cost_usd_equiv: null },
-          stderr_tail: null,
+          stderr_tail: "RuntimeError: boom",
         },
         { pid: 3 },
       ),
@@ -165,6 +165,7 @@ describe("applyEvent — processes", () => {
       driver: "scripted",
       state: "done",
       exitReason: "done",
+      stderrTail: "RuntimeError: boom",
       thinking: false,
       budgetPct: 0.33,
     });

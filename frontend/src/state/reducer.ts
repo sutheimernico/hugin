@@ -299,6 +299,7 @@ function spawnProc(next: State, e: HEvent): void {
       startedAt: null,
       exitedAt: null,
       exitReason: null,
+      stderrTail: null,
       thinking: false,
       budgetPct: 0,
       transcript: [],
@@ -318,6 +319,7 @@ function exitProc(next: State, e: HEvent): void {
     usage: mergeUsage(proc.usage, reported),
     exitedAt: e.ts,
     exitReason: str(e.data.reason),
+    stderrTail: text(e.data.stderr_tail),
     thinking: false,
   }));
 }
@@ -457,6 +459,11 @@ function strings(value: unknown): string[] {
 
 function str(value: unknown, fallback = ""): string {
   return typeof value === "string" ? value : fallback;
+}
+
+/** An optional string field: absent, null and empty all mean "nothing to show". */
+function text(value: unknown): string | null {
+  return typeof value === "string" && value !== "" ? value : null;
 }
 
 function num(value: unknown, fallback = 0): number {

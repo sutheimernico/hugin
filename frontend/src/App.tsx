@@ -1,7 +1,8 @@
-import { MotionConfig } from "motion/react";
+import { AnimatePresence, MotionConfig } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Panel } from "./components/Panel";
 import { Toast, type ToastMessage, type ToastTone } from "./components/Toast";
+import { AgentWindow } from "./features/agent/AgentWindow";
 import { AgentGraph } from "./features/graph/AgentGraph";
 import { KernelLog } from "./features/log/KernelLog";
 import { CommandPalette } from "./features/palette/CommandPalette";
@@ -46,6 +47,10 @@ export default function App() {
   const onKill = useCallback((pid: number) => {
     void killProc(pid).catch(report);
   }, []);
+  const closeAgent = useCallback(() => setSelectedPid(null), [setSelectedPid]);
+
+  // A selection survives its process, but not a reload of the run: an unknown pid selects nothing.
+  const selected = selectedPid === null ? undefined : state.procs[selectedPid];
 
   return (
     // `motion` animates through the Web Animations API, which the global CSS override in
@@ -79,7 +84,24 @@ export default function App() {
             />
           </Panel>
         }
-        right={<KernelLog lines={state.log} />}
+        right={
+          // The sheet overlays the log rather than unmounting it, so the ticker keeps its scroll
+          // position — and its exit animation has something to slide away from.
+          <div className="relative h-full">
+            <KernelLog lines={state.log} />
+            <AnimatePresence>
+              {selected !== undefined && (
+                <AgentWindow
+                  key={selected.pid}
+                  proc={selected}
+                  now={now}
+                  onClose={closeAgent}
+                  onKill={onKill}
+                />
+              )}
+            </AnimatePresence>
+          </div>
+        }
         bottom={<MissionBar run={run} now={now} />}
       />
       <CommandPalette

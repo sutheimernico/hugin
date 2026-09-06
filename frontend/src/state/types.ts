@@ -72,6 +72,12 @@ export interface Proc {
   startedAt: number | null;
   exitedAt: number | null;
   exitReason: string | null;
+  /**
+   * Addition to the BINDING block: the driver's last stderr lines from `proc.exit`. Only the
+   * agent window (Task 22) shows them, and nothing else in the projection would keep them —
+   * without this field a `driver_error` would be a verdict with its evidence thrown away.
+   */
+  stderrTail: string | null;
   thinking: boolean;
   /** Budget fill as a fraction 0…1 — the same scale the kernel's `budget.tick` reports. */
   budgetPct: number;

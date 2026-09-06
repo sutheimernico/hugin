@@ -22,6 +22,7 @@ function proc(pid: number, ppid: number | null, program: string): Proc {
     startedAt: 0,
     exitedAt: null,
     exitReason: null,
+    stderrTail: null,
     thinking: false,
     budgetPct: 0.1,
     transcript: [],
