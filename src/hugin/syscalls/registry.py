@@ -155,7 +155,11 @@ SYSCALLS: tuple[SyscallDef, ...] = (
                         {"type": "array", "items": {"type": "integer"}, "maxItems": 8},
                         {"type": "string", "enum": ["children"]},
                         # Small models tend to wrap the keyword in a list; accept that too.
-                        {"type": "array", "items": {"type": "string", "enum": ["children"]}, "maxItems": 1},
+                        {
+                            "type": "array",
+                            "items": {"type": "string", "enum": ["children"]},
+                            "maxItems": 1,
+                        },
                     ]
                 },
                 "timeout_s": {

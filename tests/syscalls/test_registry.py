@@ -389,18 +389,20 @@ async def test_the_simulation_runs_a_whole_mission_end_to_end(kernel, until):
     assert elapsed < 3.0
 
 
-async def test_proc_wait_accepts_the_children_keyword_wrapped_in_a_list(kernel):
-    run_id = await kernel.create_run("g", "scripted")
-    root = await kernel.spawn(run_id, "planner", "script:hello", driver="scripted")
-    kernel.procs.get(root).transition("spawning")
-    kernel.procs.get(root).transition("running")
-    result = await kernel.syscalls.call(root, "proc_wait", {"pids": ["children"], "timeout_s": 5})
+async def test_proc_wait_accepts_the_children_keyword_wrapped_in_a_list(parked):
+    kernel, _run_id, spawn = parked
+    planner = await spawn("planner")
+    kernel.procs.get(planner).transition("spawning")
+    kernel.procs.get(planner).transition("running")
+    args = {"pids": ["children"], "timeout_s": 5}
+    result = await kernel.syscalls.call(planner, "proc_wait", args)
     assert result == {"results": []}
 
 
-async def test_artifact_write_defaults_the_name_to_report_md(kernel):
-    run_id = await kernel.create_run("g", "scripted")
-    root = await kernel.spawn(run_id, "planner", "script:hello", driver="scripted")
-    result = await kernel.syscalls.call(root, "artifact_write", {"content": "# Bericht"})
+async def test_artifact_write_defaults_the_name_to_report_md(parked):
+    kernel, run_id, spawn = parked
+    planner = await spawn("planner")
+    result = await kernel.syscalls.call(planner, "artifact_write", {"content": "# Bericht"})
     assert result["path"] == "artifacts/report.md"
-    assert (kernel.settings.runs_dir / run_id / "artifacts" / "report.md").read_text() == "# Bericht"
+    written = kernel.settings.runs_dir / run_id / "artifacts" / "report.md"
+    assert written.read_text() == "# Bericht"
