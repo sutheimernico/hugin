@@ -222,19 +222,13 @@ docs/                  adr/ · sessions/ · superpowers/{specs,plans} · media/
 
 ## Status
 
-**v1 feature-complete (2026-09-06), Branch `autopilot/work`.** Kernel, drei Treiber,
-Syscalls über MCP, munin, fünf Programme, Missionen, Replay und die sechs Ansichten stehen; eine
-Claude-Mission ist live auf dem Abo durchgelaufen (`apiKeySource=none`), Simulation und Ollama
-ebenso. Gate: 356 pytest + 234 vitest grün, ruff/tsc/eslint sauber.
+**v1 feature-complete (2026-09-06).** Kernel, drei Treiber, Syscalls über MCP, munin, fünf
+Programme, Missionen, Replay und die sechs Ansichten stehen; eine Claude-Mission ist live auf dem
+Abo durchgelaufen (`apiKeySource=none`), Simulation und Ollama ebenso. Gate: 356 pytest + 234
+vitest grün, ruff/tsc/eslint sauber.
 
-Offen und nur von Nico zu entscheiden:
-
-- **Remote und Sichtbarkeit.** Es gibt kein Git-Remote. Vor dem ersten Push: Remote festlegen
-  und entscheiden, ob das Repo public wird — dann die Publish-Checkliste (Secret-Scan über die
-  gesamte History, Doku-Sweep, Commit-Mails, LICENSE, Backup-Bundle).
-- **Windows-Verknüpfung** für die Demo ohne Terminal:
-  `msedge --app=http://127.0.0.1:8770` (das Backend startet vorher per `scripts/serve.sh`).
-- **Optional Tailscale**, falls die Shell auch vom Handy erreichbar sein soll.
+Tipp für die Demo ohne Terminal: nach `scripts/serve.sh` die Shell als App-Fenster öffnen, z. B.
+`msedge --app=http://127.0.0.1:8770`.
 
 ## Später
 
