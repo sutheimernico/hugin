@@ -116,7 +116,9 @@ the planner needs Claude or the simulation.
 
 Full version: [`docs/THREAT_MODEL.md`](docs/THREAT_MODEL.md).
 
-- Loopback only; `/api` and `/mcp` both refuse non-loopback `Host`/`Origin` (DNS rebinding).
+- Loopback only; `/api` and `/mcp` both refuse non-loopback `Host`/`Origin` (DNS rebinding). To open
+  the shell from another device (e.g. a phone over Tailscale), bind `HUGIN_HOST` there and name the
+  hostnames you accept in `HUGIN_ALLOWED_HOSTS` (comma-separated, exact match; default: none).
 - File tools are path-scoped to `HUGIN_WORKSPACE_ROOT` (default: this repository), secrets inside
   it are denied, no program has a shell tool, and every spawn path checks task text against the
   workspace.

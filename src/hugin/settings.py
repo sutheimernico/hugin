@@ -1,7 +1,8 @@
 from pathlib import Path
+from typing import Annotated, Any
 
-from pydantic import Field
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import Field, field_validator
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -9,6 +10,9 @@ class Settings(BaseSettings):
 
     host: str = "127.0.0.1"
     port: int = 8770
+    # Extra hostnames `/api` accepts besides loopback, e.g. "wsl-claude,100.99.224.50" for a phone
+    # on the tailnet. Comma-separated in the environment; without this the API stays loopback-only.
+    allowed_hosts: Annotated[list[str], NoDecode] = []
     repo_root: Path = Field(default_factory=lambda: Path(__file__).resolve().parents[2])
     data_dir: Path = Field(default_factory=lambda: Path(__file__).resolve().parents[2] / "data")
     runs_dir: Path = Field(default_factory=lambda: Path(__file__).resolve().parents[2] / "runs")
@@ -28,6 +32,13 @@ class Settings(BaseSettings):
     # coexist with its workers (limit 1 would park every child behind the parent).
     max_concurrent: dict[str, int] = {"claude": 3, "ollama": 3, "scripted": 8}
     log_ring: int = 5000
+
+    @field_validator("allowed_hosts", mode="before")
+    @classmethod
+    def _split_hosts(cls, value: Any) -> Any:
+        if isinstance(value, str):
+            return [host.strip() for host in value.split(",") if host.strip()]
+        return value
 
     @property
     def db_path(self) -> Path:

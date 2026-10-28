@@ -11,3 +11,11 @@ def test_defaults_bind_localhost_and_port_8770(monkeypatch, tmp_path):
     assert s.ollama_url == "http://127.0.0.1:11434"
     assert s.ollama_model == "qwen2.5:7b"
     assert s.claude_bin == "claude"
+
+
+def test_allowed_hosts_default_to_loopback_only_and_split_on_commas(monkeypatch, tmp_path):
+    monkeypatch.setenv("HUGIN_DATA_DIR", str(tmp_path / "data"))
+    assert Settings().allowed_hosts == []
+
+    monkeypatch.setenv("HUGIN_ALLOWED_HOSTS", "wsl-claude, 100.99.224.50 ,")
+    assert Settings().allowed_hosts == ["wsl-claude", "100.99.224.50"]

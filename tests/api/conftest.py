@@ -85,6 +85,7 @@ async def make_api(tmp_path: Path):
         limits: dict[str, int] | None = None,
         drivers: dict | None = None,
         system: FakeSystem | None = None,
+        allowed_hosts: list[str] | None = None,
     ) -> Api:
         nonlocal built
         root = tmp_path / f"api{built}"
@@ -95,6 +96,7 @@ async def make_api(tmp_path: Path):
             # Never the repo's own `demo/recordings/`: a test must not write into the checkout.
             recordings_dir=root / "recordings",
             max_concurrent=limits if limits is not None else {"scripted": 8},
+            allowed_hosts=allowed_hosts or [],
         )
         app = create_app(
             settings,

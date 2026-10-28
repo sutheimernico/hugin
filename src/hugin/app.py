@@ -122,7 +122,7 @@ def create_app(
 
     app = FastAPI(title="hugin", version="0.1.0", lifespan=lifespan)
     app.state.settings = settings
-    app.add_middleware(LoopbackGuard)
+    app.add_middleware(LoopbackGuard, allowed_hosts=settings.allowed_hosts)
     app.state.kernel = None
     app.state.system = None
     for module in ROUTERS:
