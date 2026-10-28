@@ -189,9 +189,7 @@ async def test_killing_a_queued_process_never_runs_it(make_kernel):
 
     proc = kernel.procs.get(queued)
     assert (proc.state, proc.exit_reason, proc.started_at) == ("killed", "killed", None)
-    states = [
-        e.data["state"] for e in _of_kind(kernel, EventKind.PROC_STATE) if e.pid == queued
-    ]
+    states = [e.data["state"] for e in _of_kind(kernel, EventKind.PROC_STATE) if e.pid == queued]
     assert states == ["killed"]
     assert [e.data["target"] for e in _of_kind(kernel, EventKind.KILL)] == [queued]
     assert [e.pid for e in _of_kind(kernel, EventKind.PROC_EXIT)] == [queued]

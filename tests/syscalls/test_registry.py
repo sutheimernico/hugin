@@ -285,9 +285,7 @@ async def test_proc_wait_without_live_children_returns_nothing(parked):
     kernel, _run_id, spawn = parked
     planner = await spawn("planner")
     await _running(kernel, planner)
-    assert await kernel.syscalls.call(planner, "proc_wait", {"pids": "children"}) == {
-        "results": []
-    }
+    assert await kernel.syscalls.call(planner, "proc_wait", {"pids": "children"}) == {"results": []}
     assert kernel.procs.get(planner).state == "running"
 
 
@@ -297,9 +295,7 @@ async def test_mission_report_lands_in_the_parent_mailbox(parked):
     scout = await spawn("scout", ppid=planner)
 
     summary = "Drei Quellen bestätigen die Zahl, eine widerspricht ihr."
-    assert await kernel.syscalls.call(scout, "mission_report", {"summary": summary}) == {
-        "ok": True
-    }
+    assert await kernel.syscalls.call(scout, "mission_report", {"summary": summary}) == {"ok": True}
     assert kernel.procs.get(scout).report == summary
     mailbox = kernel.procs.get(planner).mailbox
     assert [(m.from_pid, m.text) for m in mailbox] == [(scout, summary)]

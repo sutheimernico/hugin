@@ -110,9 +110,7 @@ class MuninStore:
         return [_row_to_memory(row) for row in rows]
 
     def get(self, memory_id: int) -> Memory | None:
-        row = self._conn.execute(
-            f"{_COLUMNS} WHERE memories_meta.id = ?", (memory_id,)
-        ).fetchone()
+        row = self._conn.execute(f"{_COLUMNS} WHERE memories_meta.id = ?", (memory_id,)).fetchone()
         return None if row is None else _row_to_memory(row)
 
     def recent(self, limit: int = 20) -> list[Memory]:

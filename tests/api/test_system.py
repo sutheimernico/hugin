@@ -106,8 +106,6 @@ async def test_the_simulation_never_needs_the_report(api, start_mission):
 
 
 async def test_an_unknown_driver_is_rejected_as_a_bad_request(api):
-    response = await api.client.post(
-        "/api/missions", json={"goal": DEFAULT_GOAL, "driver": "gpt"}
-    )
+    response = await api.client.post("/api/missions", json={"goal": DEFAULT_GOAL, "driver": "gpt"})
 
     assert response.status_code == 422

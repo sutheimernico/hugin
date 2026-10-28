@@ -145,6 +145,7 @@ docs/sessions/*.tmp
 ```python
 from hugin.settings import Settings
 
+
 def test_defaults_bind_localhost_and_port_8770(monkeypatch, tmp_path):
     monkeypatch.setenv("HUGIN_DATA_DIR", str(tmp_path / "data"))
     s = Settings()
@@ -195,6 +196,7 @@ class Settings(BaseSettings):
 ```python
 import httpx
 from hugin.app import create_app
+
 
 async def test_health_ok(tmp_path, monkeypatch):
     monkeypatch.setenv("HUGIN_DATA_DIR", str(tmp_path / "data"))
@@ -345,10 +347,12 @@ import pytest
 from pydantic import ValidationError
 from hugin.kernel.events import Event, EventKind, make_event
 
+
 def test_kinds_are_closed_list():
     assert "proc.text" in EventKind.__members__.values() or EventKind("proc.text")
     with pytest.raises(ValueError):
         EventKind("proc.unknown")
+
 
 def test_make_event_validates_payload():
     e = make_event(EventKind.PROC_TEXT, run_id="r1", pid=1, data={"delta": "hi"}, ts=1.0)
@@ -356,8 +360,11 @@ def test_make_event_validates_payload():
     with pytest.raises(ValidationError):
         make_event(EventKind.PROC_TEXT, run_id="r1", pid=1, data={"nope": 1}, ts=1.0)
 
+
 def test_event_roundtrip_json():
-    e = make_event(EventKind.KILL, run_id=None, pid=None, data={"target": "all", "by": "user"}, ts=2.0)
+    e = make_event(
+        EventKind.KILL, run_id=None, pid=None, data={"target": "all", "by": "user"}, ts=2.0
+    )
     e2 = Event.model_validate_json(e.model_dump_json())
     assert e2 == e
 ```
@@ -371,16 +378,30 @@ from pydantic import BaseModel, ConfigDict
 
 
 class EventKind(StrEnum):
-    KERNEL_BOOT = "kernel.boot"; KERNEL_SUBSYSTEM = "kernel.subsystem"
-    RUN_CREATED = "run.created"; RUN_DONE = "run.done"; RUN_FAILED = "run.failed"
-    SCHED_QUEUED = "sched.queued"; SCHED_STARTED = "sched.started"; SCHED_BLOCKED = "sched.blocked"
-    PROC_SPAWNED = "proc.spawned"; PROC_STATE = "proc.state"; PROC_TEXT = "proc.text"
-    PROC_THINKING = "proc.thinking"; PROC_EXIT = "proc.exit"
-    TOOL_CALL = "tool.call"; TOOL_RESULT = "tool.result"
-    SYS_CALL = "sys.call"; SYS_RESULT = "sys.result"
-    MSG_SENT = "msg.sent"; MUNIN_WRITE = "munin.write"; MUNIN_READ = "munin.read"
+    KERNEL_BOOT = "kernel.boot"
+    KERNEL_SUBSYSTEM = "kernel.subsystem"
+    RUN_CREATED = "run.created"
+    RUN_DONE = "run.done"
+    RUN_FAILED = "run.failed"
+    SCHED_QUEUED = "sched.queued"
+    SCHED_STARTED = "sched.started"
+    SCHED_BLOCKED = "sched.blocked"
+    PROC_SPAWNED = "proc.spawned"
+    PROC_STATE = "proc.state"
+    PROC_TEXT = "proc.text"
+    PROC_THINKING = "proc.thinking"
+    PROC_EXIT = "proc.exit"
+    TOOL_CALL = "tool.call"
+    TOOL_RESULT = "tool.result"
+    SYS_CALL = "sys.call"
+    SYS_RESULT = "sys.result"
+    MSG_SENT = "msg.sent"
+    MUNIN_WRITE = "munin.write"
+    MUNIN_READ = "munin.read"
     ARTIFACT_WRITTEN = "artifact.written"
-    BUDGET_TICK = "budget.tick"; BUDGET_EXCEEDED = "budget.exceeded"; KILL = "kill"
+    BUDGET_TICK = "budget.tick"
+    BUDGET_EXCEEDED = "budget.exceeded"
+    KILL = "kill"
 
 
 ProcState = Literal["queued", "spawning", "running", "waiting_tool", "done", "failed", "killed"]
@@ -403,45 +424,163 @@ class BudgetSpec(Strict):
     max_output_tokens: int = 6000
 
 
-class KernelBoot(Strict): version: str; pid_counter: int
-class KernelSubsystem(Strict): name: str; status: Literal["ok", "warn", "error"]; detail: str
-class RunCreated(Strict): goal: str; driver: str; template: str | None = None
-class RunDone(Strict): usage: Usage; artifacts: list[str]; duration_s: float
-class RunFailed(Strict): reason: str
-class SchedQueued(Strict): pass
-class SchedStarted(Strict): pass
-class SchedBlocked(Strict): reason: str; limit: int
+class KernelBoot(Strict):
+    version: str
+    pid_counter: int
+
+
+class KernelSubsystem(Strict):
+    name: str
+    status: Literal["ok", "warn", "error"]
+    detail: str
+
+
+class RunCreated(Strict):
+    goal: str
+    driver: str
+    template: str | None = None
+
+
+class RunDone(Strict):
+    usage: Usage
+    artifacts: list[str]
+    duration_s: float
+
+
+class RunFailed(Strict):
+    reason: str
+
+
+class SchedQueued(Strict):
+    pass
+
+
+class SchedStarted(Strict):
+    pass
+
+
+class SchedBlocked(Strict):
+    reason: str
+    limit: int
+
+
 class ProcSpawned(Strict):
-    ppid: int | None; program: str; role: str; driver: str; model: str; budget: BudgetSpec; task: str
-class ProcStateChange(Strict): state: ProcState; prev: ProcState
-class ProcText(Strict): delta: str
-class ProcThinking(Strict): on: bool
-class ProcExit(Strict): reason: str; usage: Usage; stderr_tail: str | None = None
-class ToolCall(Strict): call_id: str; tool: str; input_summary: str
-class ToolResult(Strict): call_id: str; ok: bool; output_summary: str; ms: int
-class SysCall(Strict): call_id: str; syscall: str; args_summary: str
-class SysResult(Strict): call_id: str; ok: bool; result_summary: str; ms: int
-class MsgSent(Strict): from_pid: int; to_pid: int; preview: str
-class MuninWrite(Strict): memory_id: int; title: str
-class MuninRead(Strict): query: str; hits: int
-class ArtifactWritten(Strict): name: str; bytes: int
-class BudgetTick(Strict): turns: int; output_tokens: int; seconds: float; pct: float
-class BudgetExceeded(Strict): which: Literal["turns", "seconds", "output_tokens"]
-class Kill(Strict): target: int | Literal["all"]; by: str
+    ppid: int | None
+    program: str
+    role: str
+    driver: str
+    model: str
+    budget: BudgetSpec
+    task: str
+
+
+class ProcStateChange(Strict):
+    state: ProcState
+    prev: ProcState
+
+
+class ProcText(Strict):
+    delta: str
+
+
+class ProcThinking(Strict):
+    on: bool
+
+
+class ProcExit(Strict):
+    reason: str
+    usage: Usage
+    stderr_tail: str | None = None
+
+
+class ToolCall(Strict):
+    call_id: str
+    tool: str
+    input_summary: str
+
+
+class ToolResult(Strict):
+    call_id: str
+    ok: bool
+    output_summary: str
+    ms: int
+
+
+class SysCall(Strict):
+    call_id: str
+    syscall: str
+    args_summary: str
+
+
+class SysResult(Strict):
+    call_id: str
+    ok: bool
+    result_summary: str
+    ms: int
+
+
+class MsgSent(Strict):
+    from_pid: int
+    to_pid: int
+    preview: str
+
+
+class MuninWrite(Strict):
+    memory_id: int
+    title: str
+
+
+class MuninRead(Strict):
+    query: str
+    hits: int
+
+
+class ArtifactWritten(Strict):
+    name: str
+    bytes: int
+
+
+class BudgetTick(Strict):
+    turns: int
+    output_tokens: int
+    seconds: float
+    pct: float
+
+
+class BudgetExceeded(Strict):
+    which: Literal["turns", "seconds", "output_tokens"]
+
+
+class Kill(Strict):
+    target: int | Literal["all"]
+    by: str
 
 
 PAYLOADS: dict[EventKind, type[Strict]] = {
-    EventKind.KERNEL_BOOT: KernelBoot, EventKind.KERNEL_SUBSYSTEM: KernelSubsystem,
-    EventKind.RUN_CREATED: RunCreated, EventKind.RUN_DONE: RunDone, EventKind.RUN_FAILED: RunFailed,
-    EventKind.SCHED_QUEUED: SchedQueued, EventKind.SCHED_STARTED: SchedStarted,
-    EventKind.SCHED_BLOCKED: SchedBlocked, EventKind.PROC_SPAWNED: ProcSpawned,
-    EventKind.PROC_STATE: ProcStateChange, EventKind.PROC_TEXT: ProcText,
-    EventKind.PROC_THINKING: ProcThinking, EventKind.PROC_EXIT: ProcExit,
-    EventKind.TOOL_CALL: ToolCall, EventKind.TOOL_RESULT: ToolResult,
-    EventKind.SYS_CALL: SysCall, EventKind.SYS_RESULT: SysResult, EventKind.MSG_SENT: MsgSent,
-    EventKind.MUNIN_WRITE: MuninWrite, EventKind.MUNIN_READ: MuninRead,
-    EventKind.ARTIFACT_WRITTEN: ArtifactWritten, EventKind.BUDGET_TICK: BudgetTick,
-    EventKind.BUDGET_EXCEEDED: BudgetExceeded, EventKind.KILL: Kill,
+    EventKind.KERNEL_BOOT: KernelBoot,
+    EventKind.KERNEL_SUBSYSTEM: KernelSubsystem,
+    EventKind.RUN_CREATED: RunCreated,
+    EventKind.RUN_DONE: RunDone,
+    EventKind.RUN_FAILED: RunFailed,
+    EventKind.SCHED_QUEUED: SchedQueued,
+    EventKind.SCHED_STARTED: SchedStarted,
+    EventKind.SCHED_BLOCKED: SchedBlocked,
+    EventKind.PROC_SPAWNED: ProcSpawned,
+    EventKind.PROC_STATE: ProcStateChange,
+    EventKind.PROC_TEXT: ProcText,
+    EventKind.PROC_THINKING: ProcThinking,
+    EventKind.PROC_EXIT: ProcExit,
+    EventKind.TOOL_CALL: ToolCall,
+    EventKind.TOOL_RESULT: ToolResult,
+    EventKind.SYS_CALL: SysCall,
+    EventKind.SYS_RESULT: SysResult,
+    EventKind.MSG_SENT: MsgSent,
+    EventKind.MUNIN_WRITE: MuninWrite,
+    EventKind.MUNIN_READ: MuninRead,
+    EventKind.ARTIFACT_WRITTEN: ArtifactWritten,
+    EventKind.BUDGET_TICK: BudgetTick,
+    EventKind.BUDGET_EXCEEDED: BudgetExceeded,
+    EventKind.KILL: Kill,
 }
 
 
@@ -454,7 +593,9 @@ class Event(BaseModel):
     data: dict
 
 
-def make_event(kind: EventKind, *, run_id: str | None, pid: int | None, data: dict, ts: float) -> Event:
+def make_event(
+    kind: EventKind, *, run_id: str | None, pid: int | None, data: dict, ts: float
+) -> Event:
     payload = PAYLOADS[kind].model_validate(data)
     return Event(ts=ts, run_id=run_id, pid=pid, kind=kind, data=payload.model_dump())
 ```
@@ -619,22 +760,28 @@ Tests: all five load; `planner` has `proc.spawn`; a YAML with an unknown capabil
 class EventSink(Protocol):
     async def text(self, delta: str) -> None: ...
     async def thinking(self, on: bool) -> None: ...
-    async def state(self, state: ProcState) -> None: ...            # running / waiting_tool only
+    async def state(self, state: ProcState) -> None: ...  # running / waiting_tool only
     async def tool_call(self, call_id: str, tool: str, input_summary: str) -> None: ...
     async def tool_result(self, call_id: str, ok: bool, output_summary: str, ms: int) -> None: ...
-    async def usage(self, usage: Usage) -> None: ...               # cumulative
-    async def syscall(self, name: str, args: dict) -> dict: ...    # executes via kernel; raises SyscallError
+    async def usage(self, usage: Usage) -> None: ...  # cumulative
+    async def syscall(
+        self, name: str, args: dict
+    ) -> dict: ...  # executes via kernel; raises SyscallError
+
 
 class SyscallError(Exception): ...
 
+
 @dataclass
 class ExitInfo:
-    reason: str            # "done" | "failed" | "driver_error" | "killed"
+    reason: str  # "done" | "failed" | "driver_error" | "killed"
     usage: Usage
     stderr_tail: str | None = None
 
+
 class AgentDriver(Protocol):
     name: str
+
     async def run(self, proc: AgentProcess, prompt: str, sink: EventSink) -> ExitInfo: ...
     async def kill(self, proc: AgentProcess) -> None: ...
 ```

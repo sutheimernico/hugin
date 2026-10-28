@@ -47,9 +47,7 @@ def test_the_last_op_of_both_scripts_exits():
 
 
 def test_the_planner_starts_six_workers_by_script_name():
-    spawns = [
-        op for op in _ops("stress") if op["op"] == "syscall" and op["name"] == "proc_spawn"
-    ]
+    spawns = [op for op in _ops("stress") if op["op"] == "syscall" and op["name"] == "proc_spawn"]
     assert len(spawns) == 6
     assert {spawn["args"]["task"] for spawn in spawns} == {f"{TASK_SCRIPT_PREFIX}{WORKER}"}
     # Four at a time is the kernel's fan-out limit, so the six run in two waves.

@@ -308,9 +308,7 @@ class Kernel:
         proc = self.procs.get(pid)
         if not proc.alive:
             return
-        await self.emit(
-            EventKind.KILL, run_id=proc.run_id, pid=pid, data={"target": pid, "by": by}
-        )
+        await self.emit(EventKind.KILL, run_id=proc.run_id, pid=pid, data={"target": pid, "by": by})
         # A budget kill keeps its reason: the exit must say what ran out, not just "killed".
         self._kill_reasons[pid] = by if by.startswith("budget:") else "killed"
         if proc.state == "queued":
@@ -436,9 +434,7 @@ class Kernel:
             )
         else:
             run.state = "failed"
-            await self.emit(
-                EventKind.RUN_FAILED, run_id=run.id, pid=None, data={"reason": reason}
-            )
+            await self.emit(EventKind.RUN_FAILED, run_id=run.id, pid=None, data={"reason": reason})
 
     def run_usage(self, run_id: str) -> Usage:
         procs = self.procs.for_run(run_id)

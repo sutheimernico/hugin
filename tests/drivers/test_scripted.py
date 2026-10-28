@@ -179,8 +179,13 @@ async def test_task_and_pid_are_interpolated_into_text_and_nested_args(
         [
             {"op": "text", "delta": "Auftrag: {task}"},
             {"op": "tool_call", "call_id": "t1", "tool": "WebSearch", "input_summary": "{task}"},
-            {"op": "tool_result", "call_id": "t1", "ok": True, "output_summary": "{task} ✓",
-             "ms": 5},
+            {
+                "op": "tool_result",
+                "call_id": "t1",
+                "ok": True,
+                "output_summary": "{task} ✓",
+                "ms": 5,
+            },
             {
                 "op": "syscall",
                 "name": "munin_write",
@@ -204,11 +209,9 @@ async def test_task_and_pid_are_interpolated_into_text_and_nested_args(
     ]
 
 
-async def test_a_script_without_placeholders_is_left_untouched(
-    sink: RecordingSink, tmp_path: Path
-):
+async def test_a_script_without_placeholders_is_left_untouched(sink: RecordingSink, tmp_path: Path):
     """Braces in Markdown or JSON bodies must survive — this is not `str.format`."""
-    _write_script(tmp_path, "hello", [{"op": "text", "delta": "{ \"a\": 1 } und {unbekannt}"}])
+    _write_script(tmp_path, "hello", [{"op": "text", "delta": '{ "a": 1 } und {unbekannt}'}])
     driver = ScriptedDriver(scripts_dir=tmp_path, clock_sleep=_SleepSpy())
 
     await driver.run(_proc(tmp_path, task="egal"), "prompt", sink)

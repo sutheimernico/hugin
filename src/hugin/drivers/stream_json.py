@@ -67,7 +67,6 @@ def parse_line(line: str) -> list[Op]:
             return [Op("ignore", {"type": other})]
 
 
-
 def _str_list(value: object) -> list[str]:
     """Only a real list survives; a wrong-typed `tools` must not crash the parser."""
     if not isinstance(value, list):
@@ -80,6 +79,7 @@ def _as_float(value: object) -> float:
         return float(value)  # type: ignore[arg-type]
     except (TypeError, ValueError):
         return 0.0
+
 
 def _system(event: dict) -> list[Op]:
     subtype = event.get("subtype")
@@ -224,7 +224,8 @@ def _flatten(content: Any) -> str:
         return content
     if isinstance(content, list):
         parts = [
-            block["text"] if isinstance(block, dict) and isinstance(block.get("text"), str)
+            block["text"]
+            if isinstance(block, dict) and isinstance(block.get("text"), str)
             else str(block)
             for block in content
         ]

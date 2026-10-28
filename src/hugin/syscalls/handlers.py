@@ -166,9 +166,7 @@ async def artifact_write(kernel: "Kernel", pid: int, args: dict) -> dict:
     return {"path": f"artifacts/{name}", "bytes": len(content)}
 
 
-def _in_same_run(
-    kernel: "Kernel", caller: AgentProcess, target: int, syscall: str
-) -> AgentProcess:
+def _in_same_run(kernel: "Kernel", caller: AgentProcess, target: int, syscall: str) -> AgentProcess:
     """A pid an agent passed is only addressable if it exists and belongs to the same run."""
     if target == caller.pid:
         raise SyscallError(f"{syscall}: a process cannot address itself")

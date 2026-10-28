@@ -311,9 +311,7 @@ def validate_args(name: str, schema: dict, args: dict) -> dict:
     unknown = sorted(set(args) - set(properties))
     if unknown:
         allowed = ", ".join(properties)
-        raise SyscallError(
-            f"{name}: unknown argument(s) {', '.join(unknown)} — allowed: {allowed}"
-        )
+        raise SyscallError(f"{name}: unknown argument(s) {', '.join(unknown)} — allowed: {allowed}")
     checked = {
         key: _check_value(f"{name}.{key}", properties[key], value) for key, value in args.items()
     }

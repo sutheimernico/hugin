@@ -74,8 +74,11 @@ def test_synthetic_capture_pairs_tool_call_and_tool_result_by_id():
 def test_synthetic_capture_brackets_the_thinking_block():
     ops = _parse_fixture("synthetic_tool_use.jsonl")
 
-    kinds = [(op.kind, op.data.get("block_type"), op.data.get("index")) for op in ops
-             if op.kind in {"block_start", "block_stop"}]
+    kinds = [
+        (op.kind, op.data.get("block_type"), op.data.get("index"))
+        for op in ops
+        if op.kind in {"block_start", "block_stop"}
+    ]
     assert kinds[0] == ("block_start", "thinking", 0)
     assert kinds[1] == ("block_stop", None, 0)
     assert kinds[2] == ("block_start", "text", 1)
@@ -164,20 +167,39 @@ def test_init_without_an_api_key_source_does_not_read_as_none():
 
 
 def test_tool_result_content_is_summarised_as_string_and_as_block_list():
-    as_string = parse_line(json.dumps({
-        "type": "user",
-        "message": {"role": "user", "content": [
-            {"type": "tool_result", "tool_use_id": "toolu_9", "content": "plain output"}
-        ]},
-    }))
-    as_blocks = parse_line(json.dumps({
-        "type": "user",
-        "message": {"role": "user", "content": [
-            {"type": "tool_result", "tool_use_id": "toolu_9", "content": [
-                {"type": "text", "text": "first"}, {"type": "text", "text": "second"}
-            ]}
-        ]},
-    }))
+    as_string = parse_line(
+        json.dumps(
+            {
+                "type": "user",
+                "message": {
+                    "role": "user",
+                    "content": [
+                        {"type": "tool_result", "tool_use_id": "toolu_9", "content": "plain output"}
+                    ],
+                },
+            }
+        )
+    )
+    as_blocks = parse_line(
+        json.dumps(
+            {
+                "type": "user",
+                "message": {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "tool_result",
+                            "tool_use_id": "toolu_9",
+                            "content": [
+                                {"type": "text", "text": "first"},
+                                {"type": "text", "text": "second"},
+                            ],
+                        }
+                    ],
+                },
+            }
+        )
+    )
 
     assert as_string[0].data["output_summary"] == "plain output"
     assert "first" in as_blocks[0].data["output_summary"]
@@ -187,41 +209,74 @@ def test_tool_result_content_is_summarised_as_string_and_as_block_list():
 
 
 def test_tool_result_marked_as_error_is_not_ok():
-    (op,) = parse_line(json.dumps({
-        "type": "user",
-        "message": {"role": "user", "content": [
-            {"type": "tool_result", "tool_use_id": "toolu_9", "is_error": True,
-             "content": "capability denied"}
-        ]},
-    }))
+    (op,) = parse_line(
+        json.dumps(
+            {
+                "type": "user",
+                "message": {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "tool_result",
+                            "tool_use_id": "toolu_9",
+                            "is_error": True,
+                            "content": "capability denied",
+                        }
+                    ],
+                },
+            }
+        )
+    )
 
     assert op.data["ok"] is False
     assert op.data["output_summary"] == "capability denied"
 
 
 def test_summaries_are_truncated():
-    (call, _usage) = parse_line(json.dumps({
-        "type": "assistant",
-        "message": {"content": [
-            {"type": "tool_use", "id": "toolu_1", "name": "t", "input": {"body": "x" * 400}}
-        ], "usage": {}},
-    }))
-    (result,) = parse_line(json.dumps({
-        "type": "user",
-        "message": {"content": [
-            {"type": "tool_result", "tool_use_id": "toolu_1", "content": "y" * 900}
-        ]},
-    }))
+    (call, _usage) = parse_line(
+        json.dumps(
+            {
+                "type": "assistant",
+                "message": {
+                    "content": [
+                        {
+                            "type": "tool_use",
+                            "id": "toolu_1",
+                            "name": "t",
+                            "input": {"body": "x" * 400},
+                        }
+                    ],
+                    "usage": {},
+                },
+            }
+        )
+    )
+    (result,) = parse_line(
+        json.dumps(
+            {
+                "type": "user",
+                "message": {
+                    "content": [
+                        {"type": "tool_result", "tool_use_id": "toolu_1", "content": "y" * 900}
+                    ]
+                },
+            }
+        )
+    )
 
     assert len(call.data["input_summary"]) == 200
     assert len(result.data["output_summary"]) == 300
 
 
 def test_usage_defaults_missing_cache_fields_to_zero():
-    (usage,) = parse_line(json.dumps({
-        "type": "assistant",
-        "message": {"content": [], "usage": {"input_tokens": 5, "output_tokens": 7}},
-    }))
+    (usage,) = parse_line(
+        json.dumps(
+            {
+                "type": "assistant",
+                "message": {"content": [], "usage": {"input_tokens": 5, "output_tokens": 7}},
+            }
+        )
+    )
 
     assert usage.data == {
         "input_tokens": 5,

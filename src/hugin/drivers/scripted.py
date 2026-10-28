@@ -56,9 +56,7 @@ class ScriptedDriver:
                 case "tool_call":
                     await sink.tool_call(op["call_id"], op["tool"], op["input_summary"])
                 case "tool_result":
-                    await sink.tool_result(
-                        op["call_id"], op["ok"], op["output_summary"], op["ms"]
-                    )
+                    await sink.tool_result(op["call_id"], op["ok"], op["output_summary"], op["ms"])
                 case "usage":
                     usage = Usage(
                         turns=op["turns"],

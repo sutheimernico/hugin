@@ -389,9 +389,7 @@ async def test_run_over_the_real_capture_ends_done_with_the_result_usage(
     assert spawn.process.wait_calls >= 1  # never leave a zombie behind
 
 
-async def test_run_spawns_with_the_sandboxed_cwd_env_and_stdin(
-    tmp_path: Path, sink: RecordingSink
-):
+async def test_run_spawns_with_the_sandboxed_cwd_env_and_stdin(tmp_path: Path, sink: RecordingSink):
     spawn = SpawnSpy(FakeProcess(_fixture_lines("haiku_ok_isolated.jsonl")))
     driver = _driver(tmp_path, spawn)
     proc = _proc(tmp_path)
@@ -457,9 +455,7 @@ async def test_run_over_the_synthetic_capture_forwards_ops_in_order(
     )
 
 
-async def test_run_refuses_a_session_billed_through_an_api_key(
-    tmp_path: Path, sink: RecordingSink
-):
+async def test_run_refuses_a_session_billed_through_an_api_key(tmp_path: Path, sink: RecordingSink):
     lines = _fixture_lines("synthetic_tool_use.jsonl")
     init = json.loads(lines[0])
     init["apiKeySource"] = "ANTHROPIC_API_KEY"
