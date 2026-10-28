@@ -14,6 +14,7 @@ from pydantic import ValidationError
 from hugin.drivers.base import SyscallError
 from hugin.kernel.events import BudgetSpec, EventKind
 from hugin.kernel.process import AgentProcess
+from hugin.programs.loader import Program
 
 if TYPE_CHECKING:  # pragma: no cover - import cycle guard, the kernel calls these
     from hugin.kernel.kernel import Kernel
@@ -81,15 +82,7 @@ async def proc_spawn(kernel: "Kernel", pid: int, args: dict) -> dict:
         raise SyscallError(
             "proc_spawn: budget takes positive max_turns, max_seconds and max_output_tokens only"
         ) from err
-    if budget is not None:
-        # A parent may tighten a child's budget, but not below what any real tool call needs:
-        # small models hand out 60-second budgets that no CPU inference can honour.
-        budget = budget.model_copy(
-            update={
-                "max_turns": max(budget.max_turns, MIN_CHILD_TURNS),
-                "max_seconds": max(budget.max_seconds, MIN_CHILD_SECONDS),
-            }
-        )
+    budget = _bounded_budget(kernel, proc, budget, kernel.programs.get(program))
     try:
         # The child inherits the caller's driver, not the program's default: one mission runs
         # on one driver, so a SIMULATION planner never spawns a live `claude` worker.
@@ -98,7 +91,42 @@ async def proc_spawn(kernel: "Kernel", pid: int, args: dict) -> dict:
         )
     except ValueError as err:
         raise SyscallError(f"proc_spawn: {err}") from err
-    return {"pid": child}
+    return {"pid": child, "budget": kernel.procs.get(child).budget.model_dump()}
+
+
+def _bounded_budget(
+    kernel: "Kernel", parent: AgentProcess, requested: BudgetSpec | None, spec: Program | None
+) -> BudgetSpec | None:
+    """The budget a child actually gets: what was asked for, capped by what the parent has left.
+
+    A child is paid out of its parent's allowance. Without the cap a planner (or an injected
+    instruction it follows) could hand out `max_turns=1_000_000` and spend far beyond what the
+    mission was ever granted. The floor still applies first, because small models hand out
+    60-second budgets that no CPU inference can honour — but the parent's remainder wins over it.
+    """
+    if spec is None:
+        return requested  # unknown program: `kernel.spawn` refuses it with its own message
+    wanted = requested or spec.budget
+    elapsed = kernel.clock() - parent.started_at if parent.started_at is not None else 0.0
+    left = {
+        "max_turns": parent.budget.max_turns - parent.usage.turns,
+        "max_seconds": int(parent.budget.max_seconds - elapsed),
+        "max_output_tokens": parent.budget.max_output_tokens - parent.usage.output_tokens,
+    }
+    if requested is not None:
+        wanted = wanted.model_copy(
+            update={
+                "max_turns": max(wanted.max_turns, MIN_CHILD_TURNS),
+                "max_seconds": max(wanted.max_seconds, MIN_CHILD_SECONDS),
+            }
+        )
+    for field, remaining in left.items():
+        if remaining <= 0:
+            unit = field.removeprefix("max_").replace("_", " ")
+            raise SyscallError(f"proc_spawn: the parent has no {unit} left to give a child")
+    return BudgetSpec(
+        **{field: min(getattr(wanted, field), remaining) for field, remaining in left.items()}
+    )
 
 
 async def proc_send(kernel: "Kernel", pid: int, args: dict) -> dict:
@@ -147,6 +175,8 @@ async def artifact_write(kernel: "Kernel", pid: int, args: dict) -> dict:
     run = kernel.runs.get(proc.run_id)
     if run is None or run.root_pid != pid:
         raise SyscallError("single-writer: only the root process may write artifacts")
+    if run.state != "running":
+        raise SyscallError(f"artifact_write: run {run.id} is closed ({run.state})")
     name = args.get("name") or "report.md"
     if ".." in name or ARTIFACT_NAME.fullmatch(name) is None:
         raise SyscallError(

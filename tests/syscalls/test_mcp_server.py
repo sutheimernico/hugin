@@ -35,7 +35,7 @@ from hugin.kernel.kernel import Kernel
 from hugin.settings import Settings
 from tests.conftest import FakeSystem
 
-HELLO = "script:hello"
+HOLD = "script:hold"  # a process that stays alive, so its token stays valid
 TIMEOUT_S = 10.0
 
 SCOUT_TOOLS = ["mission_report", "munin_search", "munin_write"]
@@ -49,8 +49,13 @@ PLANNER_TOOLS = [
 ]
 
 
-async def _no_sleep(_seconds: float) -> None:
-    """Scripted pacing is free in tests: the driver awaits this instead of the clock."""
+async def _no_sleep(seconds: float) -> None:
+    """Scripted pacing is free in tests — except the one long delay that keeps a process alive."""
+    if seconds >= HOLD_S:
+        await asyncio.sleep(seconds)
+
+
+HOLD_S = 0.05
 
 
 @dataclass
@@ -69,7 +74,7 @@ class Server:
 
     async def spawn(self, run_id: str, program: str) -> int:
         return await self.on_server_loop(
-            self.kernel.spawn(run_id, program, HELLO, driver="scripted")
+            self.kernel.spawn(run_id, program, HOLD, driver="scripted")
         )
 
     def token_for(self, pid: int) -> str:
@@ -103,9 +108,14 @@ async def server(tmp_path: Path) -> AsyncIterator[Server]:
     settings = Settings(
         data_dir=tmp_path / "data", runs_dir=tmp_path / "runs", max_concurrent={"scripted": 8}
     )
+    scripts = tmp_path / "scripts"
+    scripts.mkdir()
+    (scripts / "hold.json").write_text(
+        json.dumps([{"delay_ms": 100, "op": "text", "delta": "."}] * 6000), encoding="utf-8"
+    )
     app = create_app(
         settings,
-        drivers={"scripted": ScriptedDriver(clock_sleep=_no_sleep)},
+        drivers={"scripted": ScriptedDriver(scripts_dir=scripts, clock_sleep=_no_sleep)},
         system=FakeSystem(),
     )
     port = _free_port()
@@ -261,18 +271,24 @@ async def test_bad_arguments_come_back_as_a_tool_error_too(run):
     assert "body" in text_of(result)
 
 
-async def test_a_token_still_works_after_the_process_exited(run):
+async def test_a_token_stops_working_once_the_process_exited(run):
     server, _run_id, spawn = run
     scout = await spawn("scout")
     token = server.token_for(scout)
+    async with connect(server, token) as agent:
+        assert await agent.tool_names() == SCOUT_TOOLS
+
+    await server.on_server_loop(server.kernel.kill(scout))
 
     async def _exited() -> None:
         while server.kernel.procs.get(scout).alive:
             await asyncio.sleep(0.01)
 
     await asyncio.wait_for(_exited(), TIMEOUT_S)
-    async with connect(server, token) as agent:
-        assert await agent.tool_names() == SCOUT_TOOLS
+    with pytest.raises(BaseException) as caught:  # noqa: PT011 - the transport picks the type
+        async with connect(server, token) as agent:
+            await agent.tool_names()
+    assert any(isinstance(leaf, MCPError) for leaf in _leaves(caught.value))
 
 
 # --- what a token that is not one may do -------------------------------------------------

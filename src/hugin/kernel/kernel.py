@@ -243,10 +243,10 @@ class Kernel:
     def pid_for(self, token: str) -> int | None:
         """The process a bearer token belongs to, or `None`.
 
-        Every process is a candidate, exited ones included: an agent may still be finishing a
-        syscall while the kernel already recorded its exit, and a token that stops working mid
-        call would look like a kernel bug to the agent. The comparison runs over the whole
-        table in constant time, so a wrong guess learns nothing from how long the answer took.
+        A token dies with its process (`_finalize` clears it): a killed planner must not be
+        able to keep spawning children or writing artifacts through a stale credential. The
+        comparison runs over the whole table in constant time, so a wrong guess learns nothing
+        from how long the answer took.
         """
         found: int | None = None
         for proc in self.procs.all():
@@ -306,8 +306,8 @@ class Kernel:
 
     async def kill(self, pid: int, by: str = "user") -> None:
         proc = self.procs.get(pid)
-        if not proc.alive:
-            return
+        if not proc.alive or pid in self._kill_reasons:
+            return  # gone already, or a kill is on its way (a parent's kill reaches children)
         await self.emit(EventKind.KILL, run_id=proc.run_id, pid=pid, data={"target": pid, "by": by})
         # A budget kill keeps its reason: the exit must say what ran out, not just "killed".
         self._kill_reasons[pid] = by if by.startswith("budget:") else "killed"
@@ -316,8 +316,12 @@ class Kernel:
             self._dequeue(pid)
             self._blocked.discard(pid)
             await self._finalize(pid, ExitInfo("killed", proc.usage))
-            return
-        await self.drivers[proc.driver].kill(proc)
+        else:
+            await self.drivers[proc.driver].kill(proc)
+        # An orphan would keep running (and spending) with nobody left to wait for its report.
+        child_by = "parent" if by.startswith("budget:") else by
+        for child in self.procs.children(pid):
+            await self.kill(child.pid, by=child_by)
 
     async def kill_all(self, by: str = "user") -> None:
         """Always available: it announces itself once and never waits on the scheduler."""
@@ -397,6 +401,7 @@ class Kernel:
         proc = self.procs.get(pid)
         if not proc.alive:
             return
+        proc.token = ""  # revoke before anything else: no syscall may sneak in after the exit
         reason = self._kill_reasons.pop(pid, None) or exit_info.reason
         proc.usage = _merge_usage(proc.usage, exit_info.usage)
         proc.exited_at = self.clock()

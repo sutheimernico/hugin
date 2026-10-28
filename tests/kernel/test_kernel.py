@@ -381,16 +381,19 @@ async def test_an_unknown_token_resolves_to_nothing(kernel):
         assert kernel.pid_for(candidate) is None
 
 
-async def test_a_token_still_resolves_after_the_process_exited(kernel, until):
+async def test_a_token_is_revoked_once_the_process_exited(kernel, until):
     run_id = await kernel.create_run("Token", driver="scripted")
     pid = await kernel.spawn(run_id, "scout", HELLO, driver="scripted")
+    token = kernel.token_for(pid)
+    assert kernel.pid_for(token) == pid
     await until(lambda: not kernel.procs.get(pid).alive)
-    assert kernel.pid_for(kernel.token_for(pid)) == pid
+    assert kernel.pid_for(token) is None
 
 
 async def test_a_token_never_reaches_the_event_log(kernel, until):
     run_id = await kernel.create_run("Token", driver="scripted")
     pid = await kernel.spawn(run_id, "planner", HELLO, driver="scripted")
+    token = kernel.token_for(pid)  # taken while the process is still alive
     await until(lambda: not kernel.procs.get(pid).alive)
-    token = kernel.token_for(pid)
+    assert token
     assert token not in json.dumps([event.model_dump(mode="json") for event in kernel.collected])

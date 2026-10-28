@@ -259,6 +259,8 @@ class SyscallRegistry:
         return result
 
     async def _dispatch(self, proc: AgentProcess, name: str, args: dict) -> dict:
+        if not proc.alive:
+            raise SyscallError(f"{name}: pid {proc.pid} has exited and may not call the kernel")
         definition = self._defs.get(name)
         if definition is None:
             offered = ", ".join(call.name for call in self.defs_for(proc.pid)) or "nothing"
