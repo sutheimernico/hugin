@@ -55,7 +55,7 @@ async def get_run_events(
     run_id: str, kernel: KernelDep, since: int = Query(default=0, ge=0)
 ) -> list[Event]:
     _run_or_404(kernel, run_id)
-    return kernel.log.since(since, run_id)
+    return list(kernel.log.iter_since(since, run_id))
 
 
 @router.get("/runs/{run_id}/artifacts")

@@ -7,7 +7,7 @@ lose it silently.
 """
 
 import asyncio
-from collections.abc import AsyncIterator, Callable
+from collections.abc import AsyncIterator
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -62,6 +62,38 @@ def resolve_since(kernel: Kernel, since: str) -> int:
     return seq
 
 
+# Per-client buffer between the bus and a slow reader. Bounded on purpose: a stalled browser
+# tab must cost a fixed amount of memory, not grow with every event the kernel ever emits.
+CLIENT_QUEUE_MAX = 5000
+_RESYNC = object()
+
+
+class _Subscriber:
+    """The bus side of one SSE client: a bounded queue that degrades to "read the log again".
+
+    When the client falls so far behind that the queue is full, buffering more would only move
+    the problem into memory. Everything is in the log already, so the buffer is dropped and a
+    marker takes its place: the stream sees it, backfills from the last seq it delivered, and
+    carries on — a slow client loses time, never events.
+    """
+
+    def __init__(self, run_id: str | None, queue_max: int) -> None:
+        self.run_id = run_id
+        self.queue: asyncio.Queue[object] = asyncio.Queue(maxsize=queue_max)
+        self.resyncs = 0
+
+    async def push(self, event: Event) -> None:
+        if self.run_id is not None and event.run_id != self.run_id:
+            return
+        try:
+            self.queue.put_nowait(event)
+        except asyncio.QueueFull:
+            while not self.queue.empty():
+                self.queue.get_nowait()
+            self.queue.put_nowait(_RESYNC)
+            self.resyncs += 1
+
+
 @router.get("/events/stream")
 async def stream_events(
     kernel: KernelDep,
@@ -69,42 +101,38 @@ async def stream_events(
     since: str = Query(default="0"),
 ) -> EventSourceResponse:
     backfill_after = resolve_since(kernel, since)
-    queue: asyncio.Queue[Event] = asyncio.Queue()
-
-    async def on_event(event: Event) -> None:
-        if run_id is None or event.run_id == run_id:
-            queue.put_nowait(event)
-
-    unsubscribe = kernel.bus.subscribe(on_event)
-    return EventSourceResponse(
-        _stream(kernel, queue, unsubscribe, run_id, backfill_after), ping=HEARTBEAT_S
-    )
+    return EventSourceResponse(event_stream(kernel, run_id, backfill_after), ping=HEARTBEAT_S)
 
 
-async def _stream(
-    kernel: Kernel,
-    queue: asyncio.Queue[Event],
-    unsubscribe: Callable[[], None],
-    run_id: str | None,
-    since: int,
+async def event_stream(
+    kernel: Kernel, run_id: str | None, since: int, queue_max: int | None = None
 ) -> AsyncIterator[dict]:
     """Backfill from the log, then live from the bus until the client goes away.
 
-    The disconnect is not polled: sse-starlette listens on the ASGI receive channel itself and
-    closes this generator when the client is gone, which runs the `finally`. Calling
-    `request.is_disconnected()` here would make a second consumer of that same channel.
+    The subscription is opened *before* the backfill is read, so an event published in between
+    sits in the queue and is dropped again by the seq filter. The disconnect is not polled:
+    sse-starlette listens on the ASGI receive channel itself and closes this generator when the
+    client is gone, which runs the `finally`. Calling `request.is_disconnected()` here would
+    make a second consumer of that same channel.
     """
+    subscriber = _Subscriber(run_id, queue_max or CLIENT_QUEUE_MAX)
+    unsubscribe = kernel.bus.subscribe(subscriber.push)
     last_seq = since
     try:
-        for event in kernel.log.since(since, run_id):
-            last_seq = event.seq or last_seq
-            yield sse_message(event)
         while True:
-            event = await queue.get()
-            if event.seq is not None and event.seq <= last_seq:
-                continue  # the backfill already delivered it
-            last_seq = event.seq or last_seq
-            yield sse_message(event)
+            # Paged: one capped read would silently end the backfill of a long run.
+            for event in kernel.log.iter_since(last_seq, run_id):
+                last_seq = event.seq or last_seq
+                yield sse_message(event)
+            while True:
+                item = await subscriber.queue.get()
+                if item is _RESYNC:
+                    break  # fell behind: read the missed events out of the log
+                assert isinstance(item, Event)
+                if item.seq is not None and item.seq <= last_seq:
+                    continue  # the backfill already delivered it
+                last_seq = item.seq or last_seq
+                yield sse_message(item)
     finally:
         unsubscribe()
 
