@@ -14,3 +14,13 @@ frontend/dist/
 frontend/coverage/
 docs/sessions/*.tmp
 .playwright-cli/
+
+# Agent process files: kept on disk for local tooling, not part of the public tree.
+/LOOP.md
+/AUTOPILOT_LOG.md
+/PLAN.md
+/PROJECT.md
+/AGENTS.md
+/CLAUDE.md
+/.vscode/
+/.claude/

@@ -40,12 +40,12 @@ Non-negotiables:
 4. **Sandboxed agents.** Own working directory per process under `runs/`, tool whitelist per
    program, capability-gated kernel syscalls, isolated Claude config dir (no user hooks, no
    user MCP servers, no user CLAUDE.md), hard budgets (turns / seconds / output tokens), kill
-   switch, no company paths (the company workspace is never mounted, never referenced).
+   switch, no paths outside the configured workspace.
 5. **Single writer.** Only one process per run (the planner) may write the run's artifact.
    Workers report back via IPC. This is the cheapest known guard against the classic
    multi-agent failure "two agents write inconsistent halves".
 6. **Local & private, publishable later.** No remote until Nico decides; the repo must never
-   contain company data. `runs/`, `data/`, `.hugin/` are gitignored. Demo recordings that are
+   contain private data. `runs/`, `data/`, `.hugin/` are gitignored. Demo recordings that are
    committed pass a scrub step (paths, secrets) — see §7.
 7. **UI copy German; code, identifiers, comments, commits, docs English.**
 
@@ -344,13 +344,11 @@ decisions this section otherwise summarises.
 5. Kill-all during a live run: all processes reach `killed` within 3 s.
 6. Mode chip always correct; no unlabeled simulated/replayed data anywhere.
 7. Gate green; README has Status, Quickstart, honest framing, a GIF of the demo.
-8. Repo contains no absolute personal paths, no company references, no secrets (scan passes).
+8. Repo contains no absolute personal paths, no third-party references, no secrets (scan passes).
 
 ## 9 · Decisions (closed, 2026-09-05)
 
-- New repo `hugin`, not an extension of `leitstand` (leitstand is a company status cockpit
-  bound to internal data and must never be public; hugin is a publishable showpiece with a
-  real agent runtime).
+- New standalone repo `hugin`: a publishable showpiece with a real agent runtime.
 - Raw `claude -p` subprocesses, not the Claude Agent SDK (SDK requires an API key → cost).
 - No `--bare` (rejects subscription login). Isolation via `CLAUDE_CONFIG_DIR` + symlinked
   credentials instead.

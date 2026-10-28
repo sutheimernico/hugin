@@ -20,7 +20,7 @@
 6. **No network in tests.** No test may call `claude`, Ollama, or the internet. Use the fakes described in each task.
 7. **Language:** code, identifiers, comments, commit messages, docs → English. UI copy (anything a user sees in the browser) → German. Note that the wordmark "hugin", program names (`planner`, `scout`, …) and state names stay as-is in the UI, with German labels next to them where the plan says so.
 8. **Honesty:** never fake a value. Unavailable subsystem → explicit `warn`/`error` state. Mock or simulated data always carries the `SIMULATION` or `REPLAY` label.
-9. **Never write outside the repo** except `~/private/AUTOPILOT.md` (Task 1, register entry). Never reference the company workspace. Never print or read `.env`.
+9. **Never write outside the repo** except `~/private/AUTOPILOT.md` (Task 1, register entry). Never print or read `.env`.
 10. **Done means:** the task's steps are all checked, gate green, committed, and the "Acceptance" line of the task holds. Report exactly what you verified and how.
 
 ### Repository file map (target state)
