@@ -1,242 +1,186 @@
 # hugin
 
+[![CI](https://github.com/sutheimernico/hugin/actions/workflows/ci.yml/badge.svg)](https://github.com/sutheimernico/hugin/actions/workflows/ci.yml)
+
+**hugin is a local agent runtime: a Python kernel runs AI agents — `claude -p` subprocesses or a
+local Ollama loop — as supervised processes with PIDs, budgets, capability-gated syscalls and an
+append-only event log, and a React UI shows, kills and replays every step live.**
+
 <p align="center">
   <img src="docs/media/mission-control.png" width="900"
-       alt="Mission Control: Prozesstabelle, Live-Graph und Kernel-Log während einer laufenden Mission">
+       alt="Mission Control: process table, live agent graph and kernel log during a running mission">
 </p>
 
 <p align="center">
-  <a href="docs/media/demo.webm"><b>▶ 30-Sekunden-Demo (WebM)</b></a> ·
+  <a href="docs/media/demo.webm"><b>30-second demo (WebM)</b></a> ·
   <a href="docs/media/boot.png">Boot</a> ·
   <a href="docs/media/replay.png">Replay</a>
 </p>
 
-## Was ist hugin?
+**Headline result.** The largest real run so far: one planner plus three web-searching scouts on
+a Claude subscription — 848 events, 51 turns, 231 s, five memories, one `report.md`. API-equivalent
+cost $1.12, billed 0 €: no API key is ever used, the kernel strips it from every agent
+environment and refuses to start the Claude driver if it finds one in its own.
 
-hugin ist ein lokal laufendes **agentisches Betriebssystem**: ein Python-Kernel führt KI-Agenten
-als überwachte Prozesse aus — mit PID, Budget, Capabilities, Scheduler, IPC und einem
-gemeinsamen Gedächtnis — und eine React-Shell zeigt jeden Agenten, jede Nachricht, jeden
-Tool-Aufruf und jeden Speicher-Schreibvorgang live. Echt ist alles darunter: die Prozesse sind
-echte `claude -p`-Subprozesse oder echte Ollama-Schleifen, die Syscalls sind echte MCP-Tools,
-und das Ereignisprotokoll ist die einzige Wahrheit — die Oberfläche ist nur eine Projektion
-davon. Simuliert ist genau ein Treiber: die *Simulation* fährt dieselbe Maschine mit
-deterministischen Skripten statt einem Modell, damit Tests und die Offline-Demo ohne LLM laufen,
-und sie ist im Modus-Chip immer als `SIMULATION` beschriftet — ein abgespielter Lauf als
-`REPLAY`. Kosten: keine — Claude läuft headless auf einem vorhandenen Abo (der Kernel entfernt
-`ANTHROPIC_API_KEY` aus jeder Agenten-Umgebung und startet den Claude-Treiber gar nicht erst,
-wenn der Key in seiner eigenen Umgebung steht), Ollama läuft lokal, und der Dollar-Wert, den
-Claude Code meldet, steht in der UI als „API-Äquivalent“ und ist keine Rechnung. Der bisher
-größte echte Lauf: Planner plus drei Scouts mit Websuche, 848 Ereignisse, 51 Runden, 231
-Sekunden, fünf Gedächtniseinträge, ein `report.md` — API-Äquivalent 1,12 $, abgerechnet 0 €.
+**Quick start**
 
-## Demo in 2 Minuten
+```bash
+uv sync                                   # Python environment
+npm --prefix frontend ci                  # frontend dependencies
+npm --prefix frontend run build           # builds frontend/dist
+scripts/serve.sh                          # -> http://127.0.0.1:8770
+```
 
-1. **Boot.** `scripts/serve.sh`, dann `http://127.0.0.1:8770` öffnen. Der Startbildschirm ist
-   kein Splash, sondern ein Statusbericht: jede Zeile kommt aus `/api/system` — Kernel-Version,
-   ob `claude` mit Abo-Login antwortet, wie viele Ollama-Modelle da sind, wie viele Einträge
-   munin hält. Fehlt ein Subsystem, steht es in Amber statt zu fehlen. Nach 2,1 s hebt der
-   Bildschirm ab.
-2. **⌘K.** Die Palette ist der einzige Ort, an dem eine Mission startet. Treiber oben wählen
-   (Simulation / Claude (Abo) / Ollama) — ein nicht verfügbarer Treiber ist deaktiviert und sagt
-   auf Deutsch warum. Ziel eintippen, ⏎.
-3. **Der Graph blüht.** Der Planner erscheint, spawnt über den Syscall `proc_spawn` seine
-   Worker, Kanten wachsen nach, Nachrichten laufen als Partikel über die Kanten, der
-   munin-Knoten pulst bei jedem Gedächtnis-Schreibvorgang. Links tickt die Prozesstabelle
-   (`htop`-artig: PID, Programm, Status, Runden, Tokens, Zeit), rechts das Kernel-Log.
-4. **Agentenfenster.** Ein Klick auf einen Knoten — die Karte morpht in ein Fenster mit dem
-   laufenden Transkript, den Tool-Aufrufen als Karten und dem Budget des Prozesses.
-   Esc schließt es, das Log daneben behält seine Scroll-Position.
-5. **Replay-Scrubber.** Tab „Runs“ → „Replay“ auf einem beliebigen Lauf. Der Modus-Chip springt
-   auf `REPLAY`, die Zeitleiste lässt sich ziehen, Leertaste spielt, 1× bis 8× beschleunigt,
-   ←/→ gehen Ereignis für Ereignis. Es ist derselbe Reducer wie live — Replay ist keine zweite
-   Ansicht, sondern derselbe Zustandsfaden an einer anderen Stelle.
+Press ⌘K / Ctrl+K, pick a driver (Simulation needs nothing installed), type a goal. The UI copy
+is German; code, docs and commits are English.
 
-## Architektur
+## What it is — and what it is not
+
+hugin borrows an operating system's *process model*, not its kernel: agents get a PID, a state
+machine (`queued → spawning → running ⇄ waiting_tool → done | failed | killed`), a working
+directory, hard budgets, a capability set and a kill switch. The "scheduler" is a FIFO
+concurrency limiter per driver (21 lines), not a time-slicing scheduler. There is no auth and no
+multi-user mode; it binds to 127.0.0.1 and trusts the person at the keyboard. See
+[`docs/THREAT_MODEL.md`](docs/THREAT_MODEL.md) for what that does and does not cover.
+
+Real: the processes are real `claude -p` subprocesses or a real Ollama tool loop, the syscalls
+are real MCP tools, and the event log is the source of truth. Simulated: exactly one driver — the
+*Simulation* replays a fixed script instead of calling a model, so tests and the offline demo run
+without an LLM. It plays the same example mission whatever goal you type (the UI says so), and the
+mode chip always reads `SIMULATION`, `LIVE · CLAUDE`, `LIVE · OLLAMA` or `REPLAY`.
+
+## How this was built
+
+hugin was built with spec-driven agentic development. I wrote the design spec and the plan
+(`docs/superpowers/specs/`, `docs/superpowers/plans/`), set the constraints (no API cost, no
+network or LLM in tests, capability gate on every syscall), reviewed what the coding agents
+produced, and own the verification: 390 backend tests and 236 frontend tests are the gate, run on
+every push by CI. The architecture decisions that were not obvious are written down as ADRs in
+`docs/adr/`. A later audit pass found real problems in that first version — stale tokens, an
+unbounded child budget, an over-broad file tool, a log that was not actually used to rebuild state
+— and fixed them with a failing test each; the threat model records what is still open.
+
+## Architecture
 
 ```
-┌──────────────────────────── Browser (React 19 "shell") ────────────────────────────┐
-│ Boot · Mission Control (process table · live graph · kernel log · meters) · Agent   │
-│ window · Munin browser · Runs & Replay (timeline scrubber) · ⌘K palette             │
+┌──────────────────────────── Browser (React 19) ────────────────────────────────────┐
+│ Boot · Mission Control (process table · live graph · kernel log) · Agent window ·   │
+│ Munin browser · Runs & Replay (scrubber) · ⌘K palette                               │
 │                     ▲ SSE /api/events/stream  · REST /api/*                          │
 └─────────────────────┼───────────────────────────────────────────────────────────────┘
 ┌─────────────────────┼──────────── FastAPI (port 8770) — src/hugin ──────────────────┐
-│ api/  ──────────────┘                                                                │
-│ kernel/   EventBus → EventLog (SQLite)  · ProcessTable · Scheduler · Budgets · Kill  │
-│ drivers/  ScriptedDriver · ClaudeCodeDriver (claude -p stream-json) · OllamaDriver  │
-│ syscalls/ capability-gated kernel calls, exposed to agents as MCP tools (HTTP /mcp)  │
+│ api/  ──────────────┘   (loopback Host/Origin guard)                                 │
+│ kernel/   EventBus → EventLog (SQLite) · ProcessTable · concurrency limiter · Budgets│
+│ drivers/  ScriptedDriver · ClaudeCodeDriver (claude -p stream-json) · OllamaDriver   │
+│ syscalls/ capability-gated kernel calls, exposed to agents as MCP tools (/mcp)       │
 │ munin/    memory store (SQLite FTS5) · programs/ (YAML agent definitions)            │
-│ missions/ planner→workers→report lifecycle · replay/ recorder + time-scaled player   │
+│ missions/ planner → workers → report · replay/ recorder + time-scaled player         │
 └───────┬──────────────────────────────┬───────────────────────────────────────────────┘
         │ subprocess per agent          │ HTTP /api/chat (stream, tools)
    claude -p … (isolated config dir)   Ollama (qwen2.5:7b)
-   cwd = runs/<run>/p<pid>/
 ```
 
-- **Event-Sourcing als Rückgrat.** Jede Zustandsänderung ist ein unveränderliches `Event`
-  (`{seq, ts, run_id, pid, kind, data}`, 24 geschlossene Kinds mit je einem pydantic-Payload),
-  das erst ins Log geschrieben und dann verteilt wird. Die UI leitet ihren Zustand aus nichts
-  anderem ab.
-- **Kernel, Prozesse, Budgets.** `AgentProcess` hat eine validierte Zustandsmaschine
-  (`queued → spawning → running ⇄ waiting_tool → done | failed | killed`), ein eigenes
-  Arbeitsverzeichnis unter `runs/<run>/p<pid>/` und harte Budgets (Runden, Sekunden,
-  Output-Tokens). Bei Überschreitung killt der Watcher den Prozess mit
-  `exit_reason="budget:<welches>"`; der Panik-Schalter beendet alles und wartet auf niemanden.
-- **Drei austauschbare Treiber** hinter einem Protokoll (`run(proc, prompt, sink)`): der
-  deterministische `ScriptedDriver`, der `ClaudeCodeDriver` (`claude -p --output-format
-  stream-json` als Subprozess) und der `OllamaDriver` (der die Tool-Schleife selbst fährt).
-  Ein Treiber kennt weder Prozesstabelle noch Datenbank — er übersetzt nur seine Welt in
-  Kernel-Ereignisse.
-- **Syscalls als MCP-Tools.** Sechs Kernel-Aufrufe (`munin_search`, `munin_write`,
-  `proc_spawn`, `proc_wait`, `mission_report`, `artifact_write`) hängen an einer
-  Capability-Prüfung und werden Agenten über Streamable HTTP unter `/mcp` als MCP-Tools
-  angeboten. Jeder Prozess authentifiziert sich mit einem eigenen 32-Hex-Token, das der Kernel
-  beim Spawn ausstellt — das Token ist die PID.
-- **munin (Gedächtnis).** SQLite mit FTS5: Agenten schreiben Titel/Text/Tags und suchen mit
-  bm25-Ranking über alle bisherigen Läufe hinweg. Keine Embeddings in v1.
-- **Replay als Projektion.** Ein Lauf abzuspielen heißt, dasselbe Log noch einmal durch
-  denselben Reducer zu falten — der Player taktet nur die Pausen (skaliert, gedeckelt bei 3 s).
-  Deshalb gibt es keinen zweiten Renderer und keine Replay-Sonderfälle im Zustand.
+- **Event sourcing.** Every state change is an immutable `Event` (24 closed kinds, a pydantic
+  payload each), written to SQLite before it is published. The UI derives its state from nothing
+  else, and a restarted kernel folds runs and processes back out of the log — old runs stay
+  listed and replayable; a run the previous kernel left open is closed as `interrupted`.
+- **Kernel, processes, budgets.** Per-process budgets (turns, seconds, output tokens); a watcher
+  kills on breach with `exit_reason="budget:<which>"`. A child's budget is capped by what its
+  parent has left, and killing a parent kills its children. The panic button stops everything.
+- **Three drivers behind one protocol** (`run(proc, prompt, sink)`): scripted, Claude Code and
+  Ollama. A driver knows neither the process table nor the database.
+- **Syscalls as MCP tools.** Six kernel calls (`munin_search`, `munin_write`, `proc_spawn`,
+  `proc_wait`, `mission_report`, `artifact_write`) sit behind a capability check and reach agents
+  over Streamable HTTP at `/mcp`. Each process authenticates with its own token, issued at spawn
+  and revoked at exit; it is passed to `claude` through a private file, not the command line.
+- **munin.** SQLite FTS5 memory shared by all runs, bm25 ranking, no embeddings. Results are
+  marked untrusted when an agent reads them.
+- **Replay is a projection.** Replaying a run folds the same log through the same reducer as the
+  live view; the player only paces the gaps.
 
-## Treiber
+## Drivers
 
-| Treiber | Voraussetzung | Tempo | Modus-Chip |
+| Driver | Needs | Speed | Mode chip |
 | --- | --- | --- | --- |
-| **Claude (Abo)** | `claude`-CLI installiert und mit Abo angemeldet; **kein** `ANTHROPIC_API_KEY` in der Umgebung des Kernels | Recherche-Mission mit 3 Scouts: ≈ 231 s | `LIVE · CLAUDE` |
-| **Ollama (lokal)** | laufender Ollama-Dienst mit `qwen2.5:7b` | rein auf CPU ≈ 5 Token/s → mehrere Minuten pro Mission | `LIVE · OLLAMA` |
-| **Simulation** | nichts | ≈ 8 s, deterministisch | `SIMULATION` |
+| **Claude (subscription)** | `claude` CLI logged in; no `ANTHROPIC_API_KEY` in the kernel's environment | research mission with 3 scouts ≈ 231 s | `LIVE · CLAUDE` |
+| **Ollama (local)** | Ollama with `qwen2.5:7b` | CPU only ≈ 5 tokens/s, minutes per mission | `LIVE · OLLAMA` |
+| **Simulation** | nothing | ≈ 8 s, deterministic, fixed script | `SIMULATION` |
 
-Ein abgespielter Lauf zeigt immer `REPLAY`, unabhängig davon, mit welchem Treiber er
-aufgezeichnet wurde. Fehlt ein Treiber, deaktiviert die Palette ihn mit der Begründung des
-Kernels („Claude nicht angemeldet“, „Ollama nicht erreichbar“) und `POST /api/missions`
-antwortet mit 409 statt still auf etwas anderes auszuweichen.
+An unavailable driver is disabled in the palette with the reason, and `POST /api/missions`
+answers 409 instead of silently falling back. Honest limit: in five demo runs the 7B Ollama
+planner never completed a multi-agent run (60-second child budgets, tool calls written as text,
+looping until the 900 s budget). Ollama is stable as a single program (`program:scout <task>`);
+the planner needs Claude or the simulation.
 
-Für kleine lokale Modelle sind die Syscall-Schemas absichtlich nachsichtig: `qwen2.5:7b`
-schickt Zahlen als Strings und packt einzelne PIDs nicht in eine Liste — das wird toleriert,
-statt die Mission an einer Formalie scheitern zu lassen. Die Grenze bleibt das Modell selbst:
-in fünf Demo-Läufen hat der Ollama-Planner kein Mal einen vollständigen Mehr-Agenten-Lauf zu
-Ende gebracht — er gab seinen Kindern 60-Sekunden-Budgets, schrieb Tool-Aufrufe als Text oder
-kreiste bis zum 900-Sekunden-Budget (`exit_reason=budget:seconds`, Run rot als `Fehler`).
-Genau dafür ist das Budget da. Stabil ist Ollama als Einzelprogramm: eine Mission mit dem
-Präfix `program:scout …` lässt einen Späher allein recherchieren, in Munin schreiben und
-berichten — so entstand die Ollama-Aufnahme unten. Der Planner ist damit auf `claude`
-oder die Simulation angewiesen; ein 7B-Modell orchestriert (noch) nicht zuverlässig.
+## Security model (short)
 
-## Quickstart
+Full version: [`docs/THREAT_MODEL.md`](docs/THREAT_MODEL.md).
 
-```bash
-uv sync                                   # Python-Umgebung
-npm --prefix frontend ci                  # Frontend-Abhängigkeiten
-npm --prefix frontend run build           # baut frontend/dist
-scripts/serve.sh                          # → http://127.0.0.1:8770
-```
+- Loopback only; `/api` and `/mcp` both refuse non-loopback `Host`/`Origin` (DNS rebinding).
+- File tools are path-scoped to `HUGIN_WORKSPACE_ROOT` (default: this repository), secrets inside
+  it are denied, no program has a shell tool, and every spawn path checks task text against the
+  workspace.
+- Per-program tool whitelist, `--permission-mode dontAsk`, `--strict-mcp-config`, an isolated
+  `CLAUDE_CONFIG_DIR` (no user hooks, MCP servers or CLAUDE.md), a scrubbed environment.
+- Capability gate before every syscall; only a run's planner may write its artifact, and not
+  after the run is closed.
+- Recordings are scrubbed (home paths masked, export refused if anything looks like a key).
 
-Der Server liefert im Produktionsmodus die gebaute SPA aus `frontend/dist` selbst aus; es
-braucht keinen zweiten Prozess. Konfiguration ist optional — `.env.example` nach `.env` kopieren
-und beliebige `HUGIN_*`-Werte überschreiben. Gebunden wird ausschließlich an 127.0.0.1;
-Authentifizierung gibt es bewusst keine.
+Not covered: a hostile web page can still mislead a scout's *text*; there is no authentication.
 
-Für die Frontend-Entwicklung mit Hot Reload:
+## Replay and demo recordings
+
+Any run can be replayed, also after a restart. A run worth keeping is exported as a recording
+(`.jsonl` events plus a `.json` manifest) under `demo/recordings/`:
 
 ```bash
-scripts/serve.sh                          # Backend auf 8770
-npm --prefix frontend run dev             # → http://127.0.0.1:5177, proxyt /api auf 8770
-```
-
-## Replay & Demo-Aufnahmen
-
-Weil jeder Lauf vollständig als Ereignisstrom im Log steht, lässt sich jeder Lauf abspielen —
-auch nach einem Neustart. Ein Lauf, der bleiben soll, wird als **Aufnahme** exportiert: eine
-`.jsonl` mit den Ereignissen plus eine `.json` mit Ziel, Treiber, Ereigniszahl und Dauer, beides
-unter `demo/recordings/` und committet. Der Export läuft durch einen Scrubber, der Pfade auf
-`/home/user` maskiert und den Export verweigert, wenn noch etwas wie ein Schlüssel aussieht.
-
-```bash
-# aus dem laufenden Kernel
 curl -X POST 127.0.0.1:8770/api/recordings/<run_id> -H 'content-type: application/json' \
-     -d '{"slug": "mein-lauf"}'
-
-# oder direkt aus der Datenbank, auch bei gestopptem Server
-uv run python scripts/record_demo.py <run_id> <slug>
+     -d '{"slug": "my-run"}'
+uv run python scripts/record_demo.py <run_id> <slug>      # or straight from the database
 ```
 
-Aufgezeichnet wird dieselbe Recherche-Aufgabe je Treiber — diese Aufnahmen sind die
-Offline-Demo, für die weder ein Abo noch ein lokales Modell nötig ist. Was im Repo liegt, sagt
-`demo/recordings/`:
-
-| Slug | Treiber | Ereignisse | Dauer |
+| Slug | Driver | Events | Duration |
 | --- | --- | --- | --- |
-| `simulation-research-brief` | Simulation | 127 | 7,6 s |
-| `claude-research-brief` | Claude (Abo) | 848 | 231,5 s |
-| `ollama-scout-brief` | Ollama (lokal, `program:scout`) | 462 | 242,0 s |
+| `simulation-research-brief` | Simulation | 127 | 7.6 s |
+| `claude-research-brief` | Claude (subscription) | 848 | 231.5 s |
+| `ollama-scout-brief` | Ollama (`program:scout`) | 462 | 242.0 s |
 
-Im Tab „Runs“ stehen sie unter „Demo-Aufnahmen“; „Replay“ lädt sie in denselben Cursor wie
-einen frischen Lauf.
-
-## Sicherheitsmodell
-
-- Der Server bindet ausschließlich an **127.0.0.1**.
-- Jeder Agent arbeitet in seinem eigenen Verzeichnis unterhalb von `runs/<run>/p<pid>/`, und
-  `artifact_write` nimmt nur einen reinen Dateinamen (1–64 Zeichen aus `A-Z a-z 0-9 . _ -`) —
-  ein Artefakt kann das Lauf-Verzeichnis nicht verlassen.
-- **Absolute Pfade im Missionsziel** müssen unter `~/private` liegen, sonst 422
-  („Pfade müssen unter ~/private liegen.“).
-- **Werkzeug-Whitelist pro Programm** (`--tools` + `--allowedTools`, `--permission-mode
-  dontAsk`), dazu `--strict-mcp-config`, damit ein Agent nur die Syscalls des Kernels sieht und
-  nicht die MCP-Server des Benutzers.
-- **Isoliertes `CLAUDE_CONFIG_DIR`**: keine Hooks, keine Benutzer-MCP-Server, keine
-  Benutzer-`CLAUDE.md`. Nur die Credentials sind hineingelinkt, damit der Abo-Login gilt.
-  (`--bare` wäre der offensichtliche Weg, lehnt den Abo-Login aber ab — siehe Entscheidung D3.)
-- **Umgebung gesäubert**: an einen Agenten gehen nur `PATH`, `HOME`, `LANG` und
-  `CLAUDE_CONFIG_DIR`; `ANTHROPIC_API_KEY` wird entfernt.
-- **Capability-Gate** vor jedem Syscall, plus die Single-Writer-Regel: nur der Planner eines
-  Laufs darf dessen Artefakt schreiben.
-- **Aufnahmen werden vor dem Export gescrubbt**; keine Secrets im Repo, Publish-Checkliste vor
-  jeder Veröffentlichung.
-
-## Entwicklung
+## Development
 
 ```bash
-uv run pytest -q                          # 356 Tests
-uv run ruff check .
+uv run pytest -q                          # 390 tests
+uv run ruff check . && uv run ruff format --check .
+uv run mypy                               # type check
 npm --prefix frontend run check           # tsc + eslint
-npm --prefix frontend test -- --run       # 234 Tests
+npm --prefix frontend test -- --run       # 236 tests
 ```
 
-Kein Test spricht mit dem Netz, mit `claude` oder mit Ollama: der Kernel wird über den
-`ScriptedDriver` gefahren, Subprozesse über eine Fake-Factory, Ollama über
-`httpx.MockTransport`. Der Produktions-Build liegt bei 249,1 kB gzip (236,2 kB JS + 12,9 kB
-CSS); mit den lateinischen woff2-Subsets sind es im schlechtesten Fall rund 474 kB Transfer.
+CI (`.github/workflows/ci.yml`) runs exactly these. No test talks to the network, to `claude` or
+to Ollama: the kernel runs on the scripted driver, subprocesses behind a fake factory, Ollama
+behind `httpx.MockTransport`. Frontend hot reload: `scripts/serve.sh` plus
+`npm --prefix frontend run dev` (http://127.0.0.1:5177, proxies `/api`). Settings are `HUGIN_*`
+environment variables, see `.env.example`.
 
 ```
-src/hugin/kernel/      events · log · bus · process · budget · scheduler · kernel · sink
+src/hugin/kernel/      events · log · restore · bus · process · budget · scheduler · kernel · sink
 src/hugin/drivers/     base · scripted · stream_json · claude_code · ollama · scripts/*.json
-src/hugin/syscalls/    registry · handlers · mcp_server (HTTP /mcp)
-src/hugin/munin/       store (SQLite FTS5)      src/hugin/programs/  *.yaml + contract.md
-src/hugin/missions/    Lebenszyklus             src/hugin/replay/    player · recorder
-src/hugin/api/         routes_* · SSE           src/hugin/system/    Subsystem-Status
-tests/                 spiegelt src/            demo/recordings/     committete Aufnahmen
-frontend/src/state/    types · reducer · store · selectors (die Projektion)
+src/hugin/syscalls/    registry · handlers · mcp_server        src/hugin/workspace.py  path rule
+src/hugin/munin/       FTS5 store     src/hugin/programs/  *.yaml + contract.md
+src/hugin/missions/    lifecycle      src/hugin/replay/    player · recorder
+src/hugin/api/         routes_* · SSE · loopback guard        src/hugin/system/  subsystem status
+frontend/src/state/    types · reducer · store · selectors (the projection)
 frontend/src/features/ boot · shell · procs · log · graph · agent · palette · munin · replay
-docs/                  adr/ · sessions/ · superpowers/{specs,plans} · media/
+docs/                  THREAT_MODEL.md · adr/ · superpowers/{specs,plans} · media/
 ```
 
-## Status
+## Status and later
 
-**v1 feature-complete (2026-09-06).** Kernel, drei Treiber, Syscalls über MCP, munin, fünf
-Programme, Missionen, Replay und die sechs Ansichten stehen; eine Claude-Mission ist live auf dem
-Abo durchgelaufen (`apiKeySource=none`), Simulation und Ollama ebenso. Gate: 356 pytest + 234
-vitest grün, ruff/tsc/eslint sauber.
+v1 is feature-complete: kernel, three drivers, MCP syscalls, munin, five programs, missions,
+replay and six views. Not in v1, written down on purpose: 3D constellation view, sound cues, an
+embeddings track in munin, scheduled missions, run comparison, mobile/PWA, authentication, a
+Tauri shell, a git worktree per run, agent-to-agent messaging (`proc_send` was removed: a
+`claude -p` process cannot receive a message mid-run).
 
-Tipp für die Demo ohne Terminal: nach `scripts/serve.sh` die Shell als App-Fenster öffnen, z. B.
-`msedge --app=http://127.0.0.1:8770`.
+## License
 
-## Später
-
-Nicht in v1, bewusst aufgeschrieben, damit niemand es mitten im Bau neu erfindet: 3D-Constellation-
-Ansicht, Sound-Cues, eine Embeddings-Spur in munin, geplante Missionen („Nachtschicht“),
-Vergleich mehrerer Läufe, PWA/Mobile, Authentifizierung, eine Tauri-Shell, ein zweiter
-MCP-Transport, ein Git-Worktree pro Lauf.
-
-## Lizenz
-
-MIT — siehe `LICENSE`.
+MIT — see `LICENSE`.
