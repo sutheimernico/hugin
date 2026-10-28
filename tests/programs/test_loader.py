@@ -17,7 +17,6 @@ SYSCALLS = [
     "munin_search",
     "munin_write",
     "proc_spawn",
-    "proc_send",
     "proc_wait",
     "mission_report",
     "artifact_write",
@@ -62,7 +61,6 @@ def test_planner_orchestrates_and_owns_the_artifact():
         "munin.write",
         "proc.spawn",
         "proc.wait",
-        "proc.send",
         "artifact.write",
     }
     assert planner.budget == BudgetSpec(max_turns=20, max_seconds=900, max_output_tokens=12000)

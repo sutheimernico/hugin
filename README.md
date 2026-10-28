@@ -86,8 +86,8 @@ Sekunden, fünf Gedächtniseinträge, ein `report.md` — API-Äquivalent 1,12 $
   stream-json` als Subprozess) und der `OllamaDriver` (der die Tool-Schleife selbst fährt).
   Ein Treiber kennt weder Prozesstabelle noch Datenbank — er übersetzt nur seine Welt in
   Kernel-Ereignisse.
-- **Syscalls als MCP-Tools.** Sieben Kernel-Aufrufe (`munin_search`, `munin_write`,
-  `proc_spawn`, `proc_send`, `proc_wait`, `mission_report`, `artifact_write`) hängen an einer
+- **Syscalls als MCP-Tools.** Sechs Kernel-Aufrufe (`munin_search`, `munin_write`,
+  `proc_spawn`, `proc_wait`, `mission_report`, `artifact_write`) hängen an einer
   Capability-Prüfung und werden Agenten über Streamable HTTP unter `/mcp` als MCP-Tools
   angeboten. Jeder Prozess authentifiziert sich mit einem eigenen 32-Hex-Token, das der Kernel
   beim Spawn ausstellt — das Token ist die PID.

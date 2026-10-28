@@ -43,7 +43,6 @@ PLANNER_TOOLS = [
     "artifact_write",
     "munin_search",
     "munin_write",
-    "proc_send",
     "proc_spawn",
     "proc_wait",
 ]
@@ -207,7 +206,7 @@ async def test_a_scout_is_offered_exactly_its_three_syscalls(run):
         assert await agent.tool_names() == SCOUT_TOOLS
 
 
-async def test_a_planner_is_offered_the_six_its_capabilities_grant(run):
+async def test_a_planner_is_offered_the_five_its_capabilities_grant(run):
     server, _run_id, spawn = run
     planner = await spawn("planner")
 

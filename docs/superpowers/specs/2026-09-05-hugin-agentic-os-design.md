@@ -146,7 +146,6 @@ JSON-schema, required capability and handler:
 | `munin_search(query, limit)` | `munin.read` | FTS search; emits `munin.read` |
 | `munin_write(title, body, tags)` | `munin.write` | stores memory with provenance (run, pid, program); emits `munin.write` |
 | `proc_spawn(program, task, budget?)` | `proc.spawn` | child process (ppid=caller), max fan-out 4 per parent; emits `proc.spawned` |
-| `proc_send(to_pid, text)` | `proc.send` | mailbox delivery, emits `msg.sent` |
 | `proc_wait(pids, timeout_s)` | `proc.wait` | blocks caller until children exit; returns their final reports |
 | `mission_report(summary)` | `report` | worker's final report to parent mailbox |
 | `artifact_write(name, content)` | `artifact.write` | writes `runs/<run>/artifacts/<name>`; **single writer**: only the run's root process holds it |
@@ -176,7 +175,7 @@ accent: cyan           # violet | cyan | amber | green | rose
 driver: claude         # default driver; a mission may override
 model: sonnet          # claude alias passed to --model; ollama: qwen2.5:7b
 tools: [WebSearch, WebFetch, Read]          # Claude Code built-ins (whitelist)
-capabilities: [munin.read, munin.write, proc.send, report]
+capabilities: [munin.read, munin.write, report]
 budget: {max_turns: 12, max_seconds: 300, max_output_tokens: 6000}
 system_prompt: |
   You are a research worker inside hugin OS ...

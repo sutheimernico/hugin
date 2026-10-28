@@ -106,20 +106,21 @@ async def test_empty_goal_is_rejected(api):
     assert (await api.client.get("/api/runs")).json() == []
 
 
-async def test_path_outside_private_is_rejected(api):
+async def test_path_outside_the_workspace_is_rejected(api):
     response = await api.client.post(
         "/api/missions", json={"goal": "Analysiere /etc/passwd", "driver": "scripted"}
     )
 
     assert response.status_code == 422
-    assert response.json()["detail"] == "Pfade müssen unter ~/private liegen."
+    assert response.json()["detail"].startswith("Pfade müssen unter dem Workspace liegen")
 
 
-async def test_path_inside_private_is_accepted(api, start_mission):
-    run_id = await start_mission(api, "Analysiere das Repository unter ~/private/hugin.")
+async def test_path_inside_the_workspace_is_accepted(api, start_mission):
+    inside = api.kernel.settings.workspace_root / "src"
+    run_id = await start_mission(api, f"Analysiere das Repository unter {inside}.")
 
     run = (await api.client.get(f"/api/runs/{run_id}")).json()
-    assert run["goal"].endswith("~/private/hugin.")
+    assert run["goal"].endswith(f"{inside}.")
 
 
 async def test_a_url_in_the_goal_is_not_a_path(api, start_mission):
@@ -174,3 +175,11 @@ async def test_program_prefix_with_unknown_program_is_422(api):
     assert response.status_code == 422
     assert "bogus" in response.json()["detail"]
     assert (await api.client.get("/api/runs")).json() == []
+
+
+async def test_a_parent_relative_path_is_rejected(api):
+    response = await api.client.post(
+        "/api/missions", json={"goal": "Lies ../../.ssh/id_rsa", "driver": "scripted"}
+    )
+
+    assert response.status_code == 422

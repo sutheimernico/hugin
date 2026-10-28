@@ -16,7 +16,6 @@ KNOWN_CAPABILITIES = {
     "munin.read",
     "munin.write",
     "proc.spawn",
-    "proc.send",
     "proc.wait",
     "report",
     "artifact.write",

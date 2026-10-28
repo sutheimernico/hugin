@@ -20,6 +20,7 @@ from hugin.api import (
     routes_runs,
     routes_system,
 )
+from hugin.api.guard import LoopbackGuard
 from hugin.drivers.base import AgentDriver
 from hugin.drivers.claude_code import ClaudeCodeDriver
 from hugin.drivers.ollama import OllamaDriver
@@ -118,6 +119,7 @@ def create_app(
 
     app = FastAPI(title="hugin", version="0.1.0", lifespan=lifespan)
     app.state.settings = settings
+    app.add_middleware(LoopbackGuard)
     app.state.kernel = None
     app.state.system = None
     for module in ROUTERS:

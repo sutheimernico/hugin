@@ -28,6 +28,7 @@ from hugin.munin.store import MuninStore
 from hugin.programs.loader import Program, full_system_prompt
 from hugin.settings import Settings
 from hugin.syscalls.registry import SyscallRegistry
+from hugin.workspace import ensure_inside
 
 logger = logging.getLogger(__name__)
 
@@ -186,6 +187,9 @@ class Kernel:
             spec = self.programs[program]
         except KeyError:
             raise ValueError(f"unknown program: {program}") from None
+        # Every spawn path ends here — the mission's root and every `proc_spawn` a planner makes —
+        # so a task an injected instruction hands to a child is checked like the user's goal.
+        ensure_inside(task, self.settings.workspace_root)
         driver_name = driver or spec.driver
         if driver_name not in self.drivers:
             raise ValueError(f"unknown driver: {driver_name}")
@@ -275,6 +279,12 @@ class Kernel:
         await self._enforce_budget(pid)
 
     async def send(self, from_pid: int, to_pid: int, text: str) -> None:
+        """Record a worker's report in its parent's mailbox and announce it as `msg.sent`.
+
+        Only `mission_report` calls this. There is deliberately no agent-facing `proc_send`:
+        a `claude -p` process has no channel to receive a message mid-run, so such a syscall
+        would accept text and deliver it to nobody.
+        """
         proc = self.procs.get(to_pid)
         proc.mailbox.append(Message(from_pid=from_pid, text=text, ts=self.clock()))
         await self.emit(

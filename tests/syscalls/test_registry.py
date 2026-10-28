@@ -1,4 +1,4 @@
-"""Syscalls: capability gating, schema validation, the seven handlers and the simulation.
+"""Syscalls: capability gating, schema validation, the six handlers and the simulation.
 
 Most tests run on a kernel whose scheduler starts nothing (`limits={"scripted": 0}`), so the
 processes exist and hold their capabilities while no driver runs interference. The last test
@@ -50,7 +50,6 @@ async def test_defs_and_tool_schemas_are_filtered_by_capability(parked):
         "munin_search",
         "munin_write",
         "proc_spawn",
-        "proc_send",
         "proc_wait",
         "artifact_write",
     ]
@@ -216,24 +215,6 @@ async def test_proc_spawn_reports_an_unknown_program_as_a_syscall_error(parked):
         await kernel.syscalls.call(
             planner, "proc_spawn", {"program": "hacker", "task": "irgendwas"}
         )
-
-
-async def test_proc_send_delivers_inside_the_run_only(parked):
-    kernel, _run_id, spawn = parked
-    planner = await spawn("planner")
-    scout = await spawn("scout", ppid=planner)
-    other_run = await kernel.create_run("Anderer Lauf", driver="scripted")
-    stranger = await kernel.spawn(other_run, "scout", HELLO, driver="scripted")
-
-    assert await kernel.syscalls.call(
-        planner, "proc_send", {"to_pid": scout, "text": "Prüfe die zweite Quelle."}
-    ) == {"delivered": True}
-    assert [m.text for m in kernel.procs.get(scout).mailbox] == ["Prüfe die zweite Quelle."]
-
-    with pytest.raises(SyscallError, match="another run"):
-        await kernel.syscalls.call(planner, "proc_send", {"to_pid": stranger, "text": "hallo"})
-    with pytest.raises(SyscallError, match="no process"):
-        await kernel.syscalls.call(planner, "proc_send", {"to_pid": 999, "text": "hallo"})
 
 
 async def test_proc_wait_returns_the_reports_of_the_named_pids(parked):

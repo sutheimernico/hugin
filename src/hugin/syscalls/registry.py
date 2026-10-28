@@ -23,7 +23,6 @@ from hugin.syscalls.handlers import (
     mission_report,
     munin_search,
     munin_write,
-    proc_send,
     proc_spawn,
     proc_wait,
 )
@@ -121,24 +120,6 @@ SYSCALLS: tuple[SyscallDef, ...] = (
             "additionalProperties": False,
         },
         handler=proc_spawn,
-    ),
-    SyscallDef(
-        name="proc_send",
-        capability="proc.send",
-        description=(
-            "Deliver a short message to the mailbox of another process in this run — used to"
-            " correct a worker that is still running."
-        ),
-        schema={
-            "type": "object",
-            "properties": {
-                "to_pid": {"type": "integer", "minimum": 1},
-                "text": {"type": "string", "maxLength": 2000},
-            },
-            "required": ["to_pid", "text"],
-            "additionalProperties": False,
-        },
-        handler=proc_send,
     ),
     SyscallDef(
         name="proc_wait",

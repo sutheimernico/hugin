@@ -26,7 +26,7 @@ from hugin.settings import Settings
 from tests.conftest import FakeSystem
 
 DEFAULT_GOAL = "Erstelle ein Recherche-Briefing zu lokalen KI-Agenten."
-BASE_URL = "http://hugin.test"
+BASE_URL = "http://127.0.0.1:8770"
 
 
 async def _no_sleep(_seconds: float) -> None:
@@ -193,9 +193,9 @@ class _SseStream:
             "raw_path": parts.path.encode(),
             "query_string": parts.query.encode(),
             "root_path": "",
-            "headers": [(b"host", b"hugin.test"), (b"accept", b"text/event-stream")],
+            "headers": [(b"host", b"127.0.0.1:8770"), (b"accept", b"text/event-stream")],
             "client": ("127.0.0.1", 123),
-            "server": ("hugin.test", 80),
+            "server": ("127.0.0.1", 8770),
         }
         started = asyncio.Event()
 

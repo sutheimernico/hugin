@@ -6,23 +6,16 @@ spawn emerges from the planner's own syscalls.
 """
 
 import re
-from pathlib import Path
 
 from fastapi import HTTPException
 
 from hugin.kernel.kernel import Kernel
 from hugin.system.status import SystemStatusService
+from hugin.workspace import WorkspaceViolation, ensure_inside
 
 ROOT_PROGRAM = "planner"
-PRIVATE_ROOT = Path.home() / "private"
 # The two drivers that need something outside hugin to work, and how the refusal names them.
 LIVE_DRIVERS = {"claude": "Claude", "ollama": "Ollama"}
-
-# URLs are stripped first: the "//host/path" of a URL would otherwise read as an absolute path.
-_URL = re.compile(r"\b[a-z][a-z0-9+.-]*://\S+", re.IGNORECASE)
-# An absolute or home path. The lookbehind keeps prose out — "und/oder" and "km/h" are not
-# paths — and at least one name character must follow the slash, so a lone "/" is not either.
-_PATH = re.compile(r"(?<![\w:.])(?:~/|/)[\w.~-]+(?:/[\w.~-]*)*")
 
 
 async def start_mission(
@@ -36,7 +29,13 @@ async def start_mission(
     goal = goal.strip()
     if not goal:
         raise HTTPException(status_code=422, detail="Ziel darf nicht leer sein.")
-    _reject_foreign_paths(goal)
+    try:
+        ensure_inside(goal, kernel.settings.workspace_root)
+    except WorkspaceViolation:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Pfade müssen unter dem Workspace liegen ({kernel.settings.workspace_root}).",
+        ) from None
     await _require_available_driver(kernel, system, driver)
     program, task = _split_program_prefix(goal)
     if program not in kernel.programs:
@@ -44,15 +43,6 @@ async def start_mission(
     run_id = await kernel.create_run(goal, driver, template)
     await kernel.spawn(run_id, program, task, driver=driver)
     return run_id
-
-
-def _reject_foreign_paths(goal: str) -> None:
-    """A mission may only point at the user's own private tree."""
-    private_root = PRIVATE_ROOT.resolve()
-    for match in _PATH.finditer(_URL.sub(" ", goal)):
-        candidate = Path(match.group()).expanduser()
-        if not candidate.is_absolute() or not candidate.resolve().is_relative_to(private_root):
-            raise HTTPException(status_code=422, detail="Pfade müssen unter ~/private liegen.")
 
 
 async def _require_available_driver(
