@@ -7,6 +7,7 @@ table stay a plain data structure that tests can drive without a bus or a databa
 
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Literal
 
 from hugin.kernel.events import BudgetSpec, ProcState, Usage
 
@@ -116,3 +117,15 @@ class ProcessTable:
 
     def for_run(self, run_id: str) -> list[AgentProcess]:
         return [proc for proc in self._procs.values() if proc.run_id == run_id]
+
+
+@dataclass
+class RunInfo:
+    id: str
+    goal: str
+    driver: str
+    template: str | None
+    created_at: float
+    done_at: float | None = None
+    state: Literal["running", "done", "failed"] = "running"
+    root_pid: int | None = None

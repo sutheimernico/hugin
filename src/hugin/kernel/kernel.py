@@ -13,15 +13,14 @@ import secrets
 import time
 from collections import deque
 from collections.abc import Callable
-from dataclasses import dataclass
-from typing import Literal
 
 from hugin.drivers.base import AgentDriver, ExitInfo
 from hugin.kernel.budget import BudgetWatcher
 from hugin.kernel.bus import EventBus
 from hugin.kernel.events import BudgetSpec, Event, EventKind, ProcState, Usage, make_event
 from hugin.kernel.log import EventLog
-from hugin.kernel.process import AgentProcess, Message, ProcessTable
+from hugin.kernel.process import AgentProcess, Message, ProcessTable, RunInfo
+from hugin.kernel.restore import RESTORE_KINDS, fold_log
 from hugin.kernel.scheduler import Scheduler
 from hugin.kernel.sink import ProcessSink
 from hugin.munin.store import MuninStore
@@ -36,18 +35,6 @@ FAN_OUT_LIMIT = 4
 RUN_ID_LENGTH = 12
 TOKEN_BYTES = 16  # 32 hex characters
 _WAIT_POLL_S = 0.02
-
-
-@dataclass
-class RunInfo:
-    id: str
-    goal: str
-    driver: str
-    template: str | None
-    created_at: float
-    done_at: float | None = None
-    state: Literal["running", "done", "failed"] = "running"
-    root_pid: int | None = None
 
 
 def _state_for(reason: str) -> ProcState:
@@ -118,12 +105,38 @@ class Kernel:
         self.procs.seed(self.log.max_pid())
         self.settings.data_dir.mkdir(parents=True, exist_ok=True)
         self.settings.runs_dir.mkdir(parents=True, exist_ok=True)
+        await self._restore_from_log()
         await self.emit(
             EventKind.KERNEL_BOOT,
             run_id=None,
             pid=None,
             data={"version": self.version, "pid_counter": self.procs.pid_counter},
         )
+
+    async def _restore_from_log(self) -> None:
+        """Rebuild runs and processes from the log, then close what the last kernel left open.
+
+        A process the log shows as alive belonged to a kernel that is gone — its subprocess died
+        with it — so it is finalised as `interrupted` (or `killed` if it never started). That
+        writes the truth into the log *before* this kernel's own `kernel.boot` event, which keeps
+        it out of a shell that backfills from boot.
+        """
+        runs, procs = fold_log(
+            self.log.iter_since(kinds=RESTORE_KINDS), self.programs, self.settings.runs_dir
+        )
+        self.runs.update(runs)
+        for proc in procs:
+            self.procs.add(proc)
+        # Children first, so a run's root is the last to go and closes the run with its own reason.
+        for proc in sorted((p for p in procs if p.alive), key=lambda p: -p.pid):
+            reason = "killed" if proc.state == "queued" else "interrupted"
+            await self._finalize(proc.pid, ExitInfo(reason, proc.usage))
+        for run in runs.values():
+            if run.state == "running":  # crashed before its root process was even spawned
+                run.state, run.done_at = "failed", self.clock()
+                await self.emit(
+                    EventKind.RUN_FAILED, run_id=run.id, pid=None, data={"reason": "interrupted"}
+                )
 
     async def shutdown(self) -> None:
         await self.kill_all(by="shutdown")

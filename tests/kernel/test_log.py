@@ -114,3 +114,30 @@ def test_ten_thousand_appends_stay_under_two_seconds(tmp_path):
     assert log.last_seq() == 10_000
     assert elapsed < 2.0, f"10k appends took {elapsed:.2f}s"
     log.close()
+
+
+def test_iter_since_pages_through_more_events_than_one_page_holds(tmp_path):
+    log = EventLog(tmp_path / "paged.db")
+    for index in range(25):
+        log.append(
+            make_event(
+                EventKind.KILL, run_id="r", pid=None, data={"target": index, "by": "t"}, ts=index
+            )
+        )
+
+    seqs = [event.seq for event in log.iter_since(page=10)]
+
+    assert seqs == list(range(1, 26))
+    assert [e.seq for e in log.iter_since(20, page=10)] == [21, 22, 23, 24, 25]
+
+
+def test_since_can_filter_by_kind(tmp_path):
+    log = EventLog(tmp_path / "kinds.db")
+    log.append(
+        make_event(EventKind.KILL, run_id="r", pid=None, data={"target": 1, "by": "t"}, ts=1)
+    )
+    log.append(make_event(EventKind.RUN_FAILED, run_id="r", pid=None, data={"reason": "x"}, ts=2))
+
+    kinds = [e.kind for e in log.since(0, kinds=[EventKind.RUN_FAILED])]
+
+    assert kinds == [EventKind.RUN_FAILED]

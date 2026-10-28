@@ -7,6 +7,7 @@ which makes it the one place where event order is decided. WAL mode keeps reader
 
 import json
 import sqlite3
+from collections.abc import Iterator, Sequence
 from pathlib import Path
 
 from hugin.kernel.events import Event, EventKind
@@ -50,20 +51,47 @@ class EventLog:
         )
         return event.model_copy(update={"seq": cursor.lastrowid})
 
-    def since(self, seq: int, run_id: str | None = None, limit: int = 10_000) -> list[Event]:
-        if run_id is None:
-            rows = self._conn.execute(
-                "SELECT seq, ts, run_id, pid, kind, data FROM events"
-                " WHERE seq > ? ORDER BY seq LIMIT ?",
-                (seq, limit),
-            )
-        else:
-            rows = self._conn.execute(
-                "SELECT seq, ts, run_id, pid, kind, data FROM events"
-                " WHERE seq > ? AND run_id = ? ORDER BY seq LIMIT ?",
-                (seq, run_id, limit),
-            )
+    def since(
+        self,
+        seq: int,
+        run_id: str | None = None,
+        limit: int = 10_000,
+        kinds: Sequence[EventKind] | None = None,
+    ) -> list[Event]:
+        """One page of events after `seq`, in order. `iter_since` walks the whole log."""
+        clauses, params = ["seq > ?"], [seq]
+        if run_id is not None:
+            clauses.append("run_id = ?")
+            params.append(run_id)
+        if kinds is not None:
+            clauses.append(f"kind IN ({', '.join('?' * len(kinds))})")
+            params.extend(kind.value for kind in kinds)
+        rows = self._conn.execute(
+            "SELECT seq, ts, run_id, pid, kind, data FROM events"
+            f" WHERE {' AND '.join(clauses)} ORDER BY seq LIMIT ?",
+            (*params, limit),
+        )
         return [_row_to_event(row) for row in rows]
+
+    def iter_since(
+        self,
+        seq: int = 0,
+        run_id: str | None = None,
+        kinds: Sequence[EventKind] | None = None,
+        page: int = 2_000,
+    ) -> Iterator[Event]:
+        """Every matching event after `seq`, fetched a page at a time.
+
+        A single `since` call is capped, and a cap that silently ends a backfill is how a long
+        run loses its tail in the UI. Paging by `seq` keeps memory flat and misses nothing.
+        """
+        cursor = seq
+        while True:
+            events = self.since(cursor, run_id, limit=page, kinds=kinds)
+            yield from events
+            if len(events) < page:
+                return
+            cursor = events[-1].seq or cursor
 
     def for_run(self, run_id: str) -> list[Event]:
         rows = self._conn.execute(
