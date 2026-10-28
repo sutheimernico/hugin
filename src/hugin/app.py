@@ -8,6 +8,7 @@ on `app.state`. Tests build their own app with their own drivers instead of patc
 import logging
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from typing import cast
 
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
@@ -101,7 +102,9 @@ def create_app(
         kernel = Kernel(settings, log, bus, load_programs(), table, munin)
         if drivers is None:
             add_live_drivers(table, settings, kernel)
-        app.state.system = system or SystemStatusService(settings, munin, kernel, table["ollama"])
+        app.state.system = system or SystemStatusService(
+            settings, munin, kernel, cast(OllamaDriver, table["ollama"])
+        )
         await kernel.boot()
         app.state.kernel = kernel
         await announce_subsystems(kernel, app.state.system)

@@ -83,7 +83,8 @@ class MuninStore:
             " VALUES (?, ?, ?, ?, ?)",
             (run_id, pid, program, json.dumps(tags), ts),
         )
-        memory_id = int(cursor.lastrowid)
+        assert cursor.lastrowid is not None  # an INSERT always sets it
+        memory_id = cursor.lastrowid
         self._conn.execute(
             "INSERT INTO memories (rowid, title, body, tags) VALUES (?, ?, ?, ?)",
             (memory_id, title, body, " ".join(tags)),

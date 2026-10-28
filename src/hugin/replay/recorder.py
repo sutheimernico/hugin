@@ -11,6 +11,7 @@ export leaves no half-written recording behind.
 # `list[...]` annotation after it; deferred annotations keep the binding names intact.
 from __future__ import annotations
 
+import builtins
 import json
 import os
 import re
@@ -133,7 +134,7 @@ class Recorder:
             raise KeyError(slug)
         return json.loads(path.read_text(encoding="utf-8"))
 
-    def load(self, slug: str) -> list[Event]:
+    def load(self, slug: str) -> builtins.list[Event]:  # `list` is this class's method
         path = self._path(slug)
         if not path.is_file():
             raise KeyError(slug)

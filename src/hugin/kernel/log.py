@@ -59,7 +59,8 @@ class EventLog:
         kinds: Sequence[EventKind] | None = None,
     ) -> list[Event]:
         """One page of events after `seq`, in order. `iter_since` walks the whole log."""
-        clauses, params = ["seq > ?"], [seq]
+        clauses = ["seq > ?"]
+        params: list[int | str] = [seq]
         if run_id is not None:
             clauses.append("run_id = ?")
             params.append(run_id)
