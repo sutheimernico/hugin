@@ -79,7 +79,7 @@ def test_scout_and_smith_tool_whitelists():
     assert scout.budget == BudgetSpec()
     smith = programs["smith"]
     assert (smith.role, smith.icon, smith.accent) == ("Engineer", "hammer", "amber")
-    assert smith.tools == ["Read", "Glob", "Grep", "Bash(ls *)", "Bash(cat *)", "Bash(wc *)"]
+    assert smith.tools == ["Read", "Glob", "Grep"]
     assert smith.capabilities == ["munin.read", "munin.write", "report"]
 
 

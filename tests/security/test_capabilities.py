@@ -104,3 +104,10 @@ async def test_killing_a_parent_kills_its_live_children(parked):
     await kernel.kill(planner)
 
     assert not child.alive
+
+
+def test_no_program_holds_a_shell_tool():
+    from hugin.programs.loader import load_programs
+
+    for program in load_programs().values():
+        assert not any(tool.startswith("Bash") for tool in program.tools), program.name

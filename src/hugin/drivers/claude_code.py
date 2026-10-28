@@ -14,8 +14,10 @@ source it actually picked.
 import asyncio
 import json
 import os
+import secrets
+import tempfile
 import time
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Mapping, Sequence
 from contextlib import suppress
 from pathlib import Path
 
@@ -40,6 +42,76 @@ STREAM_LIMIT = 8 * 1024 * 1024
 MCP_SERVER_ALLOW = "mcp__hugin"  # allow-list token for every tool of the kernel's MCP server
 STDERR_TAIL_BYTES = 4096
 STDERR_CHUNK = 4096
+# The file-reading tools. In a program's whitelist they mean "read inside the workspace", never
+# "read anywhere": Claude Code applies a `Read(...)` path rule to Glob and Grep as well.
+FILE_TOOLS = frozenset({"Read", "Glob", "Grep"})
+
+
+def file_scope_rules(
+    tools: Sequence[str], roots: Sequence[Path], denied: Sequence[str]
+) -> tuple[list[str], list[str]]:
+    """Path rules that confine a program's file tools: `(allow_rules, deny_rules)`.
+
+    A bare `Read` in `--allowedTools` is permission to read the whole home directory — `.ssh`,
+    browser profiles and the subscription credentials included — and a text guard on the
+    mission goal cannot stop an agent that was told so by a web page. So the allow rule names
+    the workspace roots (`//` is Claude Code's "absolute path" prefix) and the deny rules carve
+    the secrets out of them again; deny wins over allow. Programs without file tools get none.
+    """
+    if not FILE_TOOLS & set(tools):
+        return [], []
+    allow = [f"Read(//{root.as_posix().strip('/')}/**)" for root in roots]
+    deny = [f"Read({pattern})" for pattern in denied]
+    return allow, deny
+
+
+def mcp_config(url: str, token: str) -> str:
+    return json.dumps(
+        {
+            "mcpServers": {
+                "hugin": {
+                    "type": "http",
+                    "url": url,
+                    "headers": {"Authorization": f"Bearer {token}"},
+                }
+            }
+        }
+    )
+
+
+def write_mcp_config(directory: Path, pid: int, url: str, token: str) -> Path:
+    """Put the per-process MCP config, bearer token included, into a private 0600 file.
+
+    On the command line the token would be readable by every local user through
+    `/proc/<pid>/cmdline` and `ps`. The directory lives outside the repository on purpose: an
+    agent whose file tools reach the workspace must not be able to read another agent's token.
+    """
+    directory.mkdir(mode=0o700, parents=True, exist_ok=True)
+    directory.chmod(0o700)
+    path = directory / f"p{pid}-{secrets.token_hex(4)}.json"
+    descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    with os.fdopen(descriptor, "w", encoding="utf-8") as handle:
+        handle.write(mcp_config(url, token))
+    return path
+
+
+def _denied_paths(settings: Settings) -> list[str]:
+    """What stays unreadable even inside the workspace: the hugin state and every `.env`.
+
+    `claude_config_dir` holds the symlinked subscription credentials and `data_dir` the event
+    log and munin — none of it is something an agent's file tool has any business reading.
+    """
+    root = settings.workspace_root.as_posix().strip("/")
+    return [
+        f"//{settings.claude_config_dir.as_posix().strip('/')}/**",
+        f"//{settings.data_dir.as_posix().strip('/')}/**",
+        f"//{root}/**/.env",
+        f"//{root}/**/.env.*",
+    ]
+
+
+def default_mcp_dir() -> Path:
+    return Path(tempfile.gettempdir()) / f"hugin-mcp-{os.getuid()}"
 
 
 def build_command(
@@ -50,25 +122,18 @@ def build_command(
     model: str,
     tools: list[str],
     max_turns: int,
-    mcp_url: str,
-    mcp_token: str,
+    mcp_config_path: Path,
+    read_roots: Sequence[Path] = (),
+    denied_paths: Sequence[str] = (),
 ) -> list[str]:
     """The exact argv of a headless run; the order is pinned by tests."""
     whitelist = ",".join(tools) if tools else ""
     # `dontAsk` denies every tool that is not pre-approved, MCP tools included; the kernel's
     # own syscall server must therefore be allow-listed as a whole.
-    allowed = ",".join([*tools, MCP_SERVER_ALLOW])
-    mcp_config = json.dumps(
-        {
-            "mcpServers": {
-                "hugin": {
-                    "type": "http",
-                    "url": mcp_url,
-                    "headers": {"Authorization": f"Bearer {mcp_token}"},
-                }
-            }
-        }
-    )
+    allow_paths, deny_paths = file_scope_rules(tools, read_roots, denied_paths)
+    granted = [tool for tool in tools if tool not in FILE_TOOLS] + allow_paths
+    allowed = ",".join([*granted, MCP_SERVER_ALLOW])
+    denied = ["--disallowedTools", ",".join(deny_paths)] if deny_paths else []
     return [
         claude_bin,
         "-p",
@@ -86,9 +151,10 @@ def build_command(
         whitelist,
         "--allowedTools",
         allowed,
+        *denied,
         "--strict-mcp-config",
         "--mcp-config",
-        mcp_config,
+        str(mcp_config_path),
         "--settings",
         json.dumps(HOOKS_OFF),
         "--max-turns",
@@ -239,6 +305,7 @@ class ClaudeCodeDriver:
         system_prompt_for: Callable[[int], str],
         spawn=asyncio.create_subprocess_exec,
         home: Path | None = None,
+        mcp_dir: Path | None = None,
     ) -> None:
         self._settings = settings
         self._mcp_url = mcp_url
@@ -246,6 +313,7 @@ class ClaudeCodeDriver:
         self._system_prompt_for = system_prompt_for
         self._spawn = spawn
         self._home = home or Path.home()
+        self._mcp_dir = mcp_dir or default_mcp_dir()
         self._children: dict[int, object] = {}
         self._killed: set[int] = set()
 
@@ -260,15 +328,28 @@ class ClaudeCodeDriver:
         config_dir = self._settings.claude_config_dir
         ensure_config_dir(config_dir, self._home)
         self.preflight(os.environ)
+        config_path = write_mcp_config(
+            self._mcp_dir, proc.pid, self._mcp_url, self._token_for(proc.pid)
+        )
+        try:
+            return await self._run_child(proc, prompt, sink, config_dir, config_path)
+        finally:
+            config_path.unlink(missing_ok=True)  # the token must not outlive the process
+
+    async def _run_child(
+        self, proc: AgentProcess, prompt: str, sink: EventSink, config_dir: Path, config_path: Path
+    ) -> ExitInfo:
+        settings = self._settings
         argv = build_command(
-            claude_bin=self._settings.claude_bin,
+            claude_bin=settings.claude_bin,
             prompt=prompt,
             system_prompt=self._system_prompt_for(proc.pid),
             model=proc.model,
             tools=proc.allowed_tools,
             max_turns=proc.budget.max_turns,
-            mcp_url=self._mcp_url,
-            mcp_token=self._token_for(proc.pid),
+            mcp_config_path=config_path,
+            read_roots=[settings.workspace_root, proc.cwd],
+            denied_paths=_denied_paths(settings),
         )
         child = await self._spawn(
             *argv,

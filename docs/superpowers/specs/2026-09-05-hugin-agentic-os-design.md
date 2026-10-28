@@ -183,7 +183,7 @@ system_prompt: |
 ```
 
 v1 programs: `planner` (orchestrator: `proc.spawn`, `proc.wait`, `artifact.write`, munin r/w),
-`scout` (research), `smith` (code/analysis, `Read, Glob, Grep, Bash(ls *), Bash(cat *)` in cwd),
+`scout` (research), `smith` (code/analysis, `Read, Glob, Grep`, path-scoped to the workspace root),
 `judge` (review/critique, read-only), `scribe` (writing/synthesis). The kernel contract
 (appended to every system prompt) explains the syscalls, the single-writer rule and the
 budget, in ≤ 40 lines.

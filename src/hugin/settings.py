@@ -18,6 +18,9 @@ class Settings(BaseSettings):
     recordings_dir: Path = Field(
         default_factory=lambda: Path(__file__).resolve().parents[2] / "demo" / "recordings"
     )
+    # The only part of the filesystem a file-reading agent (smith) may look at. Defaults to this
+    # repository; point it at the project the agents should analyse, never at a home directory.
+    workspace_root: Path = Field(default_factory=lambda: Path(__file__).resolve().parents[2])
     claude_bin: str = "claude"
     ollama_url: str = "http://127.0.0.1:11434"
     ollama_model: str = "qwen2.5:7b"

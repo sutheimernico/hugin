@@ -17,6 +17,7 @@ from hugin.drivers.claude_code import (
     build_command,
     build_env,
     ensure_config_dir,
+    file_scope_rules,
 )
 from hugin.kernel.events import BudgetSpec, Usage
 from hugin.kernel.process import AgentProcess
@@ -130,11 +131,16 @@ class SpawnSpy:
         self.calls = 0
         self.argv: list[str] = []
         self.kwargs: dict = {}
+        self.config_text = ""
+        self.config_mode = 0
 
     async def __call__(self, *argv: str, **kwargs) -> FakeProcess:
         self.calls += 1
         self.argv = list(argv)
         self.kwargs = kwargs
+        config = Path(self.argv[self.argv.index("--mcp-config") + 1])
+        self.config_text = config.read_text(encoding="utf-8")  # gone again after the run
+        self.config_mode = config.stat().st_mode & 0o777
         return self.process
 
 
@@ -185,6 +191,7 @@ def _driver(tmp_path: Path, spawn: SpawnSpy) -> ClaudeCodeDriver:
         system_prompt_for=lambda pid: f"system prompt for {pid}",
         spawn=spawn,
         home=tmp_path / "home",
+        mcp_dir=tmp_path / "mcp",
     )
 
 
@@ -206,8 +213,7 @@ def test_build_command_matches_the_binding_argv():
         model="claude-haiku-4-5-20251001",
         tools=["mcp__hugin__munin_search", "mcp__hugin__munin_write"],
         max_turns=6,
-        mcp_url=MCP_URL,
-        mcp_token=TOKEN,
+        mcp_config_path=Path("/run/hugin/p7.json"),
     )
 
     assert argv == [
@@ -229,8 +235,7 @@ def test_build_command_matches_the_binding_argv():
         "mcp__hugin__munin_search,mcp__hugin__munin_write,mcp__hugin",
         "--strict-mcp-config",
         "--mcp-config",
-        '{"mcpServers": {"hugin": {"type": "http", "url": "http://127.0.0.1:8770/mcp",'
-        ' "headers": {"Authorization": "Bearer 0123456789abcdef0123456789abcdef"}}}}',
+        "/run/hugin/p7.json",
         "--settings",
         '{"disableAllHooks": true}',
         "--max-turns",
@@ -250,8 +255,7 @@ def test_build_command_never_carries_bare_or_a_permission_bypass():
         model="m",
         tools=[],
         max_turns=1,
-        mcp_url=MCP_URL,
-        mcp_token=TOKEN,
+        mcp_config_path=Path("/run/hugin/p7.json"),
     )
 
     # `--bare` rejects the subscription login; a permission bypass would undo
@@ -402,7 +406,8 @@ async def test_run_spawns_with_the_sandboxed_cwd_env_and_stdin(tmp_path: Path, s
     assert spawn.argv[spawn.argv.index("--model") + 1] == "claude-haiku-4-5-20251001"
     assert spawn.argv[spawn.argv.index("--max-turns") + 1] == "6"
     assert spawn.argv[spawn.argv.index("--tools") + 1] == "mcp__hugin__munin_search"
-    assert "Bearer token-7" in spawn.argv[spawn.argv.index("--mcp-config") + 1]
+    # The token must not be on the command line, where /proc/<pid>/cmdline shows it to everyone.
+    assert not any("token-7" in arg for arg in spawn.argv)
     assert spawn.argv[-1] == "system prompt for 7"
     assert spawn.kwargs["cwd"] == proc.cwd
     assert spawn.kwargs["stdin"] == -3  # asyncio.subprocess.DEVNULL
@@ -615,3 +620,54 @@ async def test_run_drains_stderr_while_stdout_is_still_streaming(
     assert exit_info.reason == "driver_error"
     assert exit_info.stderr_tail.endswith("final warning: mcp handshake slow\n")
     assert len(exit_info.stderr_tail) <= 500
+
+
+async def test_the_token_travels_in_a_private_file_that_is_removed_afterwards(
+    tmp_path: Path, sink: RecordingSink
+):
+    spawn = SpawnSpy(FakeProcess(_fixture_lines("haiku_ok_isolated.jsonl")))
+    driver = _driver(tmp_path, spawn)
+
+    await driver.run(_proc(tmp_path), "Say OK.", sink)
+
+    config = json.loads(spawn.config_text)
+    assert config["mcpServers"]["hugin"]["headers"]["Authorization"] == "Bearer token-7"
+    assert config["mcpServers"]["hugin"]["url"] == MCP_URL
+    assert spawn.config_mode == 0o600
+    assert (tmp_path / "mcp").stat().st_mode & 0o777 == 0o700
+    assert list((tmp_path / "mcp").iterdir()) == []
+
+
+def test_file_tools_are_scoped_to_the_workspace_and_secrets_are_denied():
+    allow, deny = file_scope_rules(
+        ["Read", "Glob", "Grep"],
+        roots=[Path("/work/space"), Path("/work/runs/r1/p3")],
+        denied=["//work/space/.hugin/**", "//work/space/**/.env"],
+    )
+
+    assert allow == ["Read(//work/space/**)", "Read(//work/runs/r1/p3/**)"]
+    assert deny == ["Read(//work/space/.hugin/**)", "Read(//work/space/**/.env)"]
+
+
+def test_a_program_without_file_tools_gets_no_path_rules():
+    assert file_scope_rules(["WebSearch", "WebFetch"], [Path("/w")], ["//w/x"]) == ([], [])
+
+
+def test_build_command_never_grants_a_bare_file_tool():
+    argv = build_command(
+        claude_bin="claude",
+        prompt="p",
+        system_prompt="s",
+        model="m",
+        tools=["Read", "Glob", "Grep", "WebSearch"],
+        max_turns=1,
+        mcp_config_path=Path("/run/hugin/p1.json"),
+        read_roots=[Path("/work/space")],
+        denied_paths=["//work/space/.hugin/**"],
+    )
+
+    allowed = argv[argv.index("--allowedTools") + 1].split(",")
+    assert argv[argv.index("--tools") + 1] == "Read,Glob,Grep,WebSearch"
+    assert {"Read", "Glob", "Grep"}.isdisjoint(allowed)
+    assert "Read(//work/space/**)" in allowed
+    assert argv[argv.index("--disallowedTools") + 1] == "Read(//work/space/.hugin/**)"
