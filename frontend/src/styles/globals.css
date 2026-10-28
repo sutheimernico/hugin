@@ -1,47 +1,42 @@
 html,
+body,
+#root {
+  height: 100%;
+}
+
+html,
 body {
   background: var(--color-base);
   color: var(--color-text);
   font-family: var(--font-sans);
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  /* German hyphenation keeps narrow columns from ragging; the nodes opt out (see below). */
+  hyphens: auto;
+  overflow-wrap: anywhere;
+}
+
+body {
+  overscroll-behavior: none;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
 }
 
 .mono {
   font-family: var(--font-mono);
 }
 
-/* Glow only on live elements: a chip glows while it carries data-pulse. */
-@keyframes hugin-glow {
-  0%,
-  100% {
-    box-shadow: 0 0 0 0 transparent;
-  }
-  50% {
-    box-shadow: 0 0 12px -2px currentColor;
-  }
-}
-
-.hugin-chip[data-pulse="true"] {
-  animation: hugin-glow 2.4s var(--ease-out-expo) infinite;
-}
-
-/*
- * Panic: the graph loses its colour for a moment while the kills propagate, so the button is
- * visibly connected to what it does even before the first process reports back.
- */
-@keyframes hugin-desaturate {
-  0% {
-    filter: saturate(1);
-  }
-  30% {
-    filter: saturate(0.3);
-  }
-  100% {
-    filter: saturate(1);
-  }
-}
-
-.hugin-panic {
-  animation: hugin-desaturate 300ms var(--ease-out-expo);
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
 }
 
 /*
@@ -56,7 +51,7 @@ input:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
 [tabindex]:focus-visible {
-  outline: 2px solid var(--color-cyan);
+  outline: 2px solid var(--color-blue);
   outline-offset: 2px;
 }
 
@@ -64,14 +59,172 @@ textarea:focus-visible,
   outline: none;
 }
 
-@keyframes hugin-ring-spin {
-  to {
-    transform: rotate(360deg);
+/* --- signal lamps ------------------------------------------------------------------------
+ * A lamp is the one place state is drawn in colour. Only `transform` and `opacity` move. */
+
+.hugin-lamp {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  color: var(--color-surface-2);
+  transition: background-color 300ms var(--ease-out-expo);
+}
+
+.hugin-lamp::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1.5px solid currentColor;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.hugin-lamp[data-state="running"] {
+  background: var(--color-green);
+}
+
+.hugin-lamp[data-state="running"]::after {
+  color: var(--color-green);
+  animation: hugin-lamp-ring 2.4s var(--ease-out-expo) infinite;
+}
+
+.hugin-lamp[data-state="waiting_tool"] {
+  background: var(--color-amber);
+}
+
+.hugin-lamp[data-state="spawning"] {
+  background: var(--color-amber);
+  animation: hugin-lamp-blink 900ms ease-in-out infinite;
+}
+
+.hugin-lamp[data-state="queued"] {
+  box-shadow: inset 0 0 0 1.5px var(--color-muted);
+  background: transparent;
+  color: var(--color-muted);
+}
+
+.hugin-lamp[data-state="done"] {
+  background: var(--color-green);
+}
+
+/* One ring when a process finishes, not a loop. */
+.hugin-lamp[data-state="done"]::after {
+  color: var(--color-green);
+  animation: hugin-lamp-ring-once 700ms var(--ease-out-expo) 1;
+}
+
+.hugin-lamp[data-state="failed"] {
+  background: var(--color-red);
+}
+
+.hugin-lamp[data-state="killed"] {
+  box-shadow: inset 0 0 0 1.5px var(--color-red);
+  background: transparent;
+  color: var(--color-red);
+}
+
+@keyframes hugin-lamp-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  70%,
+  100% {
+    transform: scale(2.1);
+    opacity: 0;
   }
 }
 
-.hugin-ring[data-state="running"] .hugin-ring-track {
-  animation: hugin-ring-spin 3s linear infinite;
+@keyframes hugin-lamp-ring-once {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+@keyframes hugin-lamp-blink {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+/* --- gauges -------------------------------------------------------------------------------
+ * Budget and meters are drawn as a row of segments, like a fuel gauge. The fill is one
+ * element scaled on its x axis; the gaps are a mask, so the segments appear lit one by one. */
+
+.hugin-gauge {
+  position: relative;
+  overflow: hidden;
+  height: 6px;
+  background: var(--color-border);
+  -webkit-mask-image: repeating-linear-gradient(90deg, #000 0 5px, transparent 5px 7px);
+  mask-image: repeating-linear-gradient(90deg, #000 0 5px, transparent 5px 7px);
+}
+
+.hugin-gauge > span {
+  position: absolute;
+  inset: 0;
+  transform-origin: left center;
+  transition: transform 400ms var(--ease-out-expo);
+}
+
+/* A stamp: the word is the event, the border is the stamp. */
+@keyframes hugin-stamp {
+  0% {
+    transform: scale(1.5) rotate(-6deg);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1) rotate(-6deg);
+    opacity: 1;
+  }
+}
+
+.hugin-stamp {
+  animation: hugin-stamp 220ms var(--ease-out-expo) both;
+}
+
+/*
+ * Panic: the diagram holds its breath while the kills propagate, so the button is visibly
+ * connected to what it does even before the first process reports back.
+ */
+@keyframes hugin-desaturate {
+  0% {
+    filter: saturate(1);
+  }
+  30% {
+    filter: saturate(0.2);
+  }
+  100% {
+    filter: saturate(1);
+  }
+}
+
+.hugin-panic {
+  animation: hugin-desaturate 300ms var(--ease-out-expo);
+}
+
+@keyframes hugin-rise {
+  from {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.hugin-rise {
+  animation: hugin-rise 260ms var(--ease-out-expo) both;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -79,6 +232,7 @@ textarea:focus-visible,
   *::before,
   *::after {
     animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
   }
 }
@@ -90,7 +244,6 @@ textarea:focus-visible,
  */
 .hugin-graph.react-flow {
   --xy-background-color: transparent;
-  --xy-background-pattern-color: var(--color-border);
   --xy-edge-stroke: var(--color-border);
   --xy-edge-stroke-selected: var(--color-muted);
   --xy-node-color: var(--color-text);
@@ -103,14 +256,19 @@ textarea:focus-visible,
   --xy-attribution-background-color: transparent;
 }
 
-.hugin-graph .react-flow__attribution a {
-  color: var(--color-muted);
-  opacity: 0.5;
+.hugin-graph .react-flow__attribution {
+  display: none;
 }
 
 /* Re-layout moves a node instead of teleporting it. */
 .hugin-graph .react-flow__node {
   transition: transform 400ms var(--ease-out-expo);
+}
+
+/* Nodes are readouts: no hyphenation, no mid-word breaks. */
+.hugin-node {
+  hyphens: none;
+  overflow-wrap: normal;
 }
 
 /*
@@ -120,30 +278,29 @@ textarea:focus-visible,
  */
 .hugin-scrubber::-webkit-slider-thumb {
   appearance: none;
-  width: 12px;
-  height: 12px;
-  border-radius: 9999px;
-  background: var(--color-violet);
-  box-shadow: 0 0 10px -2px var(--color-violet);
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  background: var(--color-text);
+  border: 2px solid var(--color-surface-2);
   cursor: grab;
 }
 
 .hugin-scrubber::-moz-range-thumb {
-  width: 12px;
-  height: 12px;
-  border: none;
-  border-radius: 9999px;
-  background: var(--color-violet);
-  box-shadow: 0 0 10px -2px var(--color-violet);
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--color-surface-2);
+  border-radius: 3px;
+  background: var(--color-text);
   cursor: grab;
 }
 
 .hugin-scrubber:focus-visible::-webkit-slider-thumb {
-  outline: 2px solid var(--color-cyan);
+  outline: 2px solid var(--color-blue);
   outline-offset: 2px;
 }
 
 .hugin-scrubber:focus-visible::-moz-range-thumb {
-  outline: 2px solid var(--color-cyan);
+  outline: 2px solid var(--color-blue);
   outline-offset: 2px;
 }

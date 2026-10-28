@@ -11,7 +11,7 @@ export interface ToastMessage {
 }
 
 const TONE_CLASS: Record<ToastTone, string> = {
-  info: "border-violet/40 text-text",
+  info: "border-blue/40 text-text",
   error: "border-red/50 text-red",
 };
 
@@ -38,7 +38,7 @@ export function Toast({ toast, onDone }: { toast: ToastMessage | null; onDone: (
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 10, transition: { duration: 0.2 } }}
           transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-          className={`fixed bottom-14 left-1/2 z-[60] -translate-x-1/2 rounded-panel border bg-surface-2 px-4 py-2 text-[13px] shadow-[0_18px_40px_-20px_#000] ${TONE_CLASS[toast.tone]}`}
+          className={`fixed bottom-14 left-1/2 z-[60] -translate-x-1/2 rounded-panel border bg-surface-2 px-4 py-2 text-[13px] shadow-[0_12px_28px_-14px_rgba(27,33,38,0.45)] ${TONE_CLASS[toast.tone]}`}
         >
           {toast.text}
         </motion.div>

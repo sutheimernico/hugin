@@ -72,10 +72,10 @@ function makeRun(over: Partial<Run> = {}): Run {
 describe("ModeChip", () => {
   const cases: [Mode, string][] = [
     ["idle", "muted"],
-    ["claude", "violet"],
+    ["claude", "blue"],
     ["ollama", "amber"],
-    ["scripted", "cyan"],
-    ["replay", "rose"],
+    ["scripted", "teal"],
+    ["replay", "plum"],
   ];
 
   it.each(cases)("renders %s with its label and tone", (mode, tone) => {
@@ -217,7 +217,7 @@ describe("KernelLog", () => {
     render(<KernelLog lines={lines} />);
     const [runLine, procLine, muninLine] = screen.getAllByTestId("log-line");
     expect(runLine).toHaveClass("text-text");
-    expect(procLine).toHaveClass("text-violet");
+    expect(procLine).toHaveClass("text-blue");
     expect(muninLine).toHaveClass("text-green");
   });
 

@@ -5,13 +5,13 @@ import type { LogLine } from "../../state/types";
 
 /**
  * Colour by event family, longest prefix first. The families carry the meaning: agents are
- * violet, everything the agents call is cyan, memory is green, budgets warn and a kill is red.
+ * blue, everything the agents call is teal, memory is green, budgets warn and a kill is red.
  * Everything the kernel does around them stays muted so the ticker has a foreground at all.
  */
 const KIND_COLOR: [string, string][] = [
-  ["proc.", "text-violet"],
-  ["tool.", "text-cyan"],
-  ["sys.", "text-cyan"],
+  ["proc.", "text-blue"],
+  ["tool.", "text-teal"],
+  ["sys.", "text-teal"],
   ["munin.", "text-green"],
   ["budget.", "text-amber"],
   ["kill", "text-red"],

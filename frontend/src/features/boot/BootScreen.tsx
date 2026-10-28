@@ -162,8 +162,6 @@ export function BootScreen({ onDone }: { onDone: () => void }) {
           role="img"
           aria-label={WORDMARK}
           className="font-display flex text-[clamp(3rem,12vw,7rem)] leading-none font-bold tracking-[0.12em] text-text"
-          // The one glow in the shell that is not on live data: the hero of this view.
-          style={{ textShadow: "0 0 56px rgba(110, 91, 255, 0.30)" }}
         >
           {[...WORDMARK].map((letter, index) => (
             <motion.span
@@ -190,7 +188,7 @@ export function BootScreen({ onDone }: { onDone: () => void }) {
       {lines !== null && (
         <motion.div
           aria-hidden="true"
-          className="absolute inset-x-0 bottom-0 h-px origin-left bg-violet"
+          className="absolute inset-x-0 bottom-0 h-px origin-left bg-blue"
           initial={reduced ? false : { scaleX: 0 }}
           animate={{ scaleX: 1 }}
           transition={{ duration: totalMs / 1_000, ease: "linear" }}

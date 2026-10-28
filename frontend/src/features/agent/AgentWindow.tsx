@@ -22,7 +22,7 @@ import type { Driver, Proc, TranscriptItem } from "../../state/types";
 import { ToolCallCard } from "./ToolCallCard";
 
 /** Same tones as the mode chip: the driver is named the same way wherever it is named. */
-const DRIVER_TONE: Record<Driver, Tone> = { claude: "violet", ollama: "amber", scripted: "cyan" };
+const DRIVER_TONE: Record<Driver, Tone> = { claude: "blue", ollama: "amber", scripted: "teal" };
 
 /** How an ending reads: finished, stopped, or broken. */
 const EXIT_TONE: Record<string, string> = {
@@ -119,21 +119,21 @@ export function AgentWindow({ proc, now, onClose, onKill }: AgentWindowProps) {
             label="Runden"
             value={usage.turns}
             max={budget.max_turns}
-            tone="violet"
+            tone="blue"
             format={(value) => `${value}/${budget.max_turns}`}
           />
           <Meter
             label="Tokens"
             value={usage.output_tokens}
             max={budget.max_output_tokens}
-            tone="cyan"
+            tone="teal"
             format={(value) => `${fmtTokens(value)}/${fmtTokens(budget.max_output_tokens)}`}
           />
           <Meter
             label="Zeit"
             value={elapsed}
             max={budget.max_seconds}
-            tone="violet"
+            tone="blue"
             format={(value) => `${fmtDuration(value)}/${fmtDuration(budget.max_seconds)}`}
           />
           {/* Context is the model's window, not a budget: how much this agent has read. */}
@@ -141,7 +141,7 @@ export function AgentWindow({ proc, now, onClose, onKill }: AgentWindowProps) {
             label="Kontext"
             value={usage.input_tokens}
             max={CONTEXT_WINDOW}
-            tone="cyan"
+            tone="teal"
             format={(value) => `${Math.round((value / CONTEXT_WINDOW) * 100)} %`}
           />
         </div>
@@ -244,7 +244,7 @@ const Row = memo(function Row({ item, cursor }: { item: TranscriptItem; cursor: 
         <motion.span
           data-testid="transcript-cursor"
           aria-hidden
-          className="ml-px inline-block text-violet"
+          className="ml-px inline-block text-blue"
           animate={{ opacity: [1, 1, 0, 0] }}
           transition={{ duration: 1, times: [0, 0.5, 0.5, 1], repeat: Infinity, ease: "linear" }}
         >

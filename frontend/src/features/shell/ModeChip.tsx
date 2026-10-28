@@ -9,10 +9,10 @@ import type { Mode } from "../../state/types";
  */
 const MODE_TONE: Record<Mode, Tone> = {
   idle: "muted",
-  claude: "violet",
+  claude: "blue",
   ollama: "amber",
-  scripted: "cyan",
-  replay: "rose",
+  scripted: "teal",
+  replay: "plum",
 };
 
 export function ModeChip({ mode }: { mode: Mode }) {

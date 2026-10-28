@@ -22,7 +22,7 @@ const TRACK_STEPS = 1_000;
 
 /** The two moments worth finding again by eye: a process appearing and a result being written. */
 const MARKER_CLASS: Record<string, string> = {
-  "proc.spawned": "bg-cyan",
+  "proc.spawned": "bg-teal",
   "artifact.written": "bg-green",
 };
 
@@ -50,7 +50,7 @@ export function Timeline() {
         type="button"
         aria-label={playing ? "Pause" : "Abspielen"}
         onClick={playing ? pause : play}
-        className="ease-out-expo flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-violet/50 text-violet transition-colors duration-150 hover:bg-violet/15"
+        className="ease-out-expo flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-blue/50 text-blue transition-colors duration-150 hover:bg-blue/15"
       >
         {playing ? <Pause size={14} fill="currentColor" /> : <Play size={14} fill="currentColor" />}
       </button>
@@ -96,7 +96,7 @@ function SpeedButton({
       aria-pressed={active}
       onClick={() => onPick(speed)}
       className={`ease-out-expo h-6 rounded px-1.5 font-mono text-[11px] transition-colors duration-150 ${
-        active ? "bg-violet/20 text-violet" : "text-muted hover:text-text"
+        active ? "bg-blue/20 text-blue" : "text-muted hover:text-text"
       }`}
     >
       {speed}×
@@ -104,7 +104,7 @@ function SpeedButton({
   );
 }
 
-/** Hairline track, violet fill up to the cursor, event markers, and the range input on top. */
+/** Hairline track, blue fill up to the cursor, event markers, and the range input on top. */
 function Track({
   events,
   fraction,
@@ -118,7 +118,7 @@ function Track({
     <div className="relative h-6 min-w-0 flex-1">
       <div className="pointer-events-none absolute top-1/2 right-0 left-0 h-px -translate-y-1/2 bg-border" />
       <div
-        className="pointer-events-none absolute top-1/2 left-0 h-px -translate-y-1/2 bg-violet"
+        className="pointer-events-none absolute top-1/2 left-0 h-px -translate-y-1/2 bg-blue"
         style={{ width: `${fraction * 100}%` }}
       />
       {events

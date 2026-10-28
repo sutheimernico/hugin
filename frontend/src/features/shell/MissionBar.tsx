@@ -5,7 +5,7 @@ import { STATE_LABEL } from "../../lib/i18n";
 import type { Run } from "../../state/types";
 
 const RUN_TONE: Record<Run["state"], Tone> = {
-  running: "violet",
+  running: "blue",
   done: "green",
   failed: "red",
 };

@@ -24,14 +24,14 @@ export const PROGRAM_ICON: Record<string, LucideIcon> = {
  * sync with `styles/tokens.css` by hand — the palette is closed and does not move.
  */
 export const PROGRAM_ACCENT: Record<string, string> = {
-  planner: "#6E5BFF",
-  scout: "#22D3C7",
-  smith: "#F5A623",
-  judge: "#F472B6",
-  scribe: "#3ECF8E",
+  planner: "#2A5C9E",
+  scout: "#1C7C80",
+  smith: "#A86A00",
+  judge: "#86426A",
+  scribe: "#4F6F1F",
 };
 
-export const NEUTRAL_ACCENT = "#8B92A5";
+export const NEUTRAL_ACCENT = "#566059";
 
 /** Claude's context window — the reference the fill bars are honest about being measured against. */
 export const CONTEXT_WINDOW = 200_000;

@@ -94,7 +94,7 @@ export function MuninBrowser() {
           placeholder="Wonach suchst du?"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          className="ease-out-expo h-9 w-full rounded-panel border border-border bg-surface-2 pr-3 pl-9 text-[13px] text-text transition-colors duration-150 outline-none placeholder:text-muted focus:border-violet/60"
+          className="ease-out-expo h-9 w-full rounded-panel border border-border bg-surface-2 pr-3 pl-9 text-[13px] text-text transition-colors duration-150 outline-none placeholder:text-muted focus:border-blue/60"
         />
       </div>
 
@@ -159,7 +159,7 @@ function ResultRow({ memory, now, active, onSelect }: ResultRowProps) {
       aria-current={active ? "true" : undefined}
       onClick={() => onSelect(memory)}
       className={`ease-out-expo block w-full border-b border-border/60 px-3 py-2.5 text-left transition-colors duration-150 hover:bg-surface-2 ${
-        active ? "bg-surface-2 shadow-[inset_2px_0_0_0_var(--color-violet)]" : ""
+        active ? "bg-surface-2 shadow-[inset_2px_0_0_0_var(--color-blue)]" : ""
       }`}
     >
       <span className="block truncate text-[13px] text-text">{memory.title}</span>

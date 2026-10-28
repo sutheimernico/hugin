@@ -9,7 +9,7 @@ type PanelProps = {
   bodyClassName?: string;
 };
 
-/** Surface container with an optional header row: HUD title left, free slot right. */
+/** Surface with an optional header row: title left in the display face, free slot right. */
 export function Panel({
   title,
   right,
@@ -19,11 +19,13 @@ export function Panel({
 }: PanelProps) {
   const hasHeader = title !== undefined || right !== undefined;
   return (
-    <section className={`flex flex-col rounded-panel border border-border bg-surface ${className}`}>
+    <section
+      className={`flex flex-col overflow-hidden rounded-panel border border-border bg-surface ${className}`}
+    >
       {hasHeader && (
-        <header className="flex shrink-0 items-center justify-between gap-3 border-b border-border px-3 py-2">
+        <header className="flex min-h-10 shrink-0 items-center justify-between gap-3 border-b border-border px-3.5">
           {title !== undefined ? (
-            <h2 className="font-display text-[12px] font-medium tracking-[0.14em] text-muted uppercase">
+            <h2 className="font-display text-[16px] leading-none font-semibold tracking-[0.01em] text-text">
               {title}
             </h2>
           ) : (

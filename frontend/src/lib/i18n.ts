@@ -2,8 +2,8 @@ export const ROLE_LABEL: Record<string, string> = {
   planner: "Planer", scout: "Späher", smith: "Schmied", judge: "Richter", scribe: "Schreiber",
 };
 export const STATE_LABEL: Record<string, string> = {
-  queued: "Wartet", spawning: "Startet", running: "Läuft", waiting_tool: "Werkzeug",
-  done: "Fertig", failed: "Fehler", killed: "Beendet",
+  queued: "Wartet", spawning: "Startet", running: "Läuft", waiting_tool: "Werkzeug aktiv",
+  done: "Fertig", failed: "Fehler", killed: "Gestoppt",
 };
 export const MODE_LABEL = {
   idle: "BEREIT", claude: "LIVE · CLAUDE", ollama: "LIVE · OLLAMA",

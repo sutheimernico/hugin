@@ -46,7 +46,7 @@ export function ProcessTable({
             aria-checked={showAll}
             title={showAll ? "Nur den laufenden Auftrag zeigen" : "Alle Prozesse zeigen"}
             onClick={() => onShowAllChange(!showAll)}
-            className="ease-out-expo rounded-full border border-border px-2 py-0.5 text-[10px] tracking-[0.08em] text-muted uppercase transition-colors duration-150 hover:bg-surface-2 aria-checked:border-violet/50 aria-checked:bg-violet/12 aria-checked:text-violet"
+            className="ease-out-expo rounded-full border border-border px-2 py-0.5 text-[10px] tracking-[0.08em] text-muted uppercase transition-colors duration-150 hover:bg-surface-2 aria-checked:border-blue/50 aria-checked:bg-blue/12 aria-checked:text-blue"
           >
             Alle
           </button>
@@ -128,7 +128,7 @@ const ProcessRow = memo(function ProcessRow({ proc, end, selected, onSelect, onK
         event.preventDefault();
         onSelect(proc.pid);
       }}
-      className="ease-out-expo cursor-pointer border-t border-border/60 transition-colors duration-150 outline-none hover:bg-surface-2 focus-visible:bg-surface-2 data-[selected=true]:bg-violet/12"
+      className="ease-out-expo cursor-pointer border-t border-border/60 transition-colors duration-150 outline-none hover:bg-surface-2 focus-visible:bg-surface-2 data-[selected=true]:bg-blue/12"
     >
       <td className="px-1.5 py-1.5 pl-3 font-mono text-[11px] text-muted tabular-nums">{proc.pid}</td>
       {/* `ROLE_LABEL` is keyed by program name; the kernel's own `role` is English prose

@@ -192,7 +192,7 @@ export function CommandPalette({ open, onOpen, onClose, onToast }: CommandPalett
             transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
             // The backdrop closes; a click inside is never a click on the backdrop.
             onMouseDown={(event) => event.stopPropagation()}
-            className="w-[640px] max-w-full overflow-hidden rounded-panel border border-border bg-surface shadow-[0_40px_80px_-30px_#000]"
+            className="w-[640px] max-w-full overflow-hidden rounded-panel border border-border bg-surface shadow-[0_28px_60px_-24px_rgba(27,33,38,0.5)]"
           >
             <Cmdk
               label="Befehle"
@@ -300,7 +300,7 @@ function CommandItem({
       value={command.id}
       disabled={command.disabled !== undefined}
       onSelect={() => onSelect(command)}
-      className="ease-out-expo flex cursor-pointer items-center gap-3 rounded-panel px-3 py-2.5 transition-colors duration-150 data-[disabled=true]:cursor-not-allowed data-[disabled=true]:opacity-45 data-[selected=true]:bg-violet/15 data-[selected=true]:text-text"
+      className="ease-out-expo flex cursor-pointer items-center gap-3 rounded-panel px-3 py-2.5 transition-colors duration-150 data-[disabled=true]:cursor-not-allowed data-[disabled=true]:opacity-45 data-[selected=true]:bg-blue/15 data-[selected=true]:text-text"
     >
       <span className="min-w-0 flex-1 truncate text-[13px] text-text">{command.label}</span>
       {command.disabled !== undefined ? (
@@ -339,7 +339,7 @@ function DriverPicker({
             title={reason ?? DRIVER_LABEL[option]}
             onClick={() => onPick(option)}
             className={`mono ease-out-expo rounded-[6px] px-2.5 py-1 text-[11px] transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-40 ${
-              active ? "bg-violet/20 text-violet" : "text-muted hover:text-text"
+              active ? "bg-blue/20 text-blue" : "text-muted hover:text-text"
             }`}
           >
             {DRIVER_LABEL[option]}

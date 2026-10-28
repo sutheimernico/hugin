@@ -26,13 +26,13 @@ import { useHuginStore } from "../../state/store";
 import type { Driver, HEvent, Run } from "../../state/types";
 
 const DRIVER_TONE: Record<string, Tone> = {
-  claude: "violet",
+  claude: "blue",
   ollama: "amber",
-  scripted: "cyan",
+  scripted: "teal",
 };
 
 const RUN_TONE: Record<Run["state"], Tone> = {
-  running: "violet",
+  running: "blue",
   done: "green",
   failed: "red",
 };

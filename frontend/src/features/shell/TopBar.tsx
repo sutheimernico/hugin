@@ -68,14 +68,14 @@ export function TopBar({
             quarter of that width below 1440 px so ⌘K and Panik never leave the bar. */}
         <div className="hidden items-center gap-6 lg:flex">
           <div className="w-32 shrink-0 min-[1440px]:w-40">
-            <Meter label="Prozesse" value={meters.activeProcs} max={PROC_SCALE} tone="violet" />
+            <Meter label="Prozesse" value={meters.activeProcs} max={PROC_SCALE} tone="blue" />
           </div>
           <div className="w-32 shrink-0 min-[1440px]:w-40">
             <Meter
               label="Tokens/min"
               value={meters.tokensPerMin}
               max={TOKENS_PER_MIN_SCALE}
-              tone="cyan"
+              tone="teal"
               format={fmtTokens}
             />
           </div>
@@ -125,7 +125,7 @@ function ViewTabs({ view, onViewChange }: { view: View; onViewChange: (view: Vie
             onClick={() => onViewChange(tab.view)}
             className={`ease-out-expo h-7 rounded-panel border px-2.5 text-[11px] whitespace-nowrap transition-colors duration-150 ${
               active
-                ? "border-violet/60 bg-violet/10 text-text"
+                ? "border-blue/60 bg-blue/10 text-text"
                 : "border-transparent text-muted hover:bg-surface-2 hover:text-text"
             }`}
           >
@@ -178,7 +178,7 @@ function PanicButton({ onKillAll }: { onKillAll: () => void }) {
             initial={{ opacity: 0, y: -6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute top-9 right-0 z-20 w-60 rounded-panel border border-border bg-surface-2 p-3 shadow-[0_18px_40px_-20px_#000]"
+            className="absolute top-9 right-0 z-20 w-60 rounded-panel border border-border bg-surface-2 p-3 shadow-[0_12px_28px_-14px_rgba(27,33,38,0.45)]"
           >
             <p className="text-[13px] text-text">Alle Prozesse beenden?</p>
             <p className="mt-1 text-[11px] text-muted">

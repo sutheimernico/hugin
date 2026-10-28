@@ -20,9 +20,9 @@ export interface EdgePulse {
 }
 
 const PARTICLE_COLOR: Record<Pulse["kind"], string> = {
-  msg: "var(--color-violet)",
+  msg: "var(--color-blue)",
   munin: "var(--color-green)",
-  spawn: "var(--color-cyan)",
+  spawn: "var(--color-teal)",
 };
 
 export type PulseEdgeType = Edge<
