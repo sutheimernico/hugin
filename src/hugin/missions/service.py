@@ -47,7 +47,7 @@ async def start_mission(
 
 
 def _reject_foreign_paths(goal: str) -> None:
-    """A mission may only point at the user's own private tree — see spec §7."""
+    """A mission may only point at the user's own private tree."""
     private_root = PRIVATE_ROOT.resolve()
     for match in _PATH.finditer(_URL.sub(" ", goal)):
         candidate = Path(match.group()).expanduser()

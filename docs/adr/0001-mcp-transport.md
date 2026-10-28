@@ -4,8 +4,8 @@ Status: accepted · 2026-09-06
 
 ## Context
 
-Claude agents run as `claude -p` subprocesses and reach the kernel only through MCP. The spec
-(§2.3) prefers one HTTP endpoint at `/mcp` with a per-pid bearer token in `--mcp-config`, with
+Claude agents run as `claude -p` subprocesses and reach the kernel only through MCP. The design
+spec prefers one HTTP endpoint at `/mcp` with a per-pid bearer token in `--mcp-config`, with
 a stdio bridge (`stdio_bridge.py` + `POST /internal/syscall`) as the fallback for the case
 where `mcp` hides the HTTP request from a tool handler — a property of the installed SDK, so
 it had to be checked rather than assumed.

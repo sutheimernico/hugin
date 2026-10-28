@@ -12,7 +12,7 @@ const FILL_CLASS: Record<Tone, string> = {
   muted: "bg-muted",
 };
 
-/** House easing and the UI transition length (spec §2.9 motion rules). */
+/** House easing and the UI transition length. */
 const EASE_OUT_EXPO = [0.16, 1, 0.3, 1] as const;
 const TICK_S = 0.4;
 

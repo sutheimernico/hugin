@@ -1,5 +1,5 @@
 /**
- * The ⌘K palette (spec §2.9, view 6) — the one place a mission is started.
+ * The ⌘K palette — the one place a mission is started.
  *
  * `cmdk` provides the list: filtering, ↑↓/Enter and the group headings. The dialog frame around
  * it is ours rather than `Command.Dialog`, because the overlay is a motion element (scale .98→1

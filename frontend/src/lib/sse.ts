@@ -3,11 +3,11 @@
  *
  * Streaming text arrives at well over 100 events/s, so the client coalesces everything that
  * lands in one animation frame into a single `onBatch` call — one store write and one React
- * render per frame instead of per event (spec §2.9).
+ * render per frame instead of per event.
  *
  * Reconnect is ours, not the browser's: on error the source is closed and reopened a second
  * later with `since=<last seq seen>`, which is what makes the reducer's idempotency the whole
- * recovery story (spec §5).
+ * recovery story.
  */
 
 import { EVENT_KINDS, type HEvent } from "../state/types";

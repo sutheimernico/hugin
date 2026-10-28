@@ -1,8 +1,8 @@
 /**
  * The shell's projection types — the shape every view reads from.
  *
- * The block below is BINDING (plan Task 13): names and fields are the contract later frontend
- * tasks build on. Three additions are deliberate and documented where they appear:
+ * The projection's types: names and fields are the contract the rest of the frontend
+ * builds on. Three additions are deliberate and documented where they appear:
  * `Proc.muninWrites`, `State.tokenSamples` and `SystemStatus`.
  *
  * Time unit: every timestamp here is the backend's wall-clock time in **seconds** (float),
@@ -73,8 +73,8 @@ export interface Proc {
   exitedAt: number | null;
   exitReason: string | null;
   /**
-   * Addition to the BINDING block: the driver's last stderr lines from `proc.exit`. Only the
-   * agent window (Task 22) shows them, and nothing else in the projection would keep them —
+   * The driver's last stderr lines from `proc.exit`. Only the
+   * agent window shows them, and nothing else in the projection would keep them —
    * without this field a `driver_error` would be a verdict with its evidence thrown away.
    */
   stderrTail: string | null;
@@ -82,7 +82,7 @@ export interface Proc {
   /** Budget fill as a fraction 0…1 — the same scale the kernel's `budget.tick` reports. */
   budgetPct: number;
   transcript: TranscriptItem[];
-  /** Addition to the BINDING block: the graph (Task 15) sizes a node's munin link by this. */
+  /** The graph sizes a node's munin link by this. */
   muninWrites: number;
 }
 
@@ -121,7 +121,7 @@ export interface Meters {
 }
 
 /**
- * Addition to the BINDING block: `Meters.tokensPerMin` is a rate over a 60 s window of event
+ * `Meters.tokensPerMin` is a rate over a 60 s window of event
  * time, which cannot be derived from the other fields — the samples that feed it live here.
  * Each sample is the *delta* of a process's cumulative output tokens, so nothing is counted twice.
  */
@@ -143,8 +143,7 @@ export interface State {
 }
 
 /**
- * Addition to the BINDING block, defined here so Task 16 (palette gating) and Task 21
- * (`GET /api/system`) share one shape. Field names mirror the backend JSON verbatim.
+ * Defined here so the palette gating and `GET /api/system` share one shape. Field names mirror the backend JSON verbatim.
  */
 export interface SystemStatus {
   claude: { ok: boolean; version: string | null; detail: string };

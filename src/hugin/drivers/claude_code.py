@@ -53,10 +53,10 @@ def build_command(
     mcp_url: str,
     mcp_token: str,
 ) -> list[str]:
-    """The exact argv of a headless run; the order is part of the binding contract."""
+    """The exact argv of a headless run; the order is pinned by tests."""
     whitelist = ",".join(tools) if tools else ""
     # `dontAsk` denies every tool that is not pre-approved, MCP tools included; the kernel's
-    # own syscall server must therefore be allow-listed as a whole (verified live 2026-09-06).
+    # own syscall server must therefore be allow-listed as a whole.
     allowed = ",".join([*tools, MCP_SERVER_ALLOW])
     mcp_config = json.dumps(
         {
@@ -250,7 +250,7 @@ class ClaudeCodeDriver:
         self._killed: set[int] = set()
 
     def preflight(self, env: Mapping[str, str]) -> None:
-        """Refuse to run at all while the kernel's own env could bill the account (spec §1.1)."""
+        """Refuse to run at all while the kernel's own env could bill the account."""
         if API_KEY_ENV in env:
             raise RuntimeError(
                 f"{API_KEY_ENV} is set — hugin runs Claude Code on the subscription only"

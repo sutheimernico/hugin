@@ -5,7 +5,7 @@ Status: accepted · 2026-09-06
 ## Context
 
 `OllamaDriver` runs `qwen2.5:7b` locally and free, but *is* the tool-calling loop itself rather
-than a supervised CLI. Task 28's live runs exposed where a 7B model diverges from Claude's
+than a supervised CLI. The first live runs exposed where a 7B model diverges from Claude's
 tool-calling discipline, and where the kernel had to bend without giving up its own guarantees
 (budgets, single writer, capability gate).
 
@@ -26,7 +26,7 @@ Five kernel-side accommodations, scoped to syscall shape and scheduling, none to
 
 ## Evidence
 
-Five live planner attempts with `qwen2.5:7b` (Task 28), zero completed multi-agent runs: the
+Five live planner attempts with `qwen2.5:7b` (live), zero completed multi-agent runs: the
 planner handed children 60 s budgets, wrote tool calls as plain text, or circled to the 900 s
 mission budget (`exit_reason=budget:seconds`, run ends `failed`; documented in README). A
 single `program:scout` run completed cleanly (462 events, 242 s) — the committed

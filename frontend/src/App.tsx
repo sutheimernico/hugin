@@ -24,10 +24,10 @@ import { selectVisibleState, useHuginStore } from "./state/store";
 
 /** How often the shell re-asks `/api/system` while the tab is visible. */
 const SYSTEM_POLL_MS = 30_000;
-/** How long the graph stays desaturated after "Panik" (spec §2.9 motion rules). */
+/** How long the graph stays desaturated after "Panik". */
 const PANIC_FLASH_MS = 300;
 
-/** Mission Control (spec §2.9, view 2): the shell is a pure projection of the event stream. */
+/** Mission Control: the shell is a pure projection of the event stream. */
 export default function App() {
   const state = useHuginStore((store) => store.state);
   const replay = useHuginStore((store) => store.replay);
@@ -194,7 +194,7 @@ function useEventStream(dispatch: (events: HEvent[]) => void): void {
       // A fresh shell wants this kernel's life, not every run the database ever stored.
       since: "boot",
       onBatch: dispatch,
-      // Task 21 gives the shell a visible place for subsystem trouble; until then the kernel
+      // The shell has no dedicated place for subsystem trouble yet; the kernel
       // log is the evidence of what arrived and what did not.
       onStatus: () => {},
     });

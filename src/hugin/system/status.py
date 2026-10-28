@@ -102,7 +102,7 @@ class SystemStatusService:
 
     async def _claude(self) -> dict:
         # The key is checked first and is final: hugin runs Claude Code on the subscription
-        # only (spec §1.1), so what the CLI would answer does not matter here.
+        # only, so what the CLI would answer does not matter here.
         if API_KEY_ENV in self._env:
             return {"ok": False, "version": None, "detail": CLAUDE_API_KEY}
         try:

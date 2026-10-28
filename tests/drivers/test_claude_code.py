@@ -254,7 +254,7 @@ def test_build_command_never_carries_bare_or_a_permission_bypass():
         mcp_token=TOKEN,
     )
 
-    # `--bare` rejects the subscription login (spec §9 D3); a permission bypass would undo
+    # `--bare` rejects the subscription login; a permission bypass would undo
     # the tool whitelist. Neither may ever creep into the argv.
     assert "--bare" not in argv
     assert "--dangerously-skip-permissions" not in argv

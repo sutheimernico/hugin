@@ -28,7 +28,7 @@ listing the program's tool whitelist plus `mcp__hugin`. Env is an allow-list: `P
   servers, and cuts prompt overhead from ~40k to ~6.4k tokens per turn (verified 2026-09-05).
 - `--permission-mode dontAsk` denies any tool absent from `--allowedTools`, MCP tools included:
   without `mcp__hugin` in that list, every kernel syscall was denied (verified live 2026-09-06,
-  Task 28's first run).
+  on the first real run).
 - `ANTHROPIC_API_KEY` is refused twice: `preflight(os.environ)` before spawn, and the
   `system/init` line's `api_key_source` after spawn — only the CLI knows which billing source
   it actually picked, so the second check sits on top of the first (`claude_code.py`).

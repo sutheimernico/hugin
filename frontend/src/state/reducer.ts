@@ -2,7 +2,7 @@
  * The projection: kernel events in, shell state out.
  *
  * This module is pure and free of React and zustand on purpose — live SSE and replay feed the
- * *same* reducer (spec §2.9), and replay (Task 25) re-folds a whole run from `initialState`.
+ * *same* reducer, and replay re-folds a whole run from `initialState`.
  *
  * Two consequences of that:
  * - `applyEvent` never mutates the state it is handed. It clones the top level and then
@@ -29,7 +29,7 @@ import type {
 } from "./types";
 
 const LOG_RING = 5_000;
-/** A pulse is one travelling particle; it lives 1.2 s of event time (spec §2.9 motion rules). */
+/** A pulse is one travelling particle; it lives 1.2 s of event time. */
 const PULSE_TTL_S = 1.2;
 /**
  * Ceiling on particles in flight. Event time is not wall time: a replay at 8× or a burst of
@@ -72,7 +72,7 @@ export const initialState: State = {
 
 export function applyEvent(state: State, e: HEvent, opts?: { logRing?: number }): State {
   // Idempotent on duplicate seq: an SSE reconnect replays everything after the last seq the
-  // client acknowledged, and the backfill and the live queue overlap by design (spec §5).
+  // client acknowledged, and the backfill and the live queue overlap by design.
   if (e.seq <= state.lastSeq) return state;
 
   const next: State = {
@@ -339,7 +339,7 @@ function budgetTick(next: State, e: HEvent): void {
     usage: {
       ...proc.usage,
       turns: Math.max(proc.usage.turns, num(d.turns)),
-      // The kernel added `input_tokens` to the tick (Task 24); a recording written before that
+      // The kernel added `input_tokens` to the tick later; a recording written before that
       // has none, and then the last known context size is the truthful one.
       input_tokens: Math.max(proc.usage.input_tokens, num(d.input_tokens)),
       output_tokens: Math.max(proc.usage.output_tokens, num(d.output_tokens)),

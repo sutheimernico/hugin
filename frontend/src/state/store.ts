@@ -5,7 +5,7 @@
  * Plain functions, no immer: the reducer already returns fresh objects, and a second copy
  * layer would only hide that.
  *
- * Replay is client-side (plan Task 25): entering it loads a run's events once, and everything
+ * Replay is client-side: entering it loads a run's events once, and everything
  * afterwards is addressing — a cursor into that list. `selectVisibleState` is the one place
  * that decides which projection the views see, so live and replay never grow two code paths.
  */
@@ -17,7 +17,7 @@ import type { HEvent, State, SystemStatus } from "./types";
 
 export type View = "control" | "munin" | "runs";
 
-/** Task 25 adds the actions (enter/seek/play/step/exit); Task 13 only defines the shape. */
+/** Replay cursor: the actions are enter/seek/play/step/exit. */
 export interface ReplaySlice {
   /** The run id, or a recording's slug — whichever the shell is replaying. `null` while live. */
   runId: string | null;
@@ -49,7 +49,7 @@ export interface HuginStore {
   system: SystemStatus | null;
   selectedPid: number | null;
   view: View;
-  /** Prefilled by the palette's "Munin durchsuchen…" command, read by the browser (Task 23). */
+  /** Prefilled by the palette's "Munin durchsuchen…" command, read by the browser. */
   muninQuery: string;
   /** Process table scope: the active run only (default), or every process the kernel knows. */
   allProcs: boolean;
@@ -158,7 +158,7 @@ export const useHuginStore = create<HuginStore>()((set, get) => ({
 /**
  * What every view renders: the live projection, or the replayed run as it stood at the cursor.
  * Components read this and never `state` directly — that is what keeps replay a projection
- * instead of a second rendering path (spec §1.3).
+ * instead of a second rendering path.
  */
 export function selectVisibleState(store: Pick<HuginStore, "state" | "replay">): State {
   if (store.replay.runId === null) return store.state;

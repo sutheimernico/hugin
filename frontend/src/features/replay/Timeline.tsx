@@ -1,5 +1,5 @@
 /**
- * The replay timeline (spec §2.9, view 5): docked at the bottom in place of the mission bar
+ * The replay timeline: docked at the bottom in place of the mission bar
  * for as long as the shell is replaying.
  *
  * The player lives in an effect, not in the store: one `setTimeout` per event, re-scheduled by

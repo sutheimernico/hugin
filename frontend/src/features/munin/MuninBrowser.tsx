@@ -1,5 +1,5 @@
 /**
- * The memory browser (spec §2.9, view 4): what the agents learned, and who learned it.
+ * The memory browser: what the agents learned, and who learned it.
  *
  * Unlike every other view this one is *not* a projection of the event stream — munin is a table
  * in SQLite, and its full text lives only there. So the browser queries the API, and the event

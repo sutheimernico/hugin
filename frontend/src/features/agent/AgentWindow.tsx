@@ -1,5 +1,5 @@
 /**
- * One agent, up close (spec §2.9, view 3): who it is, what it has spent, what it has said and
+ * One agent, up close: who it is, what it has spent, what it has said and
  * the switch that stops it. Clicking a node in the graph morphs that card into this sheet —
  * both carry `layoutId="proc-<pid>"`, so the shell shows one object moving, not two panels.
  *
@@ -32,7 +32,7 @@ const EXIT_TONE: Record<string, string> = {
   driver_error: "text-red",
 };
 
-/** The house transition (spec §2.9): 280 ms on the expo curve. */
+/** The house transition: 280 ms on the expo curve. */
 const SHEET: { duration: number; ease: [number, number, number, number] } = {
   duration: 0.28,
   ease: [0.16, 1, 0.3, 1],

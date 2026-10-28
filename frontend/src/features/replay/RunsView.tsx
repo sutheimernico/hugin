@@ -1,5 +1,5 @@
 /**
- * Runs & Replay (spec §2.9, view 5): everything that has already happened, and the way back
+ * Runs & Replay: everything that has already happened, and the way back
  * into it.
  *
  * Like the munin browser this view is not a projection — a finished run is gone from the live

@@ -2,7 +2,7 @@
  * One agent as a card on the graph: who it is, what it is doing and how full its context is.
  *
  * The card blooms in when the process is spawned — that mount animation is the whole point of
- * the view (spec §1: "the graph blooms"), so it must run exactly once per pid. React keeps a
+ * the view, so it must run exactly once per pid. React keeps a
  * node component mounted as long as its id stays in the graph, which is what makes that true.
  */
 
@@ -15,7 +15,7 @@ import type { Proc, ProcState } from "../../state/types";
 import { HANDLE_IN, HANDLE_MEM, HANDLE_OUT, NODE_H, NODE_W } from "./layout";
 import { BLOOM } from "./motion";
 
-/** Glow is reserved for live elements (spec §2.9): a waiting or finished agent does not shine. */
+/** Glow is reserved for live elements: a waiting or finished agent does not shine. */
 const GLOWING: ProcState[] = ["running", "waiting_tool"];
 
 export type AgentNodeType = Node<{ proc: Proc }, "proc">;
@@ -39,7 +39,7 @@ export function AgentNode({ data, selected }: NodeProps<AgentNodeType>) {
       />
       <motion.div
         data-testid="agent-node"
-        // Shared with the agent window's header (Task 22): selecting the node morphs *this*
+        // Shared with the agent window's header selecting the node morphs *this*
         // card into the sheet instead of opening an unrelated panel beside it.
         layoutId={`proc-${proc.pid}`}
         initial={{ scale: 0.6, opacity: 0 }}

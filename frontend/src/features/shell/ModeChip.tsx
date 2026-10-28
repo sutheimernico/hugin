@@ -3,7 +3,7 @@ import { MODE_LABEL } from "../../lib/i18n";
 import type { Mode } from "../../state/types";
 
 /**
- * The honesty chip (spec §1.2): what the shell is showing is never in doubt — which driver is
+ * The honesty chip: what the shell is showing is never in doubt — which driver is
  * live, or that the data is simulated or replayed. It is the only element in the top bar that
  * glows, and only while something is actually running.
  */

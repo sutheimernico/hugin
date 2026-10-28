@@ -1,6 +1,6 @@
 /**
  * The first thing anyone sees: a full-screen log that types out what this machine can actually
- * do, then the wordmark, then it lifts (spec §2.9, view 1).
+ * do, then the wordmark, then it lifts.
  *
  * Every line comes from `/api/system` — the same snapshot the palette gates its drivers with —
  * so this is a status report, not a splash animation. A subsystem that is missing says so in

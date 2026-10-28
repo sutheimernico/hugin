@@ -2,7 +2,7 @@
  * The arithmetic behind the timeline: where a run stands at a given cursor, and when the next
  * event is due.
  *
- * Replay is a projection, not a second implementation (spec §1.3) — every state on this page
+ * Replay is a projection, not a second implementation — every state on this page
  * comes out of the very same `applyEvent` fold the live stream uses. What is added here is
  * only the *addressing*: a cursor into the event list, a fraction of the run's elapsed time,
  * and the pacing between two events.
@@ -100,7 +100,7 @@ export function nextTick(
  * The live client already coalesces a burst of events per animation frame (`lib/sse.ts`), and
  * the player has to do the same for the same reason: a run has stretches where twenty events
  * share a millisecond, and one React render each turns the *renderer* into the speed limit —
- * measured at 4.4× too slow at 8×, which would make the speed label a lie (spec §1.2).
+ * measured at 4.4× too slow at 8×, which would make the speed label a lie.
  */
 export function coalesce(
   events: HEvent[],

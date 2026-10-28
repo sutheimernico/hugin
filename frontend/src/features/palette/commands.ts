@@ -1,10 +1,10 @@
 /**
  * The palette's command list — pure data, no React.
  *
- * `Command` and `buildCommands` are BINDING (plan Task 16). Everything a command needs to do
+ * `Command` and `buildCommands` are the stable interface. Everything a command needs to do
  * lives behind `actions`, so this module can be unit-tested without a store, a fetch or a DOM.
  *
- * Honesty rule (spec §5): a driver the machine cannot run is never silently swapped for another
+ * Honesty rule: a driver the machine cannot run is never silently swapped for another
  * one — the command stays visible and carries a German reason why it will not start.
  */
 
@@ -47,7 +47,7 @@ export function missionCommandId(templateId: string): string {
   return `mission:${templateId}`;
 }
 
-/** Set by the boot screen (Task 26), cleared by the "Boot erneut abspielen" command. */
+/** Set by the boot screen, cleared by the "Boot erneut abspielen" command. */
 export const BOOTED_KEY = "hugin.booted";
 
 /** How many past runs the palette offers before the list stops being a list. */
@@ -55,7 +55,7 @@ const RUN_LIMIT = 8;
 
 /**
  * Why a driver cannot be used, in German, or `undefined` while it can. Until `/api/system`
- * exists (Task 21) `system` is `null` and nothing is gated — the shell does not invent a
+ * has answered, `system` is `null` and nothing is gated — the shell does not invent a
  * verdict it has not been told. `scripted` is the kernel itself and never unavailable.
  */
 export function driverReason(system: SystemStatus | null, driver: Driver): string | undefined {
@@ -111,7 +111,7 @@ export function buildCommands(ctx: CommandContext): Command[] {
     group: "Munin",
     label: "Munin durchsuchen…",
     hint: "Gedächtnis aller Runs",
-    // The browser (Task 23) owns the query; an empty one shows the newest memories.
+    // The browser owns the query; an empty one shows the newest memories.
     run: () => ctx.actions.openMunin(""),
   });
 
@@ -135,7 +135,7 @@ export function freeTextCommand(
   };
 }
 
-/** Forget that this browser session has booted, then load the shell again (Task 26). */
+/** Forget that this browser session has booted, then load the shell again. */
 export function replayBoot(): void {
   try {
     window.sessionStorage.removeItem(BOOTED_KEY);

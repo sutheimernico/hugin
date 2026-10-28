@@ -16,7 +16,7 @@ import { ModeChip } from "./ModeChip";
 const PROC_SCALE = 8;
 const TOKENS_PER_MIN_SCALE = 2_000;
 
-/** The three views of the shell, in the order they are offered (spec §2.9). */
+/** The three views of the shell, in the order they are offered. */
 const TABS: { view: View; label: string }[] = [
   { view: "control", label: "Mission Control" },
   { view: "munin", label: "Munin" },
