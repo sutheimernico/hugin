@@ -34,6 +34,11 @@ export function MissionBar({ run, now }: MissionBarProps) {
       <span className="min-w-0 flex-1 truncate text-[12px] text-text" title={run.goal}>
         {run.goal}
       </span>
+      {run.driver === "scripted" && (
+        <span className="hidden text-[11px] text-amber md:inline">
+          Simulation: feste Beispiel-Mission
+        </span>
+      )}
       {run.artifacts.length > 0 && (
         <span className="hidden font-mono text-[11px] text-muted sm:inline">
           {run.artifacts.length} Artefakt{run.artifacts.length === 1 ? "" : "e"}

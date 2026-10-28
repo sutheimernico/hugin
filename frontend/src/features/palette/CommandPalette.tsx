@@ -222,6 +222,15 @@ export function CommandPalette({ open, onOpen, onClose, onToast }: CommandPalett
                 </span>
                 <DriverPicker system={system} driver={driver} onPick={setDriver} />
               </div>
+              {driver === "scripted" && (
+                <p
+                  role="note"
+                  className="border-b border-border bg-amber/8 px-5 py-2 text-[12px] text-amber"
+                >
+                  Simulation: spielt eine feste Beispiel-Mission — das eingetippte Ziel ändert den
+                  Ablauf nicht.
+                </p>
+              )}
 
               <Cmdk.List className="max-h-[min(48vh,420px)] overflow-y-auto overscroll-contain p-2">
                 <Cmdk.Empty className="px-3 py-6 text-center text-[13px] text-muted">

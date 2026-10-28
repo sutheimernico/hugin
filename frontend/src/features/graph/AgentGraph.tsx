@@ -44,7 +44,7 @@ const NODE_TYPES: NodeTypes = { proc: AgentNode, munin: MuninNode };
 const EDGE_TYPES: EdgeTypes = { pulse: PulseEdge };
 
 /** The one fit the graph ever performs — on a new node, and on a resized panel. */
-const FIT = { padding: 0.2, maxZoom: 1.1, duration: 400 };
+const FIT = { padding: 0.12, maxZoom: 1.6, duration: 400 };
 
 type GraphNode = AgentNodeType | MuninNodeType;
 

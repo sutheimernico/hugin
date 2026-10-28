@@ -20,7 +20,7 @@ type LayoutProps = {
  */
 export function Layout({ topBar, main, left, center, right, bottom }: LayoutProps) {
   return (
-    <div className="grid h-screen grid-rows-[48px_1fr_auto] bg-base text-text">
+    <div className="grid h-screen grid-cols-[minmax(0,1fr)] grid-rows-[48px_1fr_auto] bg-base text-text">
       {topBar}
       {main === undefined ? (
         <main className="grid min-h-0 auto-rows-[minmax(260px,auto)] grid-cols-1 gap-3 overflow-y-auto p-3 min-[1100px]:auto-rows-[minmax(0,1fr)] min-[1100px]:grid-cols-[320px_1fr_360px] min-[1100px]:overflow-hidden">

@@ -20,7 +20,7 @@ type ProcessTableProps = {
   onShowAllChange: (showAll: boolean) => void;
 };
 
-const HEAD = "sticky top-0 z-10 bg-surface py-1.5 text-[10px] font-medium tracking-[0.12em] uppercase";
+const HEAD = "sticky top-0 z-10 bg-surface px-1.5 py-1.5 whitespace-nowrap text-[10px] font-medium tracking-[0.12em] uppercase";
 
 export function ProcessTable({
   procs,
@@ -53,7 +53,7 @@ export function ProcessTable({
         </span>
       }
       className="h-full"
-      bodyClassName="min-h-0 overflow-y-auto p-0"
+      bodyClassName="min-h-0 overflow-x-auto overflow-y-auto p-0"
     >
       {procs.length === 0 ? (
         <div className="flex h-full flex-col items-center justify-center gap-2 px-6 text-center">
@@ -65,7 +65,7 @@ export function ProcessTable({
           </p>
         </div>
       ) : (
-        <table className="w-full border-collapse text-[12px]">
+        <table className="w-full min-w-[19rem] border-collapse text-[12px]">
           <thead className="text-muted">
             <tr>
               <th className={`${HEAD} pl-3 text-left`}>PID</th>
@@ -130,28 +130,28 @@ const ProcessRow = memo(function ProcessRow({ proc, end, selected, onSelect, onK
       }}
       className="ease-out-expo cursor-pointer border-t border-border/60 transition-colors duration-150 outline-none hover:bg-surface-2 focus-visible:bg-surface-2 data-[selected=true]:bg-violet/12"
     >
-      <td className="py-1.5 pl-3 font-mono text-[11px] text-muted tabular-nums">{proc.pid}</td>
+      <td className="px-1.5 py-1.5 pl-3 font-mono text-[11px] text-muted tabular-nums">{proc.pid}</td>
       {/* `ROLE_LABEL` is keyed by program name; the kernel's own `role` is English prose
           and only stands in for a program the shell does not know. */}
-      <td title={`${ROLE_LABEL[proc.program] ?? proc.role} — ${proc.task}`}>
-        <span className="block max-w-24 truncate font-mono text-text">{proc.program}</span>
+      <td className="px-1.5" title={`${ROLE_LABEL[proc.program] ?? proc.role} — ${proc.task}`}>
+        <span className="block max-w-16 truncate font-mono text-text">{proc.program}</span>
       </td>
-      <td>
+      <td className="px-1.5 whitespace-nowrap">
         <span className="flex items-center gap-1.5 text-[11px] text-muted">
           <StateRing state={proc.state} size={10} />
           {STATE_LABEL[proc.state]}
         </span>
       </td>
-      <td className="text-right font-mono text-[11px] text-muted tabular-nums">
+      <td className="px-1.5 text-right font-mono text-[11px] whitespace-nowrap text-muted tabular-nums">
         {proc.usage.turns}
       </td>
       <td
-        className="text-right font-mono text-[11px] text-muted tabular-nums"
+        className="px-1.5 text-right font-mono text-[11px] whitespace-nowrap text-muted tabular-nums"
         title="Ausgabe-Tokens"
       >
         {fmtTokens(proc.usage.output_tokens)}
       </td>
-      <td className="text-right font-mono text-[11px] text-muted tabular-nums">
+      <td className="px-1.5 text-right font-mono text-[11px] whitespace-nowrap text-muted tabular-nums">
         {elapsed(proc, end)}
       </td>
       <td className="py-1.5 pr-3 text-right">

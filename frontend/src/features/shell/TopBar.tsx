@@ -44,8 +44,8 @@ export function TopBar({
   // a z-index the main area below paints over it — which swallowed every click on the Panik
   // confirmation, because the kernel log sat in front of it.
   return (
-    <header className="relative z-40 flex h-12 items-center gap-4 border-b border-border bg-surface/80 px-4 backdrop-blur">
-      <div className="flex min-w-0 items-baseline gap-3">
+    <header className="relative z-40 flex h-12 min-w-0 items-center gap-2 border-b border-border bg-surface/80 px-3 backdrop-blur sm:gap-4 sm:px-4">
+      <div className="flex shrink-0 items-baseline gap-3">
         <span className="font-display shrink-0 text-[17px] leading-none font-bold tracking-[0.16em] text-text">
           hugin
         </span>
@@ -62,7 +62,7 @@ export function TopBar({
 
       <ViewTabs view={view} onViewChange={onViewChange} />
 
-      <div className="ml-auto flex shrink-0 items-center gap-5">
+      <div className="ml-auto flex shrink-0 items-center gap-2 sm:gap-5">
         {/* One fixed width per meter, so a longer label or readout can never push into its
             neighbour — the bars are a HUD row and must stay on one line. They give up a
             quarter of that width below 1440 px so ⌘K and Panik never leave the bar. */}
@@ -114,7 +114,7 @@ export function TopBar({
  */
 function ViewTabs({ view, onViewChange }: { view: View; onViewChange: (view: View) => void }) {
   return (
-    <nav aria-label="Ansicht" className="flex shrink-0 items-center gap-1">
+    <nav aria-label="Ansicht" className="flex min-w-0 items-center gap-1 overflow-x-auto">
       {TABS.map((tab) => {
         const active = tab.view === view;
         return (

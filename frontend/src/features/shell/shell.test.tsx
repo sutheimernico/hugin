@@ -164,6 +164,16 @@ describe("MissionBar", () => {
     expect(screen.getByText("Läuft")).toBeInTheDocument();
   });
 
+  it("says that a simulated mission plays a fixed script", () => {
+    render(<MissionBar run={makeRun({ driver: "scripted" })} now={1_063} />);
+    expect(screen.getByText(/Simulation: feste Beispiel-Mission/)).toBeInTheDocument();
+  });
+
+  it("does not claim a script for a live driver", () => {
+    render(<MissionBar run={makeRun({ driver: "claude" })} now={1_063} />);
+    expect(screen.queryByText(/Simulation: feste/)).not.toBeInTheDocument();
+  });
+
   it("freezes the running time of a finished mission at its end", () => {
     render(<MissionBar run={makeRun({ state: "done", doneAt: 1_030 })} now={9_999} />);
     expect(screen.getByText("0:30")).toBeInTheDocument();
