@@ -340,7 +340,7 @@ describe("logText", () => {
 
   it("writes a German one-liner for a process exit", () => {
     const exit = ev("proc.exit", { reason: "budget:turns", usage: NO_USAGE }, { pid: 5 });
-    expect(logText(exit)).toBe("Prozess 5 beendet: budget:turns");
+    expect(logText(exit)).toBe("Prozess 5 beendet: Budget Runden überschritten");
   });
 
   it("writes a German one-liner for an artifact", () => {

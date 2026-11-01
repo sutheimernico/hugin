@@ -11,7 +11,8 @@
  *   replay at 8× prunes exactly what the live run pruned.
  */
 
-import { STATE_LABEL } from "../lib/i18n";
+import { syscallLabel, toolLabel } from "../lib/describe";
+import { exitReasonShort, STATE_LABEL } from "../lib/i18n";
 import { ALIVE_STATES } from "./selectors";
 import type {
   Budget,
@@ -127,15 +128,15 @@ export function logText(e: HEvent): string {
     case "proc.thinking":
       return d.on === true ? `Prozess ${pid} denkt nach` : `Prozess ${pid} denkt nicht mehr nach`;
     case "proc.exit":
-      return `Prozess ${pid} beendet: ${str(d.reason)}`;
+      return `Prozess ${pid} beendet: ${exitReasonShort(str(d.reason))}`;
     case "tool.call":
-      return `Prozess ${pid} ruft Werkzeug ${str(d.tool)} auf`;
+      return `Prozess ${pid}: ${toolLabel(str(d.tool))}`;
     case "tool.result":
       return d.ok === true
         ? `Werkzeug fertig in ${num(d.ms)} ms`
         : `Werkzeug fehlgeschlagen: ${str(d.output_summary)}`;
     case "sys.call":
-      return `Prozess ${pid} ruft Syscall ${str(d.syscall)} auf`;
+      return `Prozess ${pid}: ${syscallLabel(str(d.syscall))}`;
     case "sys.result":
       return d.ok === true
         ? `Syscall erledigt in ${num(d.ms)} ms`

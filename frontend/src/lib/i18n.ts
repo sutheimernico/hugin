@@ -28,3 +28,18 @@ export const EXIT_REASON_LABEL: Record<string, string> = {
 export function exitReasonLabel(reason: string): string {
   return EXIT_REASON_LABEL[reason] ?? reason;
 }
+
+const EXIT_REASON_SHORT: Record<string, string> = {
+  done: "fertig",
+  failed: "Fehler",
+  killed: "gestoppt",
+  driver_error: "Treiberfehler",
+  "budget:turns": "Budget Runden überschritten",
+  "budget:seconds": "Budget Zeit überschritten",
+  "budget:output_tokens": "Budget Tokens überschritten",
+};
+
+/** The reason as the end of a sentence ("Prozess 3 beendet: fertig"). */
+export function exitReasonShort(reason: string): string {
+  return EXIT_REASON_SHORT[reason] ?? reason;
+}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { exitReasonLabel } from "./i18n";
+import { exitReasonLabel, exitReasonShort } from "./i18n";
 
 describe("exitReasonLabel", () => {
   const cases: [string, string][] = [
@@ -18,5 +18,16 @@ describe("exitReasonLabel", () => {
 
   it("shows an unknown reason verbatim rather than inventing one", () => {
     expect(exitReasonLabel("budget:context")).toBe("budget:context");
+  });
+});
+
+describe("exitReasonShort", () => {
+  it("reads as the end of a sentence", () => {
+    expect(exitReasonShort("done")).toBe("fertig");
+    expect(exitReasonShort("budget:turns")).toBe("Budget Runden überschritten");
+  });
+
+  it("keeps an unknown reason verbatim", () => {
+    expect(exitReasonShort("meteor")).toBe("meteor");
   });
 });
