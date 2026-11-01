@@ -84,7 +84,7 @@ mode chip always reads `SIMULATION`, `LIVE · CLAUDE`, `LIVE · OLLAMA` or `REPL
 hugin was built with spec-driven agentic development. I wrote the design spec and the plan
 (`docs/superpowers/specs/`, `docs/superpowers/plans/`), set the constraints (no API cost, no
 network or LLM in tests, capability gate on every syscall), reviewed what the coding agents
-produced, and own the verification: 390 backend tests and 236 frontend tests are the gate, run on
+produced, and own the verification: 395 backend tests and 315 frontend tests are the gate, run on
 every push by CI. The architecture decisions that were not obvious are written down as ADRs in
 `docs/adr/`. A later audit pass found real problems in that first version — stale tokens, an
 unbounded child budget, an over-broad file tool, a log that was not actually used to rebuild state
@@ -180,11 +180,11 @@ uv run python scripts/record_demo.py <run_id> <slug>      # or straight from the
 ## Development
 
 ```bash
-uv run pytest -q                          # 390 tests
+uv run pytest -q                          # 395 tests
 uv run ruff check . && uv run ruff format --check .
 uv run mypy                               # type check
 npm --prefix frontend run check           # tsc + eslint
-npm --prefix frontend test -- --run       # 236 tests
+npm --prefix frontend test -- --run       # 315 tests
 ```
 
 CI (`.github/workflows/ci.yml`) runs exactly these. No test talks to the network, to `claude` or
