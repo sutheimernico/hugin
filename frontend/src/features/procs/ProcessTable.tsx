@@ -68,13 +68,20 @@ export function ProcessTable({
           </p>
         </div>
       ) : (
-        <table className="w-full border-collapse text-[13px]">
+        <table className="w-full table-fixed border-collapse text-[13px]">
+          {/* Fixed columns: the agent cell truncates instead of pushing the kill switch out. */}
+          <colgroup>
+            <col />
+            <col className="w-16" />
+            <col className="w-14" />
+            <col className="w-10" />
+          </colgroup>
           <thead>
             <tr>
               <th className={`${HEAD} pl-4 text-left`}>Agent</th>
               <th className={`${HEAD} text-right`}>Tokens</th>
               <th className={`${HEAD} text-right`}>Zeit</th>
-              <th className={`${HEAD} pr-3`}>
+              <th className={`${HEAD} pr-2`}>
                 <span className="sr-only">Beenden</span>
               </th>
             </tr>
@@ -132,10 +139,10 @@ const ProcessRow = memo(function ProcessRow({ proc, end, selected, onSelect, onK
     >
       {/* `ROLE_LABEL` is keyed by program name; the kernel's own `role` is English prose
           and only stands in for a program the shell does not know. */}
-      <td className="py-2 pr-1 pl-4" title={`${ROLE_LABEL[proc.program] ?? proc.role} — ${proc.task}`}>
+      <td className="overflow-hidden py-2 pr-1 pl-4" title={`${ROLE_LABEL[proc.program] ?? proc.role} — ${proc.task}`}>
         <span className="flex items-center gap-2.5">
           <StateRing state={proc.state} size={12} />
-          <span className="min-w-0">
+          <span className="min-w-0 flex-1">
             <span className="flex items-baseline gap-1.5">
               <span className="font-display truncate text-[16px] leading-5 font-semibold text-text">
                 {ROLE_LABEL[proc.program] ?? proc.role}
@@ -157,7 +164,7 @@ const ProcessRow = memo(function ProcessRow({ proc, end, selected, onSelect, onK
       <td className="px-1.5 text-right font-mono text-[12px] whitespace-nowrap text-muted tabular-nums">
         {elapsed(proc, end)}
       </td>
-      <td className="py-1.5 pr-3 text-right">
+      <td className="py-1.5 pr-2 text-right">
         {living && (
           <button
             type="button"

@@ -76,11 +76,11 @@ export function TopBar({
       <div className="ml-auto flex shrink-0 items-center gap-2 sm:gap-5">
         {/* One fixed width per meter, so a longer readout can never push into its neighbour.
             They give up a quarter of their width below 1500 px so the buttons never leave. */}
-        <div className="hidden items-center gap-6 min-[1100px]:flex">
-          <div className="w-28 shrink-0 min-[1500px]:w-36">
+        <div className="hidden items-center gap-6 min-[1280px]:flex">
+          <div className="w-32 shrink-0 min-[1500px]:w-36">
             <Meter label="Prozesse" value={meters.activeProcs} max={PROC_SCALE} tone="blue" />
           </div>
-          <div className="w-28 shrink-0 min-[1500px]:w-36">
+          <div className="w-32 shrink-0 min-[1500px]:w-36">
             <Meter
               label="Tokens/min"
               value={meters.tokensPerMin}
@@ -89,7 +89,7 @@ export function TopBar({
               format={fmtTokens}
             />
           </div>
-          <div className="w-28 shrink-0 min-[1500px]:w-36">
+          <div className="w-32 shrink-0 min-[1500px]:w-36">
             <Meter
               label="Budget"
               value={Math.round(meters.budgetPct * 100)}

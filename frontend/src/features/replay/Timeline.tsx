@@ -45,7 +45,8 @@ export function Timeline() {
   const fraction = fractionOfSeq(events, cursorSeq);
 
   return (
-    <footer className="flex h-14 items-center gap-3 border-t border-text/25 bg-surface px-4">
+    // Two rows on a phone — controls, then the track at full width — one row from 720 px.
+    <footer className="flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-text/25 bg-surface px-4 py-2.5 min-[720px]:h-14 min-[720px]:flex-nowrap min-[720px]:py-0">
       <button
         type="button"
         aria-label={playing ? "Pause" : "Abspielen"}
@@ -65,9 +66,10 @@ export function Timeline() {
 
       <span
         data-testid="replay-time"
-        className="shrink-0 font-mono text-[11px] text-muted tabular-nums"
+        className="ml-auto shrink-0 font-mono text-[11px] text-muted tabular-nums min-[720px]:ml-0"
       >
-        {fmtDuration(elapsed)} / {fmtDuration(total)}
+        {fmtDuration(elapsed)}
+        <span className="hidden min-[480px]:inline"> / {fmtDuration(total)}</span>
       </span>
 
       <span className="hidden min-w-0 max-w-56 text-[12px] leading-tight text-muted lg:inline">
@@ -75,7 +77,7 @@ export function Timeline() {
       </span>
 
       <Button variant="ghost" size="sm" className="shrink-0" onClick={exitReplay}>
-        Beenden <Kbd>Esc</Kbd>
+        Beenden <span className="hidden min-[720px]:inline-flex"><Kbd>Esc</Kbd></span>
       </Button>
     </footer>
   );
@@ -115,7 +117,7 @@ function Track({
   onSeek: (seq: number) => void;
 }) {
   return (
-    <div className="relative h-6 min-w-0 flex-1">
+    <div className="relative order-last h-6 w-full min-w-0 min-[720px]:order-none min-[720px]:w-auto min-[720px]:flex-1">
       <div className="pointer-events-none absolute top-1/2 right-0 left-0 h-px -translate-y-1/2 bg-border" />
       <div
         className="pointer-events-none absolute top-1/2 left-0 h-px -translate-y-1/2 bg-blue"
