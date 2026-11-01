@@ -56,15 +56,15 @@ function renderTable(over: Partial<Parameters<typeof ProcessTable>[0]> = {}) {
 }
 
 describe("ProcessTable", () => {
-  it("renders one row per process with program, German state, turns, tokens and elapsed time", () => {
+  it("renders one row per process with its German role, state, tokens and elapsed time", () => {
     renderTable();
     const rows = screen.getAllByTestId("proc-row");
     expect(rows).toHaveLength(2);
-    expect(rows[0]).toHaveTextContent("planner");
+    expect(rows[0]).toHaveTextContent("Planer");
     expect(rows[0]).toHaveTextContent("Läuft");
     expect(rows[0]).toHaveTextContent("1,2k");
     expect(rows[0]).toHaveTextContent("0:42");
-    expect(rows[1]).toHaveTextContent("scout");
+    expect(rows[1]).toHaveTextContent("Späher");
     expect(rows[1]).toHaveTextContent("Fertig");
   });
 
@@ -102,7 +102,7 @@ describe("ProcessTable", () => {
   it("counts what the filter shows and toggles the scope", async () => {
     const { onShowAllChange } = renderTable();
     // One of the two processes is still alive — the header count follows the rows on screen.
-    expect(screen.getByText("1/2")).toBeInTheDocument();
+    expect(screen.getByText("1 von 2 aktiv")).toBeInTheDocument();
 
     const toggle = screen.getByRole("switch", { name: "Alle" });
     expect(toggle).toHaveAttribute("aria-checked", "false");

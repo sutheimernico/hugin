@@ -4,10 +4,10 @@ import { Fragment, type ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { MODE_LABEL } from "../../lib/i18n";
 import type { View } from "../../state/store";
-import type { LogLine, Meters, Mode, Run } from "../../state/types";
-import { KernelLog } from "../log/KernelLog";
+import type { LogLine, Meters, Mode, Proc, Run } from "../../state/types";
+import { Timetable } from "../log/Timetable";
 import { Layout } from "./Layout";
-import { MissionBar } from "./MissionBar";
+import { MissionLedger } from "./MissionLedger";
 import { ModeChip } from "./ModeChip";
 import { TopBar } from "./TopBar";
 
@@ -104,6 +104,14 @@ describe("TopBar", () => {
     expect(screen.getByText("⌘K").tagName).toBe("KBD");
   });
 
+  it("leaves out the controls of a kernel the Pages build does not have", () => {
+    renderTopBar({ replayOnly: true });
+    expect(screen.queryByRole("button", { name: "Panik" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Befehle öffnen" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Munin" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Runs" })).toBeInTheDocument();
+  });
+
   it("offers the three views and marks the active one", () => {
     renderTopBar({ view: "munin" });
     expect(screen.getByRole("button", { name: "Mission Control" })).not.toHaveAttribute(
@@ -151,103 +159,99 @@ describe("TopBar", () => {
   });
 });
 
-describe("MissionBar", () => {
-  it("points at the palette while no mission exists", () => {
-    render(<MissionBar run={undefined} now={1_000} />);
-    expect(screen.getByText(/Keine aktive Mission/)).toBeInTheDocument();
-  });
+describe("MissionLedger", () => {
+  const procs = [
+    { runId: "r1", state: "running", budgetPct: 0.4, usage: { turns: 3, output_tokens: 1_200 } },
+    { runId: "r1", state: "done", budgetPct: 1, usage: { turns: 2, output_tokens: 300 } },
+  ] as unknown as Proc[];
 
-  it("shows goal, running time and state of the mission", () => {
-    render(<MissionBar run={makeRun()} now={1_063} />);
-    expect(screen.getByText("Vergleiche drei Ansätze")).toBeInTheDocument();
+  it("shows the goal as the headline with running time, turns, tokens and agents", () => {
+    render(<MissionLedger run={makeRun()} procs={procs} now={1_063} replaying={false} />);
+    expect(screen.getByRole("heading", { name: "Vergleiche drei Ansätze" })).toBeInTheDocument();
     expect(screen.getByText("1:03")).toBeInTheDocument();
     expect(screen.getByText("Läuft")).toBeInTheDocument();
+    expect(screen.getByText("1,5k")).toBeInTheDocument();
+    expect(screen.getByText("/2")).toBeInTheDocument();
+    expect(screen.getByText("40 %")).toBeInTheDocument();
   });
 
   it("says that a simulated mission plays a fixed script", () => {
-    render(<MissionBar run={makeRun({ driver: "scripted" })} now={1_063} />);
+    render(<MissionLedger run={makeRun({ driver: "scripted" })} procs={[]} now={1_063} replaying={false} />);
     expect(screen.getByText(/Simulation: feste Beispiel-Mission/)).toBeInTheDocument();
   });
 
-  it("does not claim a script for a live driver", () => {
-    render(<MissionBar run={makeRun({ driver: "claude" })} now={1_063} />);
+  it("does not claim a script for a live driver or for a replay", () => {
+    const { rerender } = render(
+      <MissionLedger run={makeRun({ driver: "claude" })} procs={[]} now={1_063} replaying={false} />,
+    );
     expect(screen.queryByText(/Simulation: feste/)).not.toBeInTheDocument();
+    rerender(<MissionLedger run={makeRun({ driver: "scripted" })} procs={[]} now={1_063} replaying />);
+    expect(screen.queryByText(/Simulation: feste/)).not.toBeInTheDocument();
+    expect(screen.getByText(/Aufgezeichnet/)).toBeInTheDocument();
   });
 
   it("freezes the running time of a finished mission at its end", () => {
-    render(<MissionBar run={makeRun({ state: "done", doneAt: 1_030 })} now={9_999} />);
+    render(
+      <MissionLedger run={makeRun({ state: "done", doneAt: 1_030 })} procs={[]} now={9_999} replaying={false} />,
+    );
     expect(screen.getByText("0:30")).toBeInTheDocument();
     expect(screen.getByText("Fertig")).toBeInTheDocument();
   });
+
+  it("names the program instead of the kernel's goal prefix", () => {
+    render(
+      <MissionLedger run={makeRun({ goal: "program:scout Finde etwas" })} procs={[]} now={1_063} replaying={false} />,
+    );
+    expect(screen.getByRole("heading", { name: "Späher: Finde etwas" })).toBeInTheDocument();
+  });
 });
 
-describe("KernelLog", () => {
+describe("Timetable", () => {
   const lines: LogLine[] = [
-    {
-      seq: 1,
-      ts: 1_757_000_000,
-      kind: "run.created",
-      pid: null,
-      text: "Mission gestartet: »Ziel«",
-    },
-    {
-      seq: 2,
-      ts: 1_757_000_001,
-      kind: "proc.spawned",
-      pid: 7,
-      text: "Prozess 7 (scout) gestartet",
-    },
-    {
-      seq: 3,
-      ts: 1_757_000_002,
-      kind: "munin.write",
-      pid: 7,
-      text: "Speicher: »Fund«",
-    },
+    { seq: 1, ts: 1_757_000_000, kind: "run.created", pid: null, text: "Mission gestartet: »Ziel«" },
+    { seq: 2, ts: 1_757_000_042, kind: "proc.spawned", pid: 7, text: "Prozess 7 (scout) gestartet" },
+    { seq: 3, ts: 1_757_000_043, kind: "munin.write", pid: 7, text: "Speicher: »Fund«" },
   ];
 
-  it("renders every line with its pid and text", () => {
-    render(<KernelLog lines={lines} />);
+  it("renders every line with its pid, its departure time and its text", () => {
+    render(<Timetable lines={lines} origin={1_757_000_000} />);
     expect(screen.getAllByTestId("log-line")).toHaveLength(3);
     expect(screen.getByText("Prozess 7 (scout) gestartet")).toBeInTheDocument();
-    expect(screen.getAllByText("[7]")).toHaveLength(2);
+    expect(screen.getAllByText("7")).toHaveLength(2);
+    // Counted from the start of the mission, not from the wall clock.
+    expect(screen.getByText("0:42")).toBeInTheDocument();
   });
 
-  it("colours a line by its event family", () => {
-    render(<KernelLog lines={lines} />);
-    const [runLine, procLine, muninLine] = screen.getAllByTestId("log-line");
-    expect(runLine).toHaveClass("text-text");
-    expect(procLine).toHaveClass("text-blue");
-    expect(muninLine).toHaveClass("text-green");
+  it("drops what happened before the mission began", () => {
+    render(<Timetable lines={lines} origin={1_757_000_042} />);
+    expect(screen.getAllByTestId("log-line")).toHaveLength(2);
+  });
+
+  it("tags a line with its event kind", () => {
+    render(<Timetable lines={lines} origin={null} />);
+    expect(screen.getAllByTestId("log-line").map((row) => row.dataset.kind)).toEqual([
+      "run.created",
+      "proc.spawned",
+      "munin.write",
+    ]);
   });
 
   it("says that the kernel is waiting when nothing happened yet", () => {
-    render(<KernelLog lines={[]} />);
+    render(<Timetable lines={[]} origin={null} />);
     expect(screen.getByText("Kernel bereit — warte auf Ereignisse")).toBeInTheDocument();
     expect(screen.queryAllByTestId("log-line")).toHaveLength(0);
   });
 });
 
 describe("Layout", () => {
-  it("renders every slot of the mission control frame", () => {
+  it("renders the frame's rows: bar, working area, timeline and navigation", () => {
     render(
-      <Layout
-        topBar={<span>oben</span>}
-        left={<span>links</span>}
-        center={<span>mitte</span>}
-        right={<span>rechts</span>}
-        bottom={<span>unten</span>}
-      />,
+      <Layout topBar={<span>oben</span>} bottom={<span>unten</span>} nav={<span>nav</span>}>
+        <span>mitte</span>
+      </Layout>,
     );
-    for (const slot of ["oben", "links", "mitte", "rechts", "unten"]) {
+    for (const slot of ["oben", "mitte", "unten", "nav"]) {
       expect(screen.getByText(slot)).toBeInTheDocument();
     }
-  });
-
-  it("gives a single view the whole middle row instead of the columns", () => {
-    render(
-      <Layout topBar={<span>oben</span>} main={<span>alles</span>} bottom={<span>unten</span>} />,
-    );
-    expect(screen.getByText("alles")).toBeInTheDocument();
   });
 });

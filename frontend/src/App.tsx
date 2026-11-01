@@ -1,26 +1,41 @@
-import { AnimatePresence, MotionConfig } from "motion/react";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Panel } from "./components/Panel";
+import { MotionConfig } from "motion/react";
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { BottomNav } from "./components/BottomNav";
 import { Toast, type ToastMessage, type ToastTone } from "./components/Toast";
-import { AgentWindow } from "./features/agent/AgentWindow";
-import { BootScreen } from "./features/boot/BootScreen";
 import { hasBooted, markBooted } from "./features/boot/sequence";
-import { AgentGraph } from "./features/graph/AgentGraph";
-import { KernelLog } from "./features/log/KernelLog";
-import { MuninBrowser } from "./features/munin/MuninBrowser";
-import { CommandPalette } from "./features/palette/CommandPalette";
-import { ProcessTable } from "./features/procs/ProcessTable";
 import { tsAtSeq } from "./features/replay/replayMath";
-import { RunsView } from "./features/replay/RunsView";
 import { Timeline } from "./features/replay/Timeline";
+import { useShowcaseReplay } from "./features/replay/useShowcaseReplay";
+import { ControlView } from "./features/shell/ControlView";
 import { Layout } from "./features/shell/Layout";
-import { MissionBar } from "./features/shell/MissionBar";
+import { MoreSheet } from "./features/shell/MoreSheet";
 import { TopBar } from "./features/shell/TopBar";
+import { useBreakpoint } from "./hooks/useBreakpoint";
 import { getSystem, killAll, killProc } from "./lib/api";
 import { connectEvents } from "./lib/sse";
-import { selectMode, selectProcs } from "./state/selectors";
+import { selectMode } from "./state/selectors";
 import type { HEvent, SystemStatus } from "./state/types";
 import { selectVisibleState, useHuginStore } from "./state/store";
+
+// Everything below the first screen is its own chunk: the other two views, the command palette
+// and the boot overlay load when they are first needed (the palette right after first paint).
+const MuninBrowser = lazy(() =>
+  import("./features/munin/MuninBrowser").then((module) => ({ default: module.MuninBrowser })),
+);
+const RunsView = lazy(() =>
+  import("./features/replay/RunsView").then((module) => ({ default: module.RunsView })),
+);
+const CommandPalette = lazy(() =>
+  import("./features/palette/CommandPalette").then((module) => ({
+    default: module.CommandPalette,
+  })),
+);
+const BootScreen = lazy(() =>
+  import("./features/boot/BootScreen").then((module) => ({ default: module.BootScreen })),
+);
+
+/** The Pages build replays recordings: no kernel, no stream, no boot sequence. */
+const REPLAY_ONLY = __REPLAY_ONLY__;
 
 /** How often the shell re-asks `/api/system` while the tab is visible. */
 const SYSTEM_POLL_MS = 30_000;
@@ -37,16 +52,22 @@ export default function App() {
   const setView = useHuginStore((store) => store.setView);
   const dispatch = useHuginStore((store) => store.dispatch);
 
+  const pane = useHuginStore((store) => store.pane);
+  const setPane = useHuginStore((store) => store.setPane);
+  const layout = useBreakpoint();
+  const [moreOpen, setMoreOpen] = useState(false);
+
   const setSystem = useHuginStore((store) => store.setSystem);
   const allProcs = useHuginStore((store) => store.allProcs);
   const setAllProcs = useHuginStore((store) => store.setAllProcs);
 
-  useEventStream(dispatch);
-  useSystemStatus(setSystem);
+  useEventStream(dispatch, !REPLAY_ONLY);
+  useSystemStatus(setSystem, !REPLAY_ONLY);
+  useShowcaseReplay(REPLAY_ONLY);
 
   // Once per browser session, and never in the way: the stream above is already connected
   // while the overlay is still counting subsystems.
-  const [booted, setBooted] = useState(hasBooted);
+  const [booted, setBooted] = useState(() => REPLAY_ONLY || hasBooted());
   const finishBoot = useCallback(() => {
     markBooted();
     setBooted(true);
@@ -99,10 +120,9 @@ export default function App() {
   }, []);
   const closeAgent = useCallback(() => setSelectedPid(null), [setSelectedPid]);
 
-  // A selection survives its process, but not a reload of the run: an unknown pid selects nothing.
-  const selected = selectedPid === null ? undefined : visible.procs[selectedPid];
-  // Mission control is the only view built from columns; the others take the whole middle row.
   const control = view === "control";
+  const openMore = useCallback(() => setMoreOpen(true), []);
+  const closeMore = useCallback(() => setMoreOpen(false), []);
 
   return (
     // `motion` animates through the Web Animations API, which the global CSS override in
@@ -114,78 +134,81 @@ export default function App() {
             mode={mode}
             meters={visible.meters}
             view={view}
+            layout={layout}
+            replayOnly={REPLAY_ONLY}
             onViewChange={setView}
             onKillAll={onKillAll}
             onOpenPalette={openPalette}
           />
         }
-        main={control ? undefined : view === "munin" ? <MuninBrowser /> : <RunsView />}
-        left={
-          control ? (
-            <ProcessTable
-              // Scoped to the mission on screen by default; the kernel log stays global.
-              procs={selectProcs(visible, allProcs ? null : visible.activeRunId)}
-              now={now}
-              selectedPid={selectedPid}
-              onSelect={setSelectedPid}
-              onKill={onKill}
-              showAll={allProcs}
-              onShowAllChange={setAllProcs}
+        bottom={mode === "replay" ? <Timeline /> : undefined}
+        nav={
+          layout === "mobile" ? (
+            <BottomNav
+              active={control ? pane : "more"}
+              onPane={setPane}
+              onMore={openMore}
             />
           ) : undefined
         }
-        center={
-          control ? (
-            <Panel title="Graph" className="h-full" bodyClassName="min-h-0 p-0">
-              <AgentGraph
-                state={visible}
-                runId={visible.activeRunId}
-                selectedPid={selectedPid}
-                onSelect={setSelectedPid}
-                panicking={panicking}
-              />
-            </Panel>
-          ) : undefined
-        }
-        right={
-          // The sheet overlays the log rather than unmounting it, so the ticker keeps its scroll
-          // position — and its exit animation has something to slide away from.
-          control ? (
-            <div className="relative h-full">
-              <KernelLog lines={visible.log} />
-              <AnimatePresence>
-                {selected !== undefined && (
-                  <AgentWindow
-                    key={selected.pid}
-                    proc={selected}
-                    now={now}
-                    onClose={closeAgent}
-                    onKill={onKill}
-                  />
-                )}
-              </AnimatePresence>
-            </div>
-          ) : undefined
-        }
-        bottom={mode === "replay" ? <Timeline /> : <MissionBar run={run} now={now} />}
-      />
-      <CommandPalette
-        open={paletteOpen}
-        onOpen={openPalette}
-        onClose={closePalette}
-        onToast={showToast}
-      />
+      >
+        <Suspense fallback={null}>
+          {control ? (
+            <ControlView
+              layout={layout}
+              pane={pane}
+              visible={visible}
+              run={run}
+              now={now}
+              replaying={mode === "replay"}
+              selectedPid={selectedPid}
+              onSelect={setSelectedPid}
+              onKill={onKill}
+              onCloseAgent={closeAgent}
+              allProcs={allProcs}
+              onShowAllChange={setAllProcs}
+              panicking={panicking}
+              onOpenPalette={REPLAY_ONLY ? undefined : openPalette}
+            />
+          ) : view === "munin" ? (
+            <MuninBrowser />
+          ) : (
+            <RunsView />
+          )}
+        </Suspense>
+      </Layout>
+      {layout === "mobile" && (
+        <MoreSheet
+          open={moreOpen}
+          replayOnly={REPLAY_ONLY}
+          onClose={closeMore}
+          onView={setView}
+          onOpenPalette={openPalette}
+          onKillAll={onKillAll}
+        />
+      )}
+      <Suspense fallback={null}>
+        {!REPLAY_ONLY && (
+          <CommandPalette
+            open={paletteOpen}
+            onOpen={openPalette}
+            onClose={closePalette}
+            onToast={showToast}
+          />
+        )}
+        {!booted && <BootScreen onDone={finishBoot} />}
+      </Suspense>
       <Toast toast={toast} onDone={clearToast} />
-      {!booted && <BootScreen onDone={finishBoot} />}
     </MotionConfig>
   );
 }
 
 /** One stream for the whole shell, opened once and closed on unmount. */
-function useEventStream(dispatch: (events: HEvent[]) => void): void {
+function useEventStream(dispatch: (events: HEvent[]) => void, enabled: boolean): void {
   const connected = useRef(false);
 
   useEffect(() => {
+    if (!enabled) return;
     // StrictMode mounts every effect twice in development. Without this guard the second mount
     // would open a second EventSource and every event would arrive — and animate — twice.
     if (connected.current) return;
@@ -202,7 +225,7 @@ function useEventStream(dispatch: (events: HEvent[]) => void): void {
       connected.current = false;
       disconnect();
     };
-  }, [dispatch]);
+  }, [dispatch, enabled]);
 }
 
 /**
@@ -210,8 +233,9 @@ function useEventStream(dispatch: (events: HEvent[]) => void): void {
  * on every start — the boot screen may be skipped, the gate may not be. A failed refresh keeps
  * the previous answer: not reaching the kernel is not the same as learning that a driver died.
  */
-function useSystemStatus(setSystem: (system: SystemStatus) => void): void {
+function useSystemStatus(setSystem: (system: SystemStatus) => void, enabled: boolean): void {
   useEffect(() => {
+    if (!enabled) return;
     let live = true;
     const load = () => {
       void getSystem()
@@ -229,7 +253,7 @@ function useSystemStatus(setSystem: (system: SystemStatus) => void): void {
       live = false;
       window.clearInterval(timer);
     };
-  }, [setSystem]);
+  }, [setSystem, enabled]);
 }
 
 /** Seconds since the epoch, ticking once a second — but only while something can move. */

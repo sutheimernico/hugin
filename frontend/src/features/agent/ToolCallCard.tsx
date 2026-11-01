@@ -6,6 +6,7 @@
 
 import { motion } from "motion/react";
 import { memo, useState } from "react";
+import { toolLabel } from "../../lib/describe";
 import type { TranscriptItem } from "../../state/types";
 
 export type ToolItem = Extract<TranscriptItem, { t: "tool" }>;
@@ -16,18 +17,20 @@ export const ToolCallCard = memo(function ToolCallCard({ call }: { call: ToolIte
   const pending = call.ok === undefined;
 
   return (
-    <div className="px-3 py-0.5">
+    <div className="px-4 py-0.5">
       <button
         type="button"
         aria-expanded={open}
         onClick={() => setOpen((was) => !was)}
-        className="ease-out-expo flex w-full items-center gap-2 rounded border border-border/60 bg-surface-2/60 px-2 py-1 text-left font-mono text-[11px] leading-4 transition-colors duration-150 hover:border-border hover:bg-surface-2"
+        className="ease-out-expo flex w-full items-center gap-2 rounded-part border border-border bg-surface-2 px-2.5 py-1.5 text-left text-[13px] leading-4 transition-colors duration-150 hover:border-text/40"
       >
         {/* Syscalls are the kernel's own surface (teal); a program's tools stay muted. */}
         <span className={call.sys ? "shrink-0 text-teal" : "shrink-0 text-muted"}>
-          {call.sys ? "[sys]" : "[tool]"}
+          {call.sys ? "System" : "Werkzeug"}
         </span>
-        <span className="min-w-0 flex-1 truncate text-text">{call.tool}</span>
+        <span className="min-w-0 flex-1 truncate font-medium text-text" title={call.tool}>
+          {toolLabel(call.tool)}
+        </span>
         {pending ? (
           <motion.span
             data-testid="tool-pending"
@@ -38,7 +41,7 @@ export const ToolCallCard = memo(function ToolCallCard({ call }: { call: ToolIte
           />
         ) : (
           <>
-            <span className="shrink-0 text-muted tabular-nums">{call.ms ?? 0} ms</span>
+            <span className="shrink-0 font-mono text-[11px] text-muted tabular-nums">{call.ms ?? 0} ms</span>
             <span className={call.ok ? "shrink-0 text-green" : "shrink-0 text-red"}>
               {call.ok ? "✓" : "✗"}
             </span>
@@ -47,7 +50,7 @@ export const ToolCallCard = memo(function ToolCallCard({ call }: { call: ToolIte
       </button>
 
       {open && (
-        <div className="mt-1 flex flex-col gap-2 rounded border border-border/60 bg-base/60 p-2">
+        <div className="mt-1 flex flex-col gap-2 rounded-part border border-border bg-base/60 p-2">
           <Field label="Eingabe" value={call.input} />
           <Field label="Ausgabe" value={call.output} />
         </div>
@@ -59,7 +62,7 @@ export const ToolCallCard = memo(function ToolCallCard({ call }: { call: ToolIte
 function Field({ label, value }: { label: string; value?: string }) {
   return (
     <div className="flex flex-col gap-0.5">
-      <span className="text-[10px] tracking-[0.12em] text-muted uppercase">{label}</span>
+      <span className="text-[12px] font-medium text-muted">{label}</span>
       {value === undefined ? (
         <span className="text-[11px] text-muted/70 italic">Noch kein Ergebnis</span>
       ) : (

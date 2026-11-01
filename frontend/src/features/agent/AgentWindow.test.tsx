@@ -89,9 +89,8 @@ function renderWindow(over: Partial<Parameters<typeof AgentWindow>[0]> = {}) {
 describe("AgentWindow", () => {
   it("names the agent: program, German role, pid, state, model and driver", () => {
     renderWindow();
-    expect(screen.getByText("scout")).toBeInTheDocument();
     expect(screen.getByText("Späher")).toBeInTheDocument();
-    expect(screen.getByText("PID 2")).toBeInTheDocument();
+    expect(screen.getByText("scout · PID 2")).toBeInTheDocument();
     expect(screen.getByText("Läuft")).toBeInTheDocument();
     expect(screen.getByText("sim-1")).toBeInTheDocument();
     expect(screen.getByText("Simulation")).toBeInTheDocument();

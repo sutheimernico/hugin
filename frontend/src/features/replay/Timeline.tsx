@@ -45,7 +45,7 @@ export function Timeline() {
   const fraction = fractionOfSeq(events, cursorSeq);
 
   return (
-    <footer className="flex h-14 items-center gap-3 border-t border-border bg-surface/60 px-4">
+    <footer className="flex h-14 items-center gap-3 border-t border-text/25 bg-surface px-4">
       <button
         type="button"
         aria-label={playing ? "Pause" : "Abspielen"}

@@ -17,7 +17,7 @@ const MODE_TONE: Record<Mode, Tone> = {
 
 export function ModeChip({ mode }: { mode: Mode }) {
   return (
-    <Chip tone={MODE_TONE[mode]} pulse={mode !== "idle"} className="font-mono tracking-[0.14em]">
+    <Chip tone={MODE_TONE[mode]} pulse={mode !== "idle"} className="tracking-[0.08em]">
       {MODE_LABEL[mode]}
     </Chip>
   );

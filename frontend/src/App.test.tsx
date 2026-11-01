@@ -19,8 +19,9 @@ const SYSTEM: SystemStatus = {
 };
 
 /** The shell asks `/api/system` on every start; no test is allowed near the network. */
-function fakeFetch(): Response {
-  return new Response(JSON.stringify(SYSTEM), {
+function fakeFetch(url: string): Response {
+  const body = url.startsWith("/api/recordings") ? [] : SYSTEM;
+  return new Response(JSON.stringify(body), {
     status: 200,
     headers: { "Content-Type": "application/json" },
   });
@@ -33,7 +34,7 @@ async function settle(): Promise<void> {
 
 beforeAll(() => {
   vi.stubGlobal("EventSource", FakeEventSource);
-  vi.stubGlobal("fetch", vi.fn(async () => fakeFetch()));
+  vi.stubGlobal("fetch", vi.fn(async (url: string) => fakeFetch(url)));
 });
 
 beforeEach(() => {
@@ -56,10 +57,10 @@ describe("App", () => {
 
   it("shows the designed empty states of an idle shell", async () => {
     render(<App />);
-    // Scoped to the active run by default, and an idle shell has none.
-    expect(screen.getByText("Kein laufender Auftrag")).toBeInTheDocument();
-    expect(screen.getByText("Kernel bereit — warte auf Ereignisse")).toBeInTheDocument();
-    expect(screen.getByText(/Keine aktive Mission/)).toBeInTheDocument();
+    // An idle shell has no mission: one stage with the way to start one, not three empty panels.
+    expect(screen.getByRole("heading", { name: "Gleis frei." })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Mission starten/ })).toBeInTheDocument();
+    expect(await screen.findByText(/Noch keine Aufzeichnungen/)).toBeInTheDocument();
     await settle();
   });
 
@@ -91,6 +92,6 @@ describe("App", () => {
     render(<App />);
     await settle();
 
-    expect(screen.getByRole("status", { name: "Startsequenz" })).toBeInTheDocument();
+    expect(await screen.findByRole("status", { name: "Startsequenz" })).toBeInTheDocument();
   });
 });
