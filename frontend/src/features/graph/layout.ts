@@ -11,13 +11,13 @@ import { Graph, layout } from "@dagrejs/dagre";
 import type { State } from "../../state/types";
 
 /** Card size of an agent node — dagre reserves exactly this, so edges meet the cards. */
-export const NODE_W = 236;
+export const NODE_W = 224;
 export const NODE_H = 100;
 /** The memory hub is a station of the same height as a card. */
-export const HUB_W = 120;
+export const HUB_W = 124;
 export const HUB_H = NODE_H;
 /** Horizontal air between the last rank of the tree and the hub. */
-const HUB_GAP = 72;
+const HUB_GAP = 48;
 
 export const MUNIN_ID = "munin";
 
@@ -99,7 +99,7 @@ export function buildGraph(state: State, runId: string | null): { nodes: GNode[]
 
   const known = new Set(procs.map((proc) => proc.pid));
   const graph = new Graph();
-  graph.setGraph({ rankdir: "LR", nodesep: 26, ranksep: 84 });
+  graph.setGraph({ rankdir: "LR", nodesep: 26, ranksep: 64 });
   graph.setDefaultEdgeLabel(() => ({}));
 
   const edges: GEdge[] = [];

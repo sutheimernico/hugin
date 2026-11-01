@@ -32,12 +32,12 @@ export function MuninNode({ data }: NodeProps<MuninNodeType>) {
       initial={{ scale: 0.6, opacity: 0 }}
       animate={controls}
       style={{ width: HUB_W, height: HUB_H }}
-      className="flex flex-col items-start justify-center rounded-part border-[1.5px] border-green bg-surface px-3"
+      className="flex flex-col items-start justify-center rounded-part border-[1.5px] border-green bg-surface px-2.5"
     >
       <Handle type="target" position={Position.Left} id={HANDLE_IN} className="!opacity-0" />
       <span className="flex items-center gap-1.5 text-green">
         <Database size={16} strokeWidth={2} aria-hidden />
-        <span className="font-display text-[20px] leading-6 font-semibold text-text">Speicher</span>
+        <span className="font-display text-[19px] leading-6 font-semibold text-text">Speicher</span>
       </span>
       <span className="font-mono text-[11px] leading-4 text-muted">munin</span>
       <span className="mt-1 flex items-baseline gap-1.5">

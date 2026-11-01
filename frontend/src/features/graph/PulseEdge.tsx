@@ -95,7 +95,17 @@ function Train({ pulse, path }: { pulse: EdgePulse; path: string }) {
   const dur = `${PARTICLE_S}s`;
 
   return (
-    <rect x={-9} y={-4} width={18} height={8} rx={2.5} style={{ fill: TRAIN_COLOR[pulse.kind] }}>
+    // Hidden until the animation starts: before `beginElement()` a SMIL element sits at the
+    // origin of the edge's coordinate system, which would show a stray train in the corner.
+    <rect
+      x={-9}
+      y={-4}
+      width={18}
+      height={8}
+      rx={2.5}
+      opacity={0}
+      style={{ fill: TRAIN_COLOR[pulse.kind] }}
+    >
       <animateMotion
         id={motionId}
         ref={start}

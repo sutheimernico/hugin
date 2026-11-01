@@ -67,7 +67,7 @@ export function OccupancyChart({ run, procs, now }: OccupancyChartProps) {
             {ticks.map((tick) => (
               <span
                 key={tick.at}
-                className="absolute top-0 text-[11px] text-muted tabular-nums"
+                className="absolute top-0 text-[11px] whitespace-nowrap text-muted tabular-nums"
                 style={{
                   left: `${tick.fraction * 100}%`,
                   transform: tick.fraction > 0.95 ? "translateX(-100%)" : undefined,

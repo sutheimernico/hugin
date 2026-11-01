@@ -76,3 +76,23 @@ abgeben" and so on (`lib/i18n.ts`, `features/log/describe.ts`).
 `VITE_REPLAY_ONLY=1` builds the same shell with a recording player instead of the SSE source
 and the HTTP API. It is deployed to GitHub Pages and labelled "Replay einer aufgezeichneten
 Mission" in the UI.
+
+## Outcome
+
+Built as designed, with these deliberate differences from the plan above:
+
+- **Occupancy plan.** The diagram alone left the middle of a wide screen half empty and said
+  nothing about time. Under it sits a time-distance chart (a *Bildfahrplan*): one row per agent,
+  a bar from start to exit, a cursor at "now". It is computed in `features/graph/occupancy.ts`.
+- **Navigation.** Wide layouts keep the three view tabs; the phone layout has the four-item bottom
+  bar (Mission, Verlauf, Prozesse, Mehr). "Mehr" holds Munin, Läufe, the palette and Panik.
+- **Idle stage.** An idle kernel shows one stage ("Gleis frei.") with a schematic of a typical
+  mission, every lamp dark, and the recordings as the way in, instead of three empty panels.
+- **Fixed diagram.** The graph always fits its sheet; there is no pan or zoom, so a page that
+  scrolls past it on a tablet is never held by it.
+- **Replay-only build.** `npm run build:pages` (`VITE_REPLAY_ONLY=1`), recordings copied next to
+  it by `frontend/scripts/pages-recordings.mjs`, deployed by `.github/workflows/pages.yml`. It
+  opens on the real Claude recording at 4x and has no Munin view (there is no memory store).
+- **Known weak spots.** Context in the agent window is measured from reported input tokens, which
+  only `proc.exit` delivers and which sum over turns, so it is clamped at 100 %. The trains are
+  SMIL and are simply not drawn under `prefers-reduced-motion`.

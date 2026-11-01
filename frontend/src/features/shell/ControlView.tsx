@@ -98,11 +98,15 @@ export function ControlView(props: ControlViewProps) {
           <>
             {ledger}
             <MobileTree procs={runProcs} selectedPid={selectedPid} onSelect={props.onSelect} />
-            {occupancy}
           </>
         )}
         {pane === "log" && <div className="h-full">{timetable}</div>}
-        {pane === "procs" && <div className="h-full">{table}</div>}
+        {pane === "procs" && (
+          <>
+            <div className="h-[min(60%,420px)] min-h-[260px]">{table}</div>
+            {occupancy}
+          </>
+        )}
         {agent}
       </div>
     );
@@ -132,7 +136,7 @@ export function ControlView(props: ControlViewProps) {
   }
 
   return (
-    <div className="grid h-full min-h-0 grid-cols-[minmax(300px,340px)_minmax(0,1fr)_minmax(320px,380px)]">
+    <div className="grid h-full min-h-0 grid-cols-[minmax(290px,320px)_minmax(0,1fr)_minmax(300px,360px)] min-[1440px]:grid-cols-[330px_minmax(0,1fr)_380px]">
       <div className="flex min-h-0 flex-col border-r border-text/20 bg-surface">
         {ledger}
         <div className="min-h-0 flex-1">{table}</div>

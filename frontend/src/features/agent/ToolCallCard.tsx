@@ -26,7 +26,7 @@ export const ToolCallCard = memo(function ToolCallCard({ call }: { call: ToolIte
       >
         {/* Syscalls are the kernel's own surface (teal); a program's tools stay muted. */}
         <span className={call.sys ? "shrink-0 text-teal" : "shrink-0 text-muted"}>
-          {call.sys ? "System" : "Werkzeug"}
+          {call.sys ? "Kernel" : "Aufruf"}
         </span>
         <span className="min-w-0 flex-1 truncate font-medium text-text" title={call.tool}>
           {toolLabel(call.tool)}
