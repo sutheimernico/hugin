@@ -62,8 +62,8 @@ describe("AgentGraph", () => {
   it("draws a card per agent and the memory hub", async () => {
     renderGraph(mission());
 
-    expect(await screen.findByText("planner")).toBeInTheDocument();
-    expect(screen.getByText("scout")).toBeInTheDocument();
+    expect(await screen.findByText("planner · PID 1")).toBeInTheDocument();
+    expect(screen.getByText("scout · PID 2")).toBeInTheDocument();
     expect(screen.getByText("munin")).toBeInTheDocument();
     // The German role labels sit under the program names.
     expect(screen.getByText("Planer")).toBeInTheDocument();
@@ -81,7 +81,7 @@ describe("AgentGraph", () => {
     const onSelect = renderGraph(mission());
     // A bare click, not a full pointer sequence: the mousedown would land in d3-zoom, which
     // has no viewport to drag in jsdom.
-    fireEvent.click(await screen.findByText("scout"));
+    fireEvent.click(await screen.findByText("Späher"));
     expect(onSelect).toHaveBeenCalledWith(2);
   });
 
@@ -102,41 +102,50 @@ describe("AgentGraph", () => {
     expect(screen.getByLabelText("scout · PID 2")).toBeInTheDocument();
   });
 
-  it("drops the glow when a process finishes", async () => {
+  it("shows what an agent is doing, in German, under its role", async () => {
+    renderGraph(mission());
+    await screen.findByText("Planer");
+    for (const node of screen.getAllByTestId("agent-node")) {
+      expect(node).toHaveTextContent("Läuft");
+    }
+  });
+
+  it("follows a process through its states, and stamps one that was stopped", async () => {
     const running = mission();
     const { rerender } = render(
       <div style={{ width: "800px", height: "600px" }}>
-        <AgentGraph
-          state={running}
-          runId={RUN}
-          selectedPid={null}
-          onSelect={vi.fn()}
-          panicking={false}
-        />
+        <AgentGraph state={running} runId={RUN} selectedPid={null} onSelect={vi.fn()} panicking={false} />
       </div>,
     );
-    const card = await screen.findByText("scout");
+    const card = await screen.findByText("Späher");
     const node = card.closest("[data-testid=agent-node]") as HTMLElement;
-    expect(node.style.boxShadow).not.toBe("none");
+    expect(node).toHaveAttribute("data-state", "running");
+    expect(screen.queryByText("KILL")).not.toBeInTheDocument();
 
-    const done: State = {
+    const killed: State = {
       ...running,
-      procs: { 1: running.procs[1], 2: { ...running.procs[2], state: "done" } },
+      procs: { 1: running.procs[1], 2: { ...running.procs[2], state: "killed" } },
     };
     rerender(
       <div style={{ width: "800px", height: "600px" }}>
-        <AgentGraph
-          state={done}
-          runId={RUN}
-          selectedPid={null}
-          onSelect={vi.fn()}
-          panicking={false}
-        />
+        <AgentGraph state={killed} runId={RUN} selectedPid={null} onSelect={vi.fn()} panicking={false} />
       </div>,
     );
 
-    // `motion` never removes a style it has written, so the quiet state must be spelled out.
-    await waitFor(() => expect(node.style.boxShadow).toBe("none"));
+    await waitFor(() => expect(node).toHaveAttribute("data-state", "killed"));
+    // The kill was watched live, so the amber TERM beat comes first and the red mark follows.
+    expect(screen.getByText("TERM")).toBeInTheDocument();
+    expect(screen.getByText("KILL")).toBeInTheDocument();
+  });
+
+  it("shows a card that mounts already stopped without the amber beat", async () => {
+    const state = mission();
+    renderGraph({
+      ...state,
+      procs: { 1: state.procs[1], 2: { ...state.procs[2], state: "killed" } },
+    });
+    expect(await screen.findByText("KILL")).toBeInTheDocument();
+    expect(screen.queryByText("TERM")).not.toBeInTheDocument();
   });
 
   it("desaturates the whole surface while a panic is propagating", () => {

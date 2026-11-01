@@ -1,8 +1,8 @@
 /**
  * The graph's geometry, kept free of React so it can be unit-tested on plain state.
  *
- * The process tree is laid out by dagre (top down: a parent sits above the children it
- * spawned). The munin hub is *not* part of that layout — it is shared memory, not a step in
+ * The process tree is laid out by dagre left to right, like track on a signal-box diagram: a
+ * parent sits to the left of the children it spawned. The munin hub is *not* part of that layout — it is shared memory, not a step in
  * the tree, and letting dagre rank it would drag every writer onto its own row. It is placed
  * beside the tree instead, at the height of its middle.
  */
@@ -11,12 +11,13 @@ import { Graph, layout } from "@dagrejs/dagre";
 import type { State } from "../../state/types";
 
 /** Card size of an agent node — dagre reserves exactly this, so edges meet the cards. */
-export const NODE_W = 180;
-export const NODE_H = 64;
-/** Diameter of the memory hub. */
-export const HUB_SIZE = 72;
-/** Horizontal air between the widest rank of the tree and the hub. */
-const HUB_GAP = 96;
+export const NODE_W = 236;
+export const NODE_H = 100;
+/** The memory hub is a station of the same height as a card. */
+export const HUB_W = 120;
+export const HUB_H = NODE_H;
+/** Horizontal air between the last rank of the tree and the hub. */
+const HUB_GAP = 72;
 
 export const MUNIN_ID = "munin";
 
@@ -34,6 +35,8 @@ export interface GNode {
   pid?: number;
   x: number;
   y: number;
+  /** Where the parent sits (top-left), so a new card can grow out of it. `null` for a root. */
+  from: { x: number; y: number } | null;
 }
 
 export interface GEdge {
@@ -96,7 +99,7 @@ export function buildGraph(state: State, runId: string | null): { nodes: GNode[]
 
   const known = new Set(procs.map((proc) => proc.pid));
   const graph = new Graph();
-  graph.setGraph({ rankdir: "TB", nodesep: 40, ranksep: 90 });
+  graph.setGraph({ rankdir: "LR", nodesep: 26, ranksep: 84 });
   graph.setDefaultEdgeLabel(() => ({}));
 
   const edges: GEdge[] = [];
@@ -117,18 +120,19 @@ export function buildGraph(state: State, runId: string | null): { nodes: GNode[]
 
   layout(graph);
 
-  const nodes: GNode[] = procs.map((proc) => {
-    const placed = graph.node(nodeId(proc.pid));
-    return {
-      id: nodeId(proc.pid),
-      kind: "proc",
-      pid: proc.pid,
-      x: placed.x - NODE_W / 2,
-      y: placed.y - NODE_H / 2,
-    };
-  });
+  const at = (pid: number) => {
+    const placed = graph.node(nodeId(pid));
+    return { x: placed.x - NODE_W / 2, y: placed.y - NODE_H / 2 };
+  };
+  const nodes: GNode[] = procs.map((proc) => ({
+    id: nodeId(proc.pid),
+    kind: "proc",
+    pid: proc.pid,
+    ...at(proc.pid),
+    from: proc.ppid !== null && known.has(proc.ppid) ? at(proc.ppid) : null,
+  }));
 
-  nodes.push({ id: MUNIN_ID, kind: "munin", ...hubPosition(nodes) });
+  nodes.push({ id: MUNIN_ID, kind: "munin", from: null, ...hubPosition(nodes) });
   for (const proc of procs) {
     if (proc.muninWrites === 0) continue;
     edges.push({
@@ -142,10 +146,10 @@ export function buildGraph(state: State, runId: string | null): { nodes: GNode[]
   return { nodes, edges };
 }
 
-/** Right of the widest rank, at the vertical middle of the tree. */
+/** Right of the last rank, at the vertical middle of the tree. */
 function hubPosition(nodes: GNode[]): { x: number; y: number } {
   const right = Math.max(...nodes.map((node) => node.x)) + NODE_W;
   const top = Math.min(...nodes.map((node) => node.y));
   const bottom = Math.max(...nodes.map((node) => node.y)) + NODE_H;
-  return { x: right + HUB_GAP, y: (top + bottom) / 2 - HUB_SIZE / 2 };
+  return { x: right + HUB_GAP, y: (top + bottom) / 2 - HUB_H / 2 };
 }

@@ -69,12 +69,20 @@ describe("buildGraph", () => {
     expect(places.size).toBe(nodes.length);
   });
 
-  it("ranks the tree top down — children sit below their parent", () => {
+  it("ranks the tree left to right — children sit right of their parent, like track", () => {
     const { nodes } = buildGraph(mission(), RUN);
     const at = (id: string) => nodes.find((node) => node.id === id)!;
     for (const child of ["p2", "p3", "p4"]) {
-      expect(at(child).y).toBeGreaterThan(at("p1").y);
+      expect(at(child).x).toBeGreaterThan(at("p1").x);
     }
+  });
+
+  it("tells a card where its parent sits, so it can grow out of it", () => {
+    const { nodes } = buildGraph(mission(), RUN);
+    const at = (id: string) => nodes.find((node) => node.id === id)!;
+    expect(at("p1").from).toBeNull();
+    expect(at("p2").from).toEqual({ x: at("p1").x, y: at("p1").y });
+    expect(at(MUNIN_ID).from).toBeNull();
   });
 
   it("puts the munin hub to the right of every agent", () => {

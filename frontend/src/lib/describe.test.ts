@@ -1,5 +1,16 @@
 import { describe, expect, it } from "vitest";
-import { syscallLabel, toolLabel } from "./describe";
+import { goalText, syscallLabel, toolLabel } from "./describe";
+
+describe("goalText", () => {
+  it("turns the program prefix into the role", () => {
+    expect(goalText("program:scout Recherchiere Ollama")).toBe("Späher: Recherchiere Ollama");
+  });
+
+  it("keeps an unknown program name and a plain goal as they are", () => {
+    expect(goalText("program:wizard Zaubere")).toBe("wizard: Zaubere");
+    expect(goalText("Erstelle ein Briefing")).toBe("Erstelle ein Briefing");
+  });
+});
 
 describe("syscallLabel", () => {
   it("names the kernel's syscalls as actions", () => {

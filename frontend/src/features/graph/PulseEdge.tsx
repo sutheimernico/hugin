@@ -1,15 +1,17 @@
 /**
- * A link between two agents — and the particles that travel along it.
+ * A link between two agents — and the trains that travel along it.
  *
- * The line itself is quiet; what carries meaning is the traffic on it. Every live pulse the
- * graph hands this edge becomes one dot that runs the edge's own path, so a message visibly
- * moves from the sender to the receiver instead of just being logged.
+ * A spawn link is drawn as track: sleepers, two rails, and a green line in the bed while one of
+ * its ends is occupied. Every live pulse the graph hands this edge becomes a train that runs
+ * the edge's own path, so a message visibly moves from the sender to the receiver instead of
+ * just being logged. The link to the memory is a cable, not track: one dashed green line.
  */
 
 import { BaseEdge, getSmoothStepPath, type Edge, type EdgeProps } from "@xyflow/react";
 import { useReducedMotion } from "motion/react";
 import { useCallback } from "react";
 import type { Pulse } from "../../state/types";
+import { Track } from "../../components/Track";
 import { PARTICLE_S } from "./motion";
 
 /** One pulse as this edge sees it: `reverse` when it travels target → source (a child's report). */
@@ -19,10 +21,10 @@ export interface EdgePulse {
   reverse: boolean;
 }
 
-const PARTICLE_COLOR: Record<Pulse["kind"], string> = {
+const TRAIN_COLOR: Record<Pulse["kind"], string> = {
   msg: "var(--color-blue)",
   munin: "var(--color-green)",
-  spawn: "var(--color-teal)",
+  spawn: "var(--color-text)",
 };
 
 export type PulseEdgeType = Edge<
@@ -57,37 +59,34 @@ export function PulseEdge({
 
   return (
     <>
-      <BaseEdge
-        path={path}
-        style={
-          kind === "munin"
-            ? {
-                stroke: "var(--color-green)",
-                strokeWidth: 1,
-                strokeDasharray: "4 4",
-                strokeOpacity: alive ? 0.5 : 0.25,
-              }
-            : {
-                // A hairline that only brightens while one of its ends is still alive.
-                stroke: alive ? "var(--color-muted)" : "var(--color-border)",
-                strokeWidth: 1,
-              }
-        }
-      />
+      {kind === "munin" ? (
+        <BaseEdge
+          path={path}
+          style={{
+            stroke: "var(--color-green)",
+            strokeWidth: 1.5,
+            strokeDasharray: "5 4",
+            strokeOpacity: alive ? 0.9 : 0.45,
+          }}
+        />
+      ) : (
+        <Track d={path} occupied={alive} />
+      )}
       {pulses.map((pulse) => (
-        <Particle key={pulse.id} pulse={pulse} path={path} />
+        <Train key={pulse.id} pulse={pulse} path={path} />
       ))}
     </>
   );
 }
 
 /**
- * SMIL, not CSS: `<animateMotion>` follows the edge's own path, including its rounded corners.
+ * SMIL, not CSS: `<animateMotion rotate="auto">` follows the edge's own path, including its
+ * rounded corners, and turns the train along it.
  *
  * It starts on `beginElement()` rather than on the document timeline, because an animation
  * inserted into a page that has been running for minutes would otherwise count as long over.
  */
-function Particle({ pulse, path }: { pulse: EdgePulse; path: string }) {
+function Train({ pulse, path }: { pulse: EdgePulse; path: string }) {
   const start = useCallback((element: SVGElement | null) => {
     (element as SVGAnimateMotionElement | null)?.beginElement?.();
   }, []);
@@ -96,7 +95,7 @@ function Particle({ pulse, path }: { pulse: EdgePulse; path: string }) {
   const dur = `${PARTICLE_S}s`;
 
   return (
-    <circle r={3} style={{ fill: PARTICLE_COLOR[pulse.kind] }}>
+    <rect x={-9} y={-4} width={18} height={8} rx={2.5} style={{ fill: TRAIN_COLOR[pulse.kind] }}>
       <animateMotion
         id={motionId}
         ref={start}
@@ -106,6 +105,7 @@ function Particle({ pulse, path }: { pulse: EdgePulse; path: string }) {
         // with the pulse when the reducer prunes it.
         fill="freeze"
         path={path}
+        rotate="auto"
         // A report travels back up the same edge it was spawned along — same path, run backwards.
         calcMode="linear"
         keyPoints={pulse.reverse ? "1;0" : "0;1"}
@@ -122,6 +122,6 @@ function Particle({ pulse, path }: { pulse: EdgePulse; path: string }) {
         keyTimes="0;0.75;1"
         fill="freeze"
       />
-    </circle>
+    </rect>
   );
 }

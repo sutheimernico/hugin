@@ -23,7 +23,19 @@ export const TOOL_LABEL: Record<string, string> = {
   Glob: "Dateien finden",
 };
 
+import { ROLE_LABEL } from "./i18n";
+
 const MCP_PREFIX = "mcp__hugin__";
+
+/**
+ * A goal as the UI shows it. A mission started for one program is stored with the kernel's
+ * `program:<name>` prefix; the reader gets the role instead ("Späher: Recherchiere …").
+ */
+export function goalText(goal: string): string {
+  const match = /^program:(\w+)\s+(.*)$/s.exec(goal);
+  if (match === null) return goal;
+  return `${ROLE_LABEL[match[1]] ?? match[1]}: ${match[2]}`;
+}
 
 export function syscallLabel(name: string): string {
   return SYSCALL_LABEL[name] ?? name;

@@ -8,8 +8,6 @@
  */
 
 import {
-  Background,
-  BackgroundVariant,
   ReactFlow,
   ReactFlowProvider,
   useReactFlow,
@@ -43,8 +41,12 @@ import { PulseEdge, type EdgePulse, type PulseEdgeType } from "./PulseEdge";
 const NODE_TYPES: NodeTypes = { proc: AgentNode, munin: MuninNode };
 const EDGE_TYPES: EdgeTypes = { pulse: PulseEdge };
 
-/** The one fit the graph ever performs — on a new node, and on a resized panel. */
-const FIT = { padding: 0.12, maxZoom: 1.6, duration: 400 };
+/**
+ * The one fit the graph ever performs — on a new node, and on a resized panel. The diagram is a
+ * fixed sheet: it always shows the whole network, so there is no pan or zoom to get lost in
+ * (and a page that scrolls past it on a tablet is never held hostage by it).
+ */
+const FIT = { padding: 0.08, maxZoom: 1.15, minZoom: 0.15, duration: 400 };
 
 type GraphNode = AgentNodeType | MuninNodeType;
 
@@ -125,17 +127,17 @@ function Graph({ state, runId, selectedPid, onSelect, panicking }: AgentGraphPro
     <div
       ref={container}
       data-testid="graph-surface"
-      className={`h-full w-full ${panicking ? "hugin-panic" : ""}`}
+      className={`relative h-full w-full ${panicking ? "hugin-panic" : ""}`}
       onKeyDown={handleKeyDown}
     >
       {count === 0 ? (
-        <div className="flex h-full items-center justify-center px-6 text-center text-[12px] text-muted">
+        <div className="flex h-full items-center justify-center px-6 text-center text-[13px] text-muted">
           Noch keine Agenten — der Graph wächst mit der Mission.
         </div>
       ) : (
         <ReactFlow<GraphNode, PulseEdgeType>
           className="hugin-graph"
-          colorMode="dark"
+          colorMode="light"
           nodes={nodes}
           edges={edges}
           nodeTypes={NODE_TYPES}
@@ -143,15 +145,43 @@ function Graph({ state, runId, selectedPid, onSelect, panicking }: AgentGraphPro
           onNodeClick={handleClick}
           fitView
           fitViewOptions={FIT}
-          panOnScroll
+          minZoom={FIT.minZoom}
+          panOnDrag={false}
+          panOnScroll={false}
+          zoomOnScroll={false}
+          zoomOnPinch={false}
+          zoomOnDoubleClick={false}
+          preventScrolling={false}
           nodesDraggable={false}
           nodesConnectable={false}
           edgesFocusable={false}
-        >
-          <Background variant={BackgroundVariant.Dots} gap={24} size={1} />
-        </ReactFlow>
+        />
       )}
+      {count > 0 && <LampLegend />}
     </div>
+  );
+}
+
+/** What the lamps mean, in the diagram's own corner — the one piece of explanation it needs. */
+function LampLegend() {
+  const items: [string, string][] = [
+    ["running", "Läuft"],
+    ["waiting_tool", "Werkzeug aktiv"],
+    ["queued", "Wartet"],
+    ["killed", "Gestoppt"],
+  ];
+  return (
+    <ul
+      aria-label="Legende der Signale"
+      className="pointer-events-none absolute bottom-3 left-3 z-10 flex flex-wrap items-center gap-x-4 gap-y-1 border border-text/20 bg-surface-2 px-3 py-1.5 text-[12px] text-muted"
+    >
+      {items.map(([state, label]) => (
+        <li key={state} className="flex items-center gap-1.5">
+          <span aria-hidden data-state={state} className="hugin-lamp size-2.5" />
+          {label}
+        </li>
+      ))}
+    </ul>
   );
 }
 
@@ -188,7 +218,10 @@ function toNodes(nodes: GNode[], state: State, selectedPid: number | null): Grap
           id: node.id,
           type: "proc",
           position: { x: node.x, y: node.y },
-          data: { proc: state.procs[node.pid!] },
+          data: {
+            proc: state.procs[node.pid!],
+            from: node.from === null ? null : { dx: node.from.x - node.x, dy: node.from.y - node.y },
+          },
           // Read out by a screen reader on focus; the card itself is icons and numbers.
           ariaLabel: `${state.procs[node.pid!].program} · PID ${node.pid}`,
           selected: node.pid === selectedPid,
