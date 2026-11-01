@@ -7,14 +7,13 @@ local Ollama loop — as supervised processes with PIDs, budgets, capability-gat
 append-only event log, and a React UI shows, kills and replays every step live.**
 
 <p align="center">
-  <img src="docs/media/mission-control.png" width="900"
-       alt="Mission Control: process table, live agent graph and kernel log during a running mission">
+  <img src="docs/media/hero.gif" width="900"
+       alt="Mission Control replaying a recorded Claude run: a planner starts three scouts, they search the web and write to memory, the occupancy plan fills in below">
 </p>
 
 <p align="center">
-  <a href="docs/media/demo.webm"><b>30-second demo (WebM)</b></a> ·
-  <a href="docs/media/boot.png">Boot</a> ·
-  <a href="docs/media/replay.png">Replay</a>
+  <sub>Replay of the real Claude run recorded for this repo (848 events, 231 s), shown at 4x.
+  The shell is the same in live mode; only the data source differs.</sub>
 </p>
 
 **Headline result.** The largest real run so far: one planner plus three web-searching scouts on
@@ -33,6 +32,37 @@ scripts/serve.sh                          # -> http://127.0.0.1:8770
 
 Press ⌘K / Ctrl+K, pick a driver (Simulation needs nothing installed), type a goal. The UI copy
 is German; code, docs and commits are English.
+
+**Try it without a kernel.** `npm --prefix frontend run build:pages` builds the replay-only shell
+into `frontend/dist-pages/`: no backend, no stream, it opens on the recorded Claude run and lists
+the other recordings. `.github/workflows/pages.yml` deploys exactly that to GitHub Pages
+(Settings → Pages → Source: GitHub Actions, once).
+
+## The interface
+
+<p align="center">
+  <img src="docs/media/mission-control.png" width="900"
+       alt="Mission Control at 1440 px: mission ledger and process table on the left, the signal-box diagram and occupancy plan in the middle, the timetable on the right">
+</p>
+
+The shell is a railway signal box, because hugin does what a signal box does: it supervises
+processes and shows who holds which section. Every agent is a block with a signal mast in front of
+it, the spawn tree is track laid out left to right, and messages travel it as trains. The lamp is
+the only place state gets a colour (green runs, amber waits for a tool, red failed or stopped, dark
+is queued). A kill reads as two beats, `TERM` and `KILL`. The event stream is a timetable, the
+mission a ledger, and the occupancy plan under the diagram shows *when* each agent held a slot.
+The concept, tokens, type and motion rules are in
+[`docs/design/redesign-2026-10.md`](docs/design/redesign-2026-10.md).
+
+<p align="center">
+  <img src="docs/media/mobile.png" width="300"
+       alt="The same mission on a 390 px phone: the diagram redrawn as a vertical process tree with the same lamps and gauges, bottom navigation below">
+</p>
+
+Below 720 px the diagram is redrawn as a vertical process tree instead of being squeezed, the agent
+window becomes a full-height sheet, and navigation moves to a bottom bar. Motion is 150 to 400 ms,
+transform and opacity only, and switched off under `prefers-reduced-motion`. Views other than
+Mission Control, the command palette and the boot sequence load as separate chunks.
 
 ## What it is — and what it is not
 
@@ -64,8 +94,8 @@ unbounded child budget, an over-broad file tool, a log that was not actually use
 
 ```
 ┌──────────────────────────── Browser (React 19) ────────────────────────────────────┐
-│ Boot · Mission Control (process table · live graph · kernel log) · Agent window ·   │
-│ Munin browser · Runs & Replay (scrubber) · ⌘K palette                               │
+│ Boot · Mission Control (process table · signal-box diagram · timetable) · Agent ·   │
+│ Munin browser · Runs & Replay (scrubber) · ⌘K palette · replay-only Pages build     │
 │                     ▲ SSE /api/events/stream  · REST /api/*                          │
 └─────────────────────┼───────────────────────────────────────────────────────────────┘
 ┌─────────────────────┼──────────── FastAPI (port 8770) — src/hugin ──────────────────┐
@@ -171,7 +201,7 @@ src/hugin/munin/       FTS5 store     src/hugin/programs/  *.yaml + contract.md
 src/hugin/missions/    lifecycle      src/hugin/replay/    player · recorder
 src/hugin/api/         routes_* · SSE · loopback guard        src/hugin/system/  subsystem status
 frontend/src/state/    types · reducer · store · selectors (the projection)
-frontend/src/features/ boot · shell · procs · log · graph · agent · palette · munin · replay
+frontend/src/features/ boot · shell · procs · log (timetable) · graph · agent · palette · munin · replay
 docs/                  THREAT_MODEL.md · adr/ · superpowers/{specs,plans} · media/
 ```
 
@@ -179,7 +209,7 @@ docs/                  THREAT_MODEL.md · adr/ · superpowers/{specs,plans} · m
 
 v1 is feature-complete: kernel, three drivers, MCP syscalls, munin, five programs, missions,
 replay and six views. Not in v1, written down on purpose: 3D constellation view, sound cues, an
-embeddings track in munin, scheduled missions, run comparison, mobile/PWA, authentication, a
+embeddings track in munin, scheduled missions, run comparison, an installable PWA, authentication, a
 Tauri shell, a git worktree per run, agent-to-agent messaging (`proc_send` was removed: a
 `claude -p` process cannot receive a message mid-run).
 
