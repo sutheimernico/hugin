@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Proc, TranscriptItem } from "../state/types";
-import { activityOf } from "./activity";
+import { activityOf, stateLine } from "./activity";
 
 function proc(over: Partial<Proc>): Proc {
   return { state: "running", thinking: false, transcript: [], exitReason: null, ...over } as Proc;
@@ -13,6 +13,17 @@ const tool = (name: string, ok?: boolean): TranscriptItem => ({
   input: "",
   sys: false,
   ok,
+});
+
+describe("stateLine", () => {
+  it("joins state and activity", () => {
+    expect(stateLine(proc({ state: "done" }))).toBe("Fertig · Bericht abgegeben");
+  });
+
+  it("does not say a thing twice", () => {
+    expect(stateLine(proc({ state: "queued" }))).toBe("Wartet auf einen Platz");
+    expect(stateLine(proc({ state: "killed" }))).toBe("Gestoppt");
+  });
 });
 
 describe("activityOf", () => {

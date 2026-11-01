@@ -118,7 +118,7 @@ const LogRow = memo(function LogRow({ row }: { row: TimetableRow }) {
         </span>
       </span>
       <Icon size={15} aria-hidden className={`mt-[3px] ${TONE_TEXT[tone]}`} />
-      <span className="min-w-0 py-1 break-words hyphens-none text-text">{line.text}</span>
+      <span className={`min-w-0 py-1 break-words hyphens-none ${tone === "muted" ? "text-muted" : "text-text"}`}>{line.text}</span>
     </div>
   );
 });

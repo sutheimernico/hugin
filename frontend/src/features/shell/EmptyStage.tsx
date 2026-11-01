@@ -24,7 +24,7 @@ export function EmptyStage({ onOpenPalette }: EmptyStageProps) {
 
   return (
     <div className="flex h-full flex-col overflow-y-auto border-text/20 bg-surface-2 min-[720px]:border-x">
-      <div className="grid flex-1 content-center items-center gap-x-10 gap-y-6 px-5 py-8 min-[900px]:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] min-[1200px]:px-14 min-[1200px]:py-10">
+      <div className="grid flex-1 content-center items-center gap-x-10 gap-y-6 px-5 py-8 min-[720px]:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] min-[1200px]:px-14 min-[1200px]:py-10">
         <div>
           <h1 className="font-display text-[clamp(44px,7vw,76px)] leading-[0.95] font-bold text-text">
             Gleis frei.
@@ -109,7 +109,7 @@ function Schema() {
       viewBox="0 0 640 280"
       role="img"
       aria-label="Schema eines Stellwerks: ein Planer startet drei Späher, alle schreiben in den Speicher. Alle Signale sind dunkel."
-      className="w-full max-w-[640px] min-[900px]:justify-self-end"
+      className="w-full max-w-[640px] min-[720px]:justify-self-end"
     >
       {SCOUT_Y.map((y, i) => (
         <g key={y} className="hugin-rise" style={rank(1 + i)}>

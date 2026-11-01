@@ -1,8 +1,8 @@
 import { StateRing } from "../../components/StateRing";
-import { activityOf } from "../../lib/activity";
+import { stateLine } from "../../lib/activity";
 import { budgetTone, FILL_CLASS } from "../../lib/budget";
 import { fmtTokens } from "../../lib/format";
-import { ROLE_LABEL, STATE_LABEL } from "../../lib/i18n";
+import { ROLE_LABEL } from "../../lib/i18n";
 import { FALLBACK_ICON, PROGRAM_ICON, programAccent } from "../../lib/programs";
 import type { Proc } from "../../state/types";
 import { treeRows } from "./tree";
@@ -85,8 +85,7 @@ export function ProcessTree({ procs, selectedPid, onSelect }: ProcessTreeProps) 
                   </span>
                 </span>
                 <span className="block truncate text-[13px] text-text">
-                  <span className="text-muted">{STATE_LABEL[proc.state]} · </span>
-                  {activityOf(proc)}
+                  {stateLine(proc)}
                 </span>
                 <span className="mt-1.5 flex items-center gap-2">
                   <span className="hugin-gauge min-w-0 flex-1" aria-hidden>

@@ -76,7 +76,7 @@ export function MuninBrowser() {
 
   return (
     <Panel
-      title="Munin — Gedächtnis"
+      title="Munin, das Gedächtnis"
       right={<Status settled={settled} count={rows.length} />}
       className="h-full"
       bodyClassName="flex min-h-0 flex-col p-0"
@@ -94,12 +94,12 @@ export function MuninBrowser() {
           placeholder="Wonach suchst du?"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          className="ease-out-expo h-9 w-full rounded-panel border border-border bg-surface-2 pr-3 pl-9 text-[13px] text-text transition-colors duration-150 outline-none placeholder:text-muted focus:border-blue/60"
+          className="ease-out-expo h-10 w-full rounded-part border border-text/30 bg-surface-2 pr-3 pl-9 text-[14px] text-text transition-colors duration-150 outline-none placeholder:text-muted focus:border-text"
         />
       </div>
 
       <div className="grid min-h-0 flex-1 grid-cols-1 min-[900px]:grid-cols-[minmax(0,380px)_minmax(0,1fr)]">
-        <div className="min-h-0 overflow-y-auto border-b border-border min-[900px]:border-r min-[900px]:border-b-0">
+        <div className="max-h-[42vh] min-h-0 overflow-y-auto border-b border-text/20 min-[900px]:max-h-none min-[900px]:border-r min-[900px]:border-b-0">
           {error !== null && <p className="p-4 text-[13px] text-red">{error}</p>}
           {error === null && settled && rows.length === 0 && (
             <p className="p-4 text-[13px] text-muted">
@@ -122,9 +122,9 @@ export function MuninBrowser() {
           </ul>
         </div>
 
-        <div className="min-h-0 overflow-y-auto p-4">
+        <div className="min-h-0 overflow-y-auto bg-surface-2 p-4 min-[900px]:p-8">
           {selected === null ? (
-            <p className="text-[13px] text-muted">
+            <p className="text-[14px] text-muted">
               Wähle einen Eintrag, um ihn samt Herkunft zu lesen.
             </p>
           ) : (
@@ -139,7 +139,7 @@ export function MuninBrowser() {
 /** Subtle by design: a spinner would claim the eye for a request that usually takes 20 ms. */
 function Status({ settled, count }: { settled: boolean; count: number }) {
   return (
-    <span className="font-mono text-[11px] text-muted">
+    <span className="font-display text-[15px] font-semibold text-muted">
       {settled ? `${count} ${count === 1 ? "Eintrag" : "Einträge"}` : "sucht…"}
     </span>
   );
@@ -158,12 +158,14 @@ function ResultRow({ memory, now, active, onSelect }: ResultRowProps) {
       type="button"
       aria-current={active ? "true" : undefined}
       onClick={() => onSelect(memory)}
-      className={`ease-out-expo block w-full border-b border-border/60 px-3 py-2.5 text-left transition-colors duration-150 hover:bg-surface-2 ${
-        active ? "bg-surface-2 shadow-[inset_2px_0_0_0_var(--color-blue)]" : ""
+      className={`ease-out-expo block w-full border-b border-border px-4 py-3 text-left transition-colors duration-150 hover:bg-surface-2 ${
+        active ? "bg-surface-2 shadow-[inset_3px_0_0_0_var(--color-text)]" : ""
       }`}
     >
-      <span className="block truncate text-[13px] text-text">{memory.title}</span>
-      <span className="mt-1 block truncate font-mono text-[11px] text-muted">
+      <span className="font-display block text-[18px] leading-[1.2] font-semibold text-text">
+        {memory.title}
+      </span>
+      <span className="mt-1 block truncate text-[12px] text-muted">
         {origin(memory, now).join(" · ")}
       </span>
       {memory.tags.length > 0 && (
@@ -183,11 +185,11 @@ function Detail({ memory }: { memory: ApiMemory }) {
   return (
     // Capped, not full-bleed: on a 1600 px screen the pane is 1 200 px wide, and prose set that
     // long is unreadable.
-    <article className="max-w-[72ch]">
-      <h3 className="font-display text-[15px] leading-snug font-medium text-text">
+    <article className="max-w-[72ch] border border-text/25 bg-surface p-6 min-[900px]:p-8">
+      <h3 className="font-display text-[28px] leading-[1.1] font-semibold text-text">
         {memory.title}
       </h3>
-      <p data-testid="munin-provenance" className="mt-1.5 font-mono text-[11px] text-muted">
+      <p data-testid="munin-provenance" className="mt-2 text-[13px] text-muted">
         {provenance(memory)}
       </p>
       {memory.tags.length > 0 && (
@@ -200,7 +202,7 @@ function Detail({ memory }: { memory: ApiMemory }) {
         </p>
       )}
       {/* The agent wrote prose with its own line breaks; the browser keeps them. */}
-      <p className="mt-4 text-[13px] leading-relaxed whitespace-pre-wrap text-text">
+      <p className="mt-5 text-[15px] leading-[1.65] whitespace-pre-wrap text-text">
         {memory.body}
       </p>
     </article>

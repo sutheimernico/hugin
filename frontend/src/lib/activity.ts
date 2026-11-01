@@ -5,7 +5,17 @@
 
 import type { Proc } from "../state/types";
 import { toolLabel } from "./describe";
-import { exitReasonShort } from "./i18n";
+import { exitReasonShort, STATE_LABEL } from "./i18n";
+
+/**
+ * The state and the activity as one line ("Läuft · Websuche"), without saying a thing twice
+ * when the activity already starts with the state ("Wartet · Wartet auf einen Platz").
+ */
+export function stateLine(proc: Proc): string {
+  const label = STATE_LABEL[proc.state];
+  const activity = activityOf(proc);
+  return activity.startsWith(label) ? activity : `${label} · ${activity}`;
+}
 
 export function activityOf(proc: Proc): string {
   switch (proc.state) {

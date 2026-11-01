@@ -12,7 +12,7 @@
  */
 
 import { syscallLabel, toolLabel } from "../lib/describe";
-import { exitReasonShort, STATE_LABEL } from "../lib/i18n";
+import { DRIVER_LABEL, exitReasonShort, STATE_LABEL } from "../lib/i18n";
 import { ALIVE_STATES } from "./selectors";
 import type {
   Budget,
@@ -118,7 +118,7 @@ export function logText(e: HEvent): string {
     case "sched.started":
       return `Prozess ${pid} läuft an`;
     case "sched.blocked":
-      return `Prozess ${pid} blockiert: ${str(d.reason)} (Limit ${num(d.limit)})`;
+      return blockedText(pid, str(d.reason), num(d.limit));
     case "proc.spawned":
       return `Prozess ${pid} (${str(d.program)}) gestartet`;
     case "proc.state":
@@ -134,13 +134,13 @@ export function logText(e: HEvent): string {
     case "tool.result":
       return d.ok === true
         ? `Werkzeug fertig in ${num(d.ms)} ms`
-        : `Werkzeug fehlgeschlagen: ${str(d.output_summary)}`;
+        : `Werkzeug fehlgeschlagen: ${clip(str(d.output_summary))}`;
     case "sys.call":
       return `Prozess ${pid}: ${syscallLabel(str(d.syscall))}`;
     case "sys.result":
       return d.ok === true
         ? `Syscall erledigt in ${num(d.ms)} ms`
-        : `Syscall abgelehnt: ${str(d.result_summary)}`;
+        : `Syscall abgelehnt: ${clip(str(d.result_summary))}`;
     case "msg.sent":
       return `Nachricht ${num(d.from_pid)} → ${num(d.to_pid)}: »${str(d.preview)}«`;
     case "munin.write":
@@ -155,11 +155,30 @@ export function logText(e: HEvent): string {
       return `Budget überschritten: ${BUDGET_DIMENSION[str(d.which)] ?? str(d.which)}`;
     case "kill":
       return d.target === "all"
-        ? `Alle Prozesse beendet (durch ${str(d.by)})`
-        : `Prozess ${num(d.target)} beendet (durch ${str(d.by)})`;
+        ? `Alle Prozesse beendet (${killer(d.by)})`
+        : `Prozess ${num(d.target)} beendet (${killer(d.by)})`;
     default:
       return e.kind;
   }
+}
+
+/** A tool's error text can be a whole stack of JSON; the timetable keeps its first words. */
+function clip(text: string, max = 90): string {
+  const flat = text.replace(/\s+/g, " ").trim();
+  return flat.length <= max ? flat : `${flat.slice(0, max - 1).trimEnd()}…`;
+}
+
+/** The scheduler's reason is an English phrase; the one it really sends is the driver limit. */
+function blockedText(pid: number | string, reason: string, limit: number): string {
+  const match = /^driver (\w+) at concurrency limit$/.exec(reason);
+  if (match === null) return `Prozess ${pid} wartet: ${reason}`;
+  const driver = DRIVER_LABEL[match[1]] ?? match[1];
+  return `Prozess ${pid} wartet auf einen freien Platz (${driver}: höchstens ${limit} gleichzeitig)`;
+}
+
+/** Who pulled the switch: the person at the keyboard is `user`, anything else is a named part. */
+function killer(by: unknown): string {
+  return by === "user" ? "von dir" : `durch ${str(by)}`;
 }
 
 // --- per-kind reduction -------------------------------------------------------------------

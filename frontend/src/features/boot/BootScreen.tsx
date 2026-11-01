@@ -35,6 +35,8 @@ const TONE_CLASS: Record<Tone, string> = {
   error: "text-red",
 };
 
+const LAMP_STATE: Record<Tone, string> = { ok: "running", warn: "waiting_tool", error: "failed" };
+
 type Phase = "log" | "wordmark" | "lifting";
 
 const EASE_OUT_EXPO = [0.16, 1, 0.3, 1] as const;
@@ -122,25 +124,31 @@ export function BootScreen({ onDone }: { onDone: () => void }) {
       role="status"
       aria-label="Startsequenz"
       onClick={finish}
-      className="fixed inset-0 z-50 flex flex-col justify-center gap-10 bg-base px-8 py-10 sm:px-16"
+      className="fixed inset-0 z-50 flex flex-col justify-center gap-10 bg-base px-8 py-10 sm:px-20"
       initial={false}
       animate={phase === "lifting" ? { opacity: 0, scale: 1.02 } : { opacity: 1, scale: 1 }}
       transition={{ duration: LIFT_MS / 1_000, ease: EASE_OUT_EXPO }}
     >
-      <ul className="mono flex flex-col gap-1 text-[13px] leading-relaxed">
+      <ul className="flex max-w-3xl flex-col gap-1.5 text-[15px] leading-relaxed">
         {/* Every line holds its place from the start and only becomes visible when it is
             typed: slicing the list would let the whole block drift upwards line by line. */}
         {(lines ?? []).map((line, index) => (
           <li
             key={line.key}
             data-tone={line.tone}
-            className={`flex gap-3 ${TONE_CLASS[line.tone]}`}
+            className={`flex items-center gap-3 ${TONE_CLASS[line.tone]}`}
             style={{ visibility: index < shown ? "visible" : "hidden" }}
           >
             {/* The spaces keep the line one readable string when it is selected or copied;
                 a flex container drops whitespace-only children, so nothing moves. */}
-            <span className="w-28 shrink-0 text-muted">{line.label}</span>{" "}
-            <span className="min-w-0 break-all">{line.detail}</span>
+            {/* The lamp test of a signal box: each subsystem lights its lamp as it reports. */}
+            <span aria-hidden className="flex size-5 shrink-0 items-center justify-center rounded-full bg-text">
+              <span className="hugin-lamp size-3" data-state={LAMP_STATE[line.tone]} />
+            </span>
+            <span className="font-display w-36 shrink-0 text-[20px] leading-6 font-semibold text-text">
+              {line.label}
+            </span>{" "}
+            <span className="min-w-0">{line.detail}</span>
             {line.mark !== "" && (
               <>
                 {" "}
@@ -161,7 +169,7 @@ export function BootScreen({ onDone }: { onDone: () => void }) {
         <div
           role="img"
           aria-label={WORDMARK}
-          className="font-display flex text-[clamp(3rem,12vw,7rem)] leading-none font-bold tracking-[0.12em] text-text"
+          className="font-display flex text-[clamp(3.5rem,14vw,9rem)] leading-none font-bold tracking-[0.02em] text-text"
         >
           {[...WORDMARK].map((letter, index) => (
             <motion.span
@@ -176,7 +184,7 @@ export function BootScreen({ onDone }: { onDone: () => void }) {
           ))}
         </div>
         <motion.p
-          className="text-[13px] text-muted"
+          className="text-[15px] text-muted"
           initial={false}
           animate={{ opacity: assembling ? 1 : 0 }}
           transition={taglineIn}
@@ -188,7 +196,7 @@ export function BootScreen({ onDone }: { onDone: () => void }) {
       {lines !== null && (
         <motion.div
           aria-hidden="true"
-          className="absolute inset-x-0 bottom-0 h-px origin-left bg-blue"
+          className="absolute inset-x-0 bottom-0 h-1 origin-left bg-text"
           initial={reduced ? false : { scaleX: 0 }}
           animate={{ scaleX: 1 }}
           transition={{ duration: totalMs / 1_000, ease: "linear" }}

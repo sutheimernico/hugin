@@ -351,8 +351,12 @@ describe("logText", () => {
 
   it("writes a German one-liner for a kill-all", () => {
     expect(logText(ev("kill", { target: "all", by: "user" }))).toBe(
-      "Alle Prozesse beendet (durch user)",
+      "Alle Prozesse beendet (von dir)",
     );
+  });
+
+  it("names a killer other than the user", () => {
+    expect(logText(ev("kill", { target: 3, by: "budget" }))).toBe("Prozess 3 beendet (durch budget)");
   });
 });
 
@@ -451,5 +455,37 @@ describe("selectMode", () => {
       ev("run.created", { goal: "Ziel", driver: "claude", template: null }),
     );
     expect(selectMode({ state, replay: { runId: "r1" } })).toBe("replay");
+  });
+});
+
+describe("logText — wording of failures", () => {
+  const ev = (kind: string, data: Record<string, unknown>, pid: number | null = 3): HEvent => ({
+    seq: 1,
+    ts: 1,
+    run_id: "r",
+    pid,
+    kind,
+    data,
+  });
+
+  it("keeps only the first words of a long tool error", () => {
+    const text = logText(ev("tool.result", { ok: false, output_summary: `${"x".repeat(300)}` }));
+    expect(text.length).toBeLessThan(120);
+    expect(text.endsWith("…")).toBe(true);
+  });
+
+  it("explains a blocked process in German", () => {
+    const text = logText(
+      ev("sched.blocked", { reason: "driver claude at concurrency limit", limit: 3 }),
+    );
+    expect(text).toBe(
+      "Prozess 3 wartet auf einen freien Platz (Claude (Abo): höchstens 3 gleichzeitig)",
+    );
+  });
+
+  it("shows an unknown blocking reason as it came", () => {
+    expect(logText(ev("sched.blocked", { reason: "mystery", limit: 1 }))).toBe(
+      "Prozess 3 wartet: mystery",
+    );
   });
 });

@@ -33,7 +33,7 @@ const GROUPS: Command["group"][] = ["Mission", "Prozesse", "Runs", "Munin"];
 
 /** `cmdk` renders the heading itself, so its style has to reach it through the group element. */
 const GROUP_CLASS =
-  "[&_[cmdk-group-heading]]:font-display [&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:pt-3 [&_[cmdk-group-heading]]:pb-1 [&_[cmdk-group-heading]]:text-[11px] [&_[cmdk-group-heading]]:tracking-[0.14em] [&_[cmdk-group-heading]]:text-muted [&_[cmdk-group-heading]]:uppercase";
+  "[&_[cmdk-group-heading]]:font-display [&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:pt-3 [&_[cmdk-group-heading]]:pb-1 [&_[cmdk-group-heading]]:text-[15px] [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:text-muted";
 
 type CommandPaletteProps = {
   open: boolean;
@@ -179,7 +179,7 @@ export function CommandPalette({ open, onOpen, onClose, onToast }: CommandPalett
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
-          className="fixed inset-0 z-50 flex items-start justify-center bg-base/70 px-4 pt-[14vh] backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-start justify-center bg-text/45 px-4 pt-[14vh]"
           onMouseDown={close}
         >
           <motion.div
@@ -192,7 +192,7 @@ export function CommandPalette({ open, onOpen, onClose, onToast }: CommandPalett
             transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
             // The backdrop closes; a click inside is never a click on the backdrop.
             onMouseDown={(event) => event.stopPropagation()}
-            className="w-[640px] max-w-full overflow-hidden rounded-panel border border-border bg-surface shadow-[0_28px_60px_-24px_rgba(27,33,38,0.5)]"
+            className="w-[640px] max-w-full overflow-hidden rounded-panel border border-text/30 bg-surface shadow-[0_28px_60px_-24px_rgba(27,33,38,0.5)]"
           >
             <Cmdk
               label="Befehle"
@@ -217,7 +217,7 @@ export function CommandPalette({ open, onOpen, onClose, onToast }: CommandPalett
               </div>
 
               <div className="flex items-center gap-3 border-b border-border px-5 py-3">
-                <span className="font-display text-[11px] tracking-[0.14em] text-muted uppercase">
+                <span className="font-display text-[15px] font-semibold text-muted">
                   Treiber
                 </span>
                 <DriverPicker system={system} driver={driver} onPick={setDriver} />
@@ -237,7 +237,7 @@ export function CommandPalette({ open, onOpen, onClose, onToast }: CommandPalett
                   Kein Befehl gefunden.
                 </Cmdk.Empty>
 
-                {!loaded && <p className="mono px-3 py-6 text-[12px] text-muted">Lade Befehle …</p>}
+                {!loaded && <p className="px-3 py-6 text-[13px] text-muted">Lade Befehle …</p>}
 
                 {loaded &&
                   GROUPS.map((group) => {
@@ -259,7 +259,7 @@ export function CommandPalette({ open, onOpen, onClose, onToast }: CommandPalett
                   })}
               </Cmdk.List>
 
-              <footer className="flex items-center gap-3 border-t border-border px-5 py-2.5 text-[11px] text-muted">
+              <footer className="flex items-center gap-3 border-t border-border px-5 py-2.5 text-[12px] text-muted">
                 <Kbd>↑</Kbd>
                 <Kbd>↓</Kbd>
                 <span>Auswählen</span>
@@ -300,9 +300,9 @@ function CommandItem({
       value={command.id}
       disabled={command.disabled !== undefined}
       onSelect={() => onSelect(command)}
-      className="ease-out-expo flex cursor-pointer items-center gap-3 rounded-panel px-3 py-2.5 transition-colors duration-150 data-[disabled=true]:cursor-not-allowed data-[disabled=true]:opacity-45 data-[selected=true]:bg-blue/15 data-[selected=true]:text-text"
+      className="ease-out-expo flex cursor-pointer items-center gap-3 rounded-panel px-3 py-2.5 transition-colors duration-150 data-[disabled=true]:cursor-not-allowed data-[disabled=true]:opacity-45 data-[selected=true]:bg-surface-2 data-[selected=true]:shadow-[inset_3px_0_0_var(--color-text)] data-[selected=true]:text-text"
     >
-      <span className="min-w-0 flex-1 truncate text-[13px] text-text">{command.label}</span>
+      <span className="min-w-0 flex-1 truncate text-[14px] text-text">{command.label}</span>
       {command.disabled !== undefined ? (
         <span className="shrink-0 text-[11px] text-amber">{command.disabled}</span>
       ) : (
@@ -338,8 +338,8 @@ function DriverPicker({
             aria-pressed={active}
             title={reason ?? DRIVER_LABEL[option]}
             onClick={() => onPick(option)}
-            className={`mono ease-out-expo rounded-[6px] px-2.5 py-1 text-[11px] transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-40 ${
-              active ? "bg-blue/20 text-blue" : "text-muted hover:text-text"
+            className={`ease-out-expo rounded-part px-2.5 py-1 font-display text-[14px] font-semibold transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-40 ${
+              active ? "bg-text text-surface-2" : "text-muted hover:text-text"
             }`}
           >
             {DRIVER_LABEL[option]}

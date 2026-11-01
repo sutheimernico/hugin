@@ -3,9 +3,9 @@ import { memo } from "react";
 import { Kbd } from "../../components/Kbd";
 import { Panel } from "../../components/Panel";
 import { StateRing } from "../../components/StateRing";
-import { activityOf } from "../../lib/activity";
+import { stateLine } from "../../lib/activity";
 import { fmtDuration, fmtTokens } from "../../lib/format";
-import { ROLE_LABEL, STATE_LABEL } from "../../lib/i18n";
+import { ROLE_LABEL } from "../../lib/i18n";
 import { isAlive } from "../../state/selectors";
 import type { Proc } from "../../state/types";
 
@@ -143,9 +143,7 @@ const ProcessRow = memo(function ProcessRow({ proc, end, selected, onSelect, onK
               <span className="font-mono text-[11px] text-muted tabular-nums">{proc.pid}</span>
             </span>
             <span className="block truncate text-[12px] text-muted">
-              {STATE_LABEL[proc.state]}
-              <span aria-hidden> · </span>
-              {activityOf(proc)}
+              {stateLine(proc)}
             </span>
           </span>
         </span>
