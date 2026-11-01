@@ -9,7 +9,7 @@ body {
   background: var(--color-base);
   color: var(--color-text);
   font-family: var(--font-sans);
-  font-size: 14px;
+  font-size: 15px;
   -webkit-font-smoothing: antialiased;
   /* German hyphenation keeps narrow columns from ragging; the nodes opt out (see below). */
   hyphens: auto;
@@ -225,6 +225,29 @@ textarea:focus-visible,
 
 .hugin-rise {
   animation: hugin-rise 260ms var(--ease-out-expo) both;
+  /* Staggered entrances: a list sets --i per item. */
+  animation-delay: calc(var(--i, 0) * 55ms);
+}
+
+/* The amber beat of a kill: it holds, then fades before the red mark takes over. */
+@keyframes hugin-term {
+  0% {
+    transform: scale(1.5) rotate(-6deg);
+    opacity: 0;
+  }
+  20%,
+  80% {
+    transform: scale(1) rotate(-6deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(-6deg);
+    opacity: 0;
+  }
+}
+
+.hugin-stamp-term {
+  animation: hugin-term 600ms var(--ease-out-expo) both;
 }
 
 @media (prefers-reduced-motion: reduce) {

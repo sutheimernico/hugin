@@ -66,3 +66,6 @@ Object.defineProperties(HTMLElement.prototype, {
 // SVGElement — the cast is the seam between the two.
 (SVGElement.prototype as unknown as { getBBox: () => DOMRect }).getBBox = () =>
   ({ x: 0, y: 0, width: 0, height: 0 }) as DOMRect;
+
+// jsdom's default window is 1024 px wide; the shell's tests describe the wide layout.
+Object.defineProperty(window, "innerWidth", { value: 1440, writable: true });

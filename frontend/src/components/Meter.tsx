@@ -1,16 +1,7 @@
 import { animate, motion, useMotionValue, useTransform } from "motion/react";
 import { useEffect } from "react";
+import { FILL_CLASS } from "../lib/budget";
 import type { Tone } from "./Chip";
-
-const FILL_CLASS: Record<Tone, string> = {
-  blue: "bg-blue",
-  teal: "bg-teal",
-  green: "bg-green",
-  amber: "bg-amber",
-  red: "bg-red",
-  plum: "bg-plum",
-  muted: "bg-muted",
-};
 
 /** House easing and the UI transition length. */
 const EASE_OUT_EXPO = [0.16, 1, 0.3, 1] as const;

@@ -26,12 +26,12 @@ export function Chip({ tone, pulse, className = "", children }: ChipProps) {
     <span
       data-tone={tone}
       data-pulse={pulse ? "true" : undefined}
-      className={`inline-flex items-center gap-1.5 rounded-part border px-1.5 py-0.5 text-[11px] leading-4 font-medium ${TONE_CLASS[tone]} ${className}`}
+      className={`inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-part border px-1.5 py-0.5 font-display text-[13px] leading-4 font-semibold ${TONE_CLASS[tone]} ${className}`}
     >
       {pulse === true && (
         <span
           aria-hidden
-          className="hugin-lamp size-1.5"
+          className="hugin-lamp size-2"
           data-state="running"
           style={{ background: "currentColor" }}
         />

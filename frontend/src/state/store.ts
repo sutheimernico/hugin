@@ -16,6 +16,8 @@ import { applyEvents, initialState } from "./reducer";
 import type { HEvent, State, SystemStatus } from "./types";
 
 export type View = "control" | "munin" | "runs";
+/** The three panes of the narrow layout (Mission, Verlauf, Prozesse); wide layouts show all. */
+export type Pane = "mission" | "log" | "procs";
 
 /** Replay cursor: the actions are enter/seek/play/step/exit. */
 export interface ReplaySlice {
@@ -49,6 +51,7 @@ export interface HuginStore {
   system: SystemStatus | null;
   selectedPid: number | null;
   view: View;
+  pane: Pane;
   /** Prefilled by the palette's "Munin durchsuchen…" command, read by the browser. */
   muninQuery: string;
   /** Process table scope: the active run only (default), or every process the kernel knows. */
@@ -58,6 +61,7 @@ export interface HuginStore {
   setSystem: (system: SystemStatus | null) => void;
   setSelectedPid: (pid: number | null) => void;
   setView: (view: View) => void;
+  setPane: (pane: Pane) => void;
   setMuninQuery: (query: string) => void;
   setAllProcs: (allProcs: boolean) => void;
   /**
@@ -84,6 +88,7 @@ export const useHuginStore = create<HuginStore>()((set, get) => ({
   system: null,
   selectedPid: null,
   view: "control",
+  pane: "mission",
   muninQuery: "",
   allProcs: false,
 
@@ -103,6 +108,7 @@ export const useHuginStore = create<HuginStore>()((set, get) => ({
   setSystem: (system) => set({ system }),
   setSelectedPid: (selectedPid) => set({ selectedPid }),
   setView: (view) => set({ view }),
+  setPane: (pane) => set({ pane, view: "control" }),
   setMuninQuery: (muninQuery) => set({ muninQuery }),
   setAllProcs: (allProcs) => set({ allProcs }),
   setActiveRunId: (activeRunId) => set({ state: { ...get().state, activeRunId } }),

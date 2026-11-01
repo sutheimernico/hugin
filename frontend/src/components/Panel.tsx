@@ -20,12 +20,12 @@ export function Panel({
   const hasHeader = title !== undefined || right !== undefined;
   return (
     <section
-      className={`flex flex-col overflow-hidden rounded-panel border border-border bg-surface ${className}`}
+      className={`flex flex-col overflow-hidden bg-surface ${className}`}
     >
       {hasHeader && (
-        <header className="flex min-h-10 shrink-0 items-center justify-between gap-3 border-b border-border px-3.5">
+        <header className="flex min-h-11 shrink-0 items-center justify-between gap-3 border-b border-border px-4">
           {title !== undefined ? (
-            <h2 className="font-display text-[16px] leading-none font-semibold tracking-[0.01em] text-text">
+            <h2 className="font-display text-[19px] leading-none font-semibold text-text">
               {title}
             </h2>
           ) : (
