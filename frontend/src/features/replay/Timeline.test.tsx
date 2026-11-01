@@ -82,9 +82,9 @@ describe("Timeline", () => {
     expect(screen.getAllByTestId("replay-marker")).toHaveLength(3);
   });
 
-  it("names the run it is replaying", () => {
+  it("says that what plays is a recording", () => {
     render(<Timeline />);
-    expect(screen.getByText("Vergleiche drei Ansätze")).toBeInTheDocument();
+    expect(screen.getByText("Replay einer aufgezeichneten Mission")).toBeInTheDocument();
   });
 
   it("leaves replay through the button", async () => {

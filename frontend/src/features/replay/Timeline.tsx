@@ -70,8 +70,8 @@ export function Timeline() {
         {fmtDuration(elapsed)} / {fmtDuration(total)}
       </span>
 
-      <span className="hidden min-w-0 max-w-56 truncate text-[12px] text-muted lg:inline" title={goalOf(events)}>
-        {goalOf(events)}
+      <span className="hidden min-w-0 max-w-56 text-[12px] leading-tight text-muted lg:inline">
+        Replay einer aufgezeichneten Mission
       </span>
 
       <Button variant="ghost" size="sm" className="shrink-0" onClick={exitReplay}>
@@ -206,10 +206,4 @@ function isTyping(target: EventTarget | null): boolean {
   if (target.isContentEditable) return true;
   if (target.tagName === "TEXTAREA" || target.tagName === "SELECT") return true;
   return target instanceof HTMLInputElement && target.type !== "range";
-}
-
-/** The goal of the replayed run, read straight out of the event that created it. */
-function goalOf(events: HEvent[]): string {
-  const created = events.find((event) => event.kind === "run.created");
-  return typeof created?.data.goal === "string" ? created.data.goal : "";
 }

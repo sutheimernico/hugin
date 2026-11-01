@@ -5,6 +5,7 @@ import { isAlive, selectProcs } from "../../state/selectors";
 import type { Pane } from "../../state/store";
 import type { Proc, Run, State } from "../../state/types";
 import { AgentWindow } from "../agent/AgentWindow";
+import { OccupancyChart } from "../graph/OccupancyChart";
 import { Timetable } from "../log/Timetable";
 import { ProcessTable } from "../procs/ProcessTable";
 import { ProcessTree } from "../procs/ProcessTree";
@@ -77,6 +78,7 @@ export function ControlView(props: ControlViewProps) {
       )}
     </AnimatePresence>
   );
+  const occupancy = <OccupancyChart run={run} procs={runProcs} now={now} />;
   const diagram = (
     <Suspense fallback={<DiagramFallback />}>
       <AgentGraph
@@ -96,6 +98,7 @@ export function ControlView(props: ControlViewProps) {
           <>
             {ledger}
             <MobileTree procs={runProcs} selectedPid={selectedPid} onSelect={props.onSelect} />
+            {occupancy}
           </>
         )}
         {pane === "log" && <div className="h-full">{timetable}</div>}
@@ -110,10 +113,12 @@ export function ControlView(props: ControlViewProps) {
       <div className="h-full overflow-y-auto">
         <section
           aria-label="Gleisbild"
-          className="h-[min(56vh,560px)] min-h-[340px] border-b border-text/20 bg-surface-2"
+          className="h-[min(56vh,560px)] min-h-[340px] bg-surface-2"
         >
           {diagram}
         </section>
+        {occupancy}
+        <div className="border-b border-text/20" />
         <div className="grid grid-cols-2">
           <div className="min-w-0 border-r border-text/20 bg-surface">
             {ledger}
@@ -132,9 +137,12 @@ export function ControlView(props: ControlViewProps) {
         {ledger}
         <div className="min-h-0 flex-1">{table}</div>
       </div>
-      <section aria-label="Gleisbild" className="min-h-0 bg-surface-2">
-        {diagram}
-      </section>
+      <div className="flex min-h-0 flex-col bg-surface-2">
+        <section aria-label="Gleisbild" className="min-h-0 flex-1">
+          {diagram}
+        </section>
+        {occupancy}
+      </div>
       <div className="relative min-h-0 border-l border-text/20 bg-surface">
         {timetable}
         {agent}
