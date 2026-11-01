@@ -4,7 +4,9 @@ import { ledgerOf } from "./ledger";
 
 const run = { id: "r", createdAt: 100, doneAt: null, artifacts: ["report.md"] } as unknown as Run;
 
-function proc(over: Partial<Proc> & { usage?: Partial<Proc["usage"]> }): Proc {
+type Over = Partial<Omit<Proc, "usage">> & { usage?: { turns?: number; output_tokens?: number } };
+
+function proc(over: Over): Proc {
   return {
     runId: "r",
     state: "running",

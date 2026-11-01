@@ -17,6 +17,7 @@ import type {
   SystemStatus,
   Usage,
 } from "../state/types";
+import { fetchStaticEvents, fetchStaticRecordings } from "./recordings";
 
 export interface ApiProc {
   pid: number;
@@ -111,6 +112,8 @@ export async function getSystem(): Promise<SystemStatus> {
 }
 
 export async function getRuns(): Promise<Run[]> {
+  // No kernel behind the Pages build, so there are no runs of its own — only recordings.
+  if (__REPLAY_ONLY__) return [];
   const runs = await request<ApiRun[]>("/api/runs");
   return runs.map(toRun);
 }
@@ -124,6 +127,7 @@ export async function getRunEvents(runId: string, since = 0): Promise<HEvent[]> 
 }
 
 export async function getRecordings(): Promise<ApiRecording[]> {
+  if (__REPLAY_ONLY__) return fetchStaticRecordings();
   return request<ApiRecording[]>("/api/recordings");
 }
 
@@ -132,6 +136,7 @@ export async function getRecordings(): Promise<ApiRecording[]> {
  * no run id: the file *is* the run.
  */
 export async function getRecordingEvents(slug: string): Promise<HEvent[]> {
+  if (__REPLAY_ONLY__) return fetchStaticEvents(slug);
   return request<HEvent[]>(`/api/recordings/${encodeURIComponent(slug)}/events`);
 }
 
