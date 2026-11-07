@@ -78,3 +78,11 @@ export function modelLabel(model: string): string {
 function capital(word: string): string {
   return word.charAt(0).toUpperCase() + word.slice(1);
 }
+
+/**
+ * One-line summaries cut agent prose at a fixed length, so a markdown mark can be left open
+ * (`**Archi`). Marks are dropped instead of rendered: a half-bold fragment helps nobody.
+ */
+export function plain(text: string): string {
+  return text.replace(/\*\*|`/g, "").replace(/^#+\s+/, "");
+}

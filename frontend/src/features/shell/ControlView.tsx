@@ -103,7 +103,7 @@ export function ControlView(props: ControlViewProps) {
         {pane === "log" && <div className="h-full">{timetable}</div>}
         {pane === "procs" && (
           <>
-            <div className="h-[min(60%,420px)] min-h-[260px]">{table}</div>
+            <div className="flex max-h-[420px] min-h-0 flex-col">{table}</div>
             {occupancy}
           </>
         )}

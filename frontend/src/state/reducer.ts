@@ -11,7 +11,7 @@
  *   replay at 8× prunes exactly what the live run pruned.
  */
 
-import { syscallLabel, toolErrorText, toolLabel } from "../lib/describe";
+import { goalText, plain, syscallLabel, toolErrorText, toolLabel } from "../lib/describe";
 import { fmtDec, fmtInt, fmtMs } from "../lib/format";
 import { DRIVER_LABEL, exitReasonShort, STATE_LABEL } from "../lib/i18n";
 import { isActive, isAlive } from "./selectors";
@@ -110,7 +110,7 @@ export function logText(e: HEvent): string {
     case "kernel.subsystem":
       return `Subsystem ${str(d.name)}: ${str(d.detail)}`;
     case "run.created":
-      return `Mission gestartet: »${str(d.goal)}«`;
+      return `Mission gestartet: »${goalText(str(d.goal))}«`;
     case "run.done":
       return `Mission abgeschlossen in ${fmtDec(num(d.duration_s))} s`;
     case "run.failed":
@@ -144,11 +144,11 @@ export function logText(e: HEvent): string {
         ? `Kernel-Aufruf erledigt in ${fmtMs(num(d.ms))}`
         : `Kernel-Aufruf abgelehnt: ${clip(str(d.result_summary))}`;
     case "msg.sent":
-      return `Nachricht ${num(d.from_pid)} → ${num(d.to_pid)}: »${str(d.preview)}«`;
+      return `Nachricht ${num(d.from_pid)} → ${num(d.to_pid)}: »${plain(str(d.preview))}«`;
     case "munin.write":
-      return `Speicher: »${str(d.title)}«`;
+      return `Speicher: »${plain(str(d.title))}«`;
     case "munin.read":
-      return `Speicher durchsucht: »${str(d.query)}« (${num(d.hits)} Treffer)`;
+      return `Speicher durchsucht: »${plain(str(d.query))}« (${num(d.hits)} Treffer)`;
     case "artifact.written":
       return `Artefakt geschrieben: ${str(d.name)} (${fmtInt(num(d.bytes))} Bytes)`;
     case "budget.tick":

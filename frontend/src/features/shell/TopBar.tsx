@@ -67,7 +67,7 @@ export function TopBar({
       </div>
 
       <div className="flex shrink-0 items-center">
-        <ModeChip mode={mode} />
+        <ModeChip mode={mode} replayOnly={replayOnly} />
       </div>
 
       {!narrow && (

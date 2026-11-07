@@ -86,7 +86,8 @@ function LogList({ rows }: { rows: TimetableRow[] }) {
 
   return (
     <div
-      className="h-full"
+      // The row cut by the top edge fades out instead of being sliced under the header.
+      className="h-full [mask-image:linear-gradient(to_bottom,transparent,black_14px)]"
       onWheel={(event) => {
         if (event.deltaY < 0) setStick(false);
       }}

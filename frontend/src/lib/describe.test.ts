@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { goalText, modelLabel, syscallLabel, toolErrorText, toolLabel } from "./describe";
+import { goalText, modelLabel, plain, syscallLabel, toolErrorText, toolLabel } from "./describe";
 
 describe("goalText", () => {
   it("turns the program prefix into the role", () => {
@@ -59,5 +59,12 @@ describe("modelLabel", () => {
     expect(modelLabel("claude-haiku-4-5-20251001")).toBe("Haiku 4.5");
     expect(modelLabel("sim")).toBe("Skript");
     expect(modelLabel("qwen2.5:7b")).toBe("qwen2.5:7b");
+  });
+});
+
+describe("plain", () => {
+  it("drops markdown marks, including one left open by truncation", () => {
+    expect(plain("Docs verifiziert: 1. **Archi")).toBe("Docs verifiziert: 1. Archi");
+    expect(plain("## Titel mit `code`")).toBe("Titel mit code");
   });
 });

@@ -44,7 +44,7 @@ export function MissionLedger({ run, procs, now, replaying }: MissionLedgerProps
       </div>
 
       <h1
-        className="font-display mt-2.5 line-clamp-5 text-[17px] leading-[1.2] font-semibold text-text min-[1100px]:text-[21px] min-[1100px]:leading-[1.18] short:mt-2 short:line-clamp-4"
+        className="font-display mt-2.5 line-clamp-5 text-[17px] leading-[1.2] font-semibold text-text min-[1100px]:text-[21px] min-[1100px]:leading-[1.18] short:mt-2 short:line-clamp-4 hyphens-manual"
         title={run.goal}
       >
         {goalText(run.goal)}

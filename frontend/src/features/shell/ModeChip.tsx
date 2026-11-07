@@ -15,10 +15,12 @@ const MODE_TONE: Record<Mode, Tone> = {
   replay: "plum",
 };
 
-export function ModeChip({ mode }: { mode: Mode }) {
+/** The replay-only build has no kernel, so "ready" would claim something that is not there. */
+export function ModeChip({ mode, replayOnly = false }: { mode: Mode; replayOnly?: boolean }) {
+  const label = mode === "idle" && replayOnly ? "AUFZEICHNUNGEN" : MODE_LABEL[mode];
   return (
     <Chip tone={MODE_TONE[mode]} pulse={mode !== "idle"} className="tracking-[0.08em]">
-      {MODE_LABEL[mode]}
+      {label}
     </Chip>
   );
 }

@@ -255,3 +255,11 @@ describe("Layout", () => {
     }
   });
 });
+
+describe("ModeChip in the replay-only build", () => {
+  it("does not claim a ready kernel when there is none", () => {
+    render(<ModeChip mode="idle" replayOnly />);
+    expect(screen.getByText("AUFZEICHNUNGEN")).toBeInTheDocument();
+    expect(screen.queryByText("BEREIT")).not.toBeInTheDocument();
+  });
+});
