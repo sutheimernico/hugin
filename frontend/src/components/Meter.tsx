@@ -13,11 +13,13 @@ type MeterProps = {
   max: number;
   tone: Tone;
   format?: (value: number) => string;
+  /** A discrete count (processes): the readout must never lag the table beside it. */
+  instant?: boolean;
 };
 
 /** Labelled bar with a mono readout: the bar animates its width, the readout counts up to it. */
-export function Meter({ label, value, max, tone, format }: MeterProps) {
-  const ticked = useTicker(value);
+export function Meter({ label, value, max, tone, format, instant = false }: MeterProps) {
+  const ticked = useTicker(value, instant);
   const readout = useTransform(ticked, (current) => {
     const rounded = Math.round(current);
     return format ? format(rounded) : String(rounded);
@@ -53,13 +55,17 @@ export function Meter({ label, value, max, tone, format }: MeterProps) {
  * The animation hangs off the effect's dependency on `value`, so it starts on a real change
  * and on nothing else — a re-render with the same number never re-triggers it.
  */
-function useTicker(value: number) {
+function useTicker(value: number, instant: boolean) {
   const current = useMotionValue(value);
 
   useEffect(() => {
+    if (instant) {
+      current.set(value);
+      return;
+    }
     const controls = animate(current, value, { duration: TICK_S, ease: EASE_OUT_EXPO });
     return () => controls.stop();
-  }, [value, current]);
+  }, [value, current, instant]);
 
   return current;
 }

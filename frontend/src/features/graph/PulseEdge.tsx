@@ -58,7 +58,9 @@ export function PulseEdge({
   const pulses = still === true ? [] : (data?.pulses ?? []);
 
   return (
-    <>
+    // The track fades in just after the card it leads to has started to appear, so a spawn
+    // never draws a stub to a node that is not there yet.
+    <g className="hugin-edge-in">
       {kind === "munin" ? (
         <BaseEdge
           path={path}
@@ -75,7 +77,7 @@ export function PulseEdge({
       {pulses.map((pulse) => (
         <Train key={pulse.id} pulse={pulse} path={path} />
       ))}
-    </>
+    </g>
   );
 }
 

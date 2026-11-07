@@ -79,7 +79,7 @@ export function TopBar({
             They give up a quarter of their width below 1500 px so the buttons never leave. */}
         <div className="hidden items-center gap-6 min-[1280px]:flex">
           <div className="w-32 shrink-0 min-[1500px]:w-36">
-            <Meter label="Prozesse" value={meters.activeProcs} max={PROC_SCALE} tone="blue" />
+            <Meter label="Prozesse" value={meters.activeProcs} max={PROC_SCALE} tone="blue" instant />
           </div>
           <div className="w-32 shrink-0 min-[1500px]:w-36">
             <Meter

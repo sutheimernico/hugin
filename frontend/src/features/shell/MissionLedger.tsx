@@ -69,7 +69,7 @@ export function MissionLedger({ run, procs, now, replaying }: MissionLedgerProps
           label="Agenten"
           value={
             <>
-              <CountUp value={ledger.procsAlive} />
+              {ledger.procsAlive}
               <span className="text-[16px] text-muted">/{ledger.procsTotal}</span>
             </>
           }
