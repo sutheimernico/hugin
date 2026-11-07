@@ -7,14 +7,14 @@ local Ollama loop — as supervised processes with PIDs, budgets, capability-gat
 append-only event log, and a React UI shows, kills and replays every step live.**
 
 <p align="center">
-  <img src="docs/media/hero.gif" width="640"
-       alt="Mission ledger, process table, signal-box diagram and occupancy plan while a recorded Claude run plays: a planner starts three scouts, the third waits for a free slot">
+  <img src="docs/media/mission-control.png" width="900"
+       alt="Mission Control at 1440 px during a recorded Claude run: mission ledger and process table on the left, the signal-box diagram with a planner, three scouts and the memory hub in the middle, the occupancy plan below it, the timetable on the right">
 </p>
 
 <p align="center">
-  <sub>Five seconds at 8x from the real Claude run recorded for this repo (848 events, 231 s): the planner
-  starts scouts, the third queues for a slot. The shell is the same in live mode; only the data source
-  differs. The timetable column is left out of the clip to keep it under 4 MB.</sub>
+  <sub>The real Claude run recorded for this repo (848 events, 231 s) at 1:09. You can replay it
+  without a kernel: <code>npm --prefix frontend run build:pages</code> builds a replay-only shell
+  that opens on this run (see below).</sub>
 </p>
 
 **Headline result.** The largest real run so far: one planner plus three web-searching scouts on
@@ -42,8 +42,14 @@ the other recordings. `.github/workflows/pages.yml` deploys exactly that to GitH
 ## The interface
 
 <p align="center">
-  <img src="docs/media/mission-control.png" width="900"
-       alt="Mission Control at 1440 px: mission ledger and process table on the left, the signal-box diagram and occupancy plan in the middle, the timetable on the right">
+  <img src="docs/media/hero.webp" width="900"
+       alt="The whole recorded run as a time-lapse: the planner starts three scouts, they search the web and write to memory, the lamps turn green one by one, report.md appears">
+</p>
+
+<p align="center">
+  <sub>The whole recorded run as a 15 s time-lapse at about 16x (animated WebP, 1280 px, full
+  colour, captured by stepping the replay timeline). Its in-flight token counter still reads <code>Tokens ≥</code>: the
+  recording predates the exact counter, and the exit totals are correct.</sub>
 </p>
 
 The shell is a railway signal box, because hugin does what a signal box does: it supervises
@@ -82,7 +88,7 @@ Real: the processes are real `claude -p` subprocesses or a real Ollama tool loop
 are real MCP tools, and the event log is the source of truth. Simulated: exactly one driver — the
 *Simulation* replays a fixed script instead of calling a model, so tests and the offline demo run
 without an LLM. It plays the same example mission whatever goal you type (the UI says so), and the
-mode chip reads `SIMULATION`, `LIVE · CLAUDE`, `LIVE · OLLAMA` or `REPLAY` while a mission or a replay is on screen, and `BEREIT` (ready) when the kernel is idle.
+mode chip reads `SIMULATION`, `LIVE · CLAUDE`, `LIVE · OLLAMA` or `REPLAY` while a mission or a replay is on screen, and `BEREIT` (ready) when the kernel is idle (`AUFZEICHNUNGEN` in the replay-only build, which has no kernel).
 
 ## How this was built
 
@@ -189,7 +195,7 @@ uv run python scripts/record_demo.py <run_id> <slug>      # or straight from the
 Note on the Claude recording: it was captured before output tokens were counted from the stream's
 `message_delta` (the first version read a start-of-message snapshot of ~1 token per turn). Its live
 token readings while agents run are therefore far too low, and the UI marks that figure as a lower
-bound (`Tokens ≥`) until the agents exit; the exit totals (20,2k output tokens) are exact. New
+bound (`Tokens ≥`, only for recordings flagged `tokens_lower_bound` in their manifest) until the agents exit; the exit totals (20,2k output tokens) are exact. New
 runs count per turn from the stream.
 
 ## Development
