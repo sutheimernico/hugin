@@ -21,26 +21,35 @@ type ReplayRowProps = {
   extra?: ReactNode;
   busy: boolean;
   onReplay: () => void;
+  /** The row the preview shows; absent where there is no preview. */
+  selected?: boolean;
+  onSelect?: () => void;
   testId: string;
   /** Stagger index for the entrance. */
   index?: number;
 };
 
 /** One run or recording: what it was about, which driver ran it, and the way back into it. */
-export function ReplayRow({ title, driver, meta, extra, busy, onReplay, testId, index = 0 }: ReplayRowProps) {
+export function ReplayRow({ title, driver, meta, extra, busy, onReplay, selected, onSelect, testId, index = 0 }: ReplayRowProps) {
   return (
     <div
       data-testid={testId}
+      data-selected={selected ? "true" : undefined}
+      onClick={onSelect}
       style={{ "--i": index } as CSSProperties}
-      className="hugin-rise ease-out-expo group flex items-center gap-4 border-b border-border px-5 py-4 transition-colors duration-150 hover:bg-surface-2"
+      className="hugin-rise ease-out-expo group flex items-center gap-4 border-b border-border px-5 py-4 transition-colors duration-150 hover:bg-surface-2 data-[selected=true]:bg-surface-2 data-[selected=true]:outline data-[selected=true]:-outline-offset-2 data-[selected=true]:outline-text/50"
     >
       <div className="min-w-0 flex-1">
-        <span
-          className="font-display line-clamp-2 text-[19px] leading-[1.2] font-semibold text-text"
+        <button
+          type="button"
+          aria-pressed={selected}
+          onClick={onSelect}
+          disabled={onSelect === undefined}
+          className="font-display line-clamp-2 block text-left text-[19px] leading-[1.2] font-semibold text-text disabled:cursor-default"
           title={title}
         >
           {goalText(title)}
-        </span>
+        </button>
         <span className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-muted">
           <Chip tone={DRIVER_TONE[driver] ?? "muted"}>{driverLabel(driver)}</Chip>
           {meta.map((part) => (
@@ -51,7 +60,11 @@ export function ReplayRow({ title, driver, meta, extra, busy, onReplay, testId, 
           {extra}
         </span>
       </div>
-      <Button variant="primary" size="md" disabled={busy} onClick={onReplay} className="shrink-0">
+      <Button variant="primary" size="md" disabled={busy} onClick={(event) => {
+          event.stopPropagation();
+          onReplay();
+        }}
+        className="shrink-0">
         <Play size={14} fill="currentColor" aria-hidden />
         {busy ? "lädt…" : "Replay"}
       </Button>

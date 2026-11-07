@@ -7,15 +7,16 @@
  * instead of a stream.
  */
 
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { useLoaded } from "../../hooks/useLoaded";
-import { getRecordings, getRuns } from "../../lib/api";
+import { getRecordingEvents, getRecordings, getRunEvents, getRuns } from "../../lib/api";
 import { Chip, type Tone } from "../../components/Chip";
 import { fmtDuration, fmtTokens } from "../../lib/format";
 import { STATE_LABEL } from "../../lib/i18n";
 import type { Run } from "../../state/types";
 import { fmtDateTimeDe } from "../../lib/time";
 import { ReplayRow } from "./ReplayRow";
+import { RunPreview } from "./RunPreview";
 import { useReplayLauncher } from "./useReplayLauncher";
 
 const RUN_TONE: Record<Run["state"], Tone> = { running: "blue", done: "green", failed: "red" };
@@ -28,8 +29,19 @@ export function RunsView() {
   const ordered = [...(runs.rows ?? [])].sort((a, b) => b.createdAt - a.createdAt);
   const showRuns = !__REPLAY_ONLY__;
 
+  // What the preview shows: the row the reader pointed at, otherwise the first recording —
+  // the Claude run, which is the one worth seeing first.
+  const [pick, setPick] = useState<{ kind: "run" | "recording"; id: string } | null>(null);
+  const first = recordings.rows?.[0];
+  const chosen =
+    pick ?? (first === undefined ? null : ({ kind: "recording", id: first.slug } as const));
+  const chosenRun = chosen?.kind === "run" ? ordered.find((run) => run.id === chosen.id) : undefined;
+  const chosenRecording =
+    chosen?.kind === "recording" ? recordings.rows?.find((rec) => rec.slug === chosen.id) : undefined;
+
   return (
-    <div className="h-full overflow-y-auto bg-surface">
+    <div className="grid h-full min-h-0 grid-cols-1 bg-surface min-[1000px]:grid-cols-[minmax(0,1fr)_minmax(400px,38%)]">
+    <div className="min-h-0 overflow-y-auto">
       <header className="border-b border-border px-5 py-5">
         <h1 className="font-display text-[30px] leading-none font-semibold text-text">
           Läufe &amp; Replay
@@ -65,6 +77,8 @@ export function RunsView() {
                 `${run.artifacts.length} Artefakt${run.artifacts.length === 1 ? "" : "e"}`,
               ]}
               busy={busy === run.id}
+              selected={chosen?.kind === "run" && chosen.id === run.id}
+              onSelect={() => setPick({ kind: "run", id: run.id })}
               onReplay={() => void startRun(run.id)}
             />
           ))}
@@ -86,10 +100,35 @@ export function RunsView() {
             meta={[`${recording.events} Ereignisse`, fmtDuration(recording.duration_s)]}
             extra={<span className="font-mono text-[12px]">{recording.slug}</span>}
             busy={busy === recording.slug}
+            selected={chosen?.kind === "recording" && chosen.id === recording.slug}
+            onSelect={() => setPick({ kind: "recording", id: recording.slug })}
             onReplay={() => void startRecording(recording.slug)}
           />
         ))}
       </Section>
+    </div>
+    <div className="hidden min-h-0 overflow-y-auto border-l border-text/20 min-[1000px]:block">
+      {chosenRun !== undefined && (
+        <RunPreview
+          sourceKey={`run:${chosenRun.id}`}
+          goal={chosenRun.goal}
+          driver={chosenRun.driver}
+          load={() => getRunEvents(chosenRun.id, 0)}
+          busy={busy === chosenRun.id}
+          onReplay={() => void startRun(chosenRun.id)}
+        />
+      )}
+      {chosenRecording !== undefined && (
+        <RunPreview
+          sourceKey={`recording:${chosenRecording.slug}`}
+          goal={chosenRecording.goal === "" ? chosenRecording.slug : chosenRecording.goal}
+          driver={chosenRecording.driver}
+          load={() => getRecordingEvents(chosenRecording.slug)}
+          busy={busy === chosenRecording.slug}
+          onReplay={() => void startRecording(chosenRecording.slug)}
+        />
+      )}
+    </div>
     </div>
   );
 }
