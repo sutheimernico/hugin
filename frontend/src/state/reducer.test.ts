@@ -360,6 +360,22 @@ describe("logText", () => {
   });
 });
 
+describe("applyEvent — a syscall reached through an MCP tool", () => {
+  it("is one transcript row, not a tool row plus a kernel row", () => {
+    const ev = makeFeed();
+    const state = run(initialState, [
+      spawn(ev, 1),
+      ev("tool.call", { call_id: "t1", tool: "mcp__hugin__munin_write", input_summary: "{}" }, { pid: 1 }),
+      ev("sys.call", { call_id: "s1", syscall: "munin_write", args_summary: "Titel" }, { pid: 1 }),
+      ev("sys.result", { call_id: "s1", ok: true, result_summary: "ok", ms: 0 }, { pid: 1 }),
+      ev("tool.result", { call_id: "t1", ok: true, output_summary: "ok", ms: 19 }, { pid: 1 }),
+    ]);
+    const rows = state.procs[1].transcript.filter((item) => item.t === "tool");
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toMatchObject({ callId: "t1", ok: true, ms: 19, sys: false });
+  });
+});
+
 describe("applyEvent — meters and munin activity", () => {
   it("counts active processes and the highest budget fill", () => {
     const ev = makeFeed();

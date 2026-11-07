@@ -236,19 +236,27 @@ function reduce(next: State, e: HEvent): void {
         ],
       }));
     case "sys.call":
-      return patchProc(next, e.pid, (proc) => ({
-        ...proc,
-        transcript: [
-          ...proc.transcript,
-          {
-            t: "tool",
-            callId: str(d.call_id),
-            tool: str(d.syscall),
-            input: str(d.args_summary),
-            sys: true,
-          },
-        ],
-      }));
+      return patchProc(next, e.pid, (proc) => {
+        // The Claude driver reaches a syscall through its MCP tool, so the same call is already
+        // in the transcript as that tool; a second row would show it twice.
+        const last = proc.transcript.at(-1);
+        if (last?.t === "tool" && last.ok === undefined && last.tool === `mcp__hugin__${str(d.syscall)}`) {
+          return proc;
+        }
+        return {
+          ...proc,
+          transcript: [
+            ...proc.transcript,
+            {
+              t: "tool",
+              callId: str(d.call_id),
+              tool: str(d.syscall),
+              input: str(d.args_summary),
+              sys: true,
+            },
+          ],
+        };
+      });
     case "tool.result":
       return patchProc(next, e.pid, (proc) => ({
         ...proc,
