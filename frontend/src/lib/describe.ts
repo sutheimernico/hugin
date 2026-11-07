@@ -49,3 +49,32 @@ export function toolLabel(tool: string): string {
   if (tool.startsWith(MCP_PREFIX)) return syscallLabel(tool.slice(MCP_PREFIX.length));
   return TOOL_LABEL[tool] ?? SYSCALL_LABEL[tool] ?? tool;
 }
+
+/**
+ * A tool error as one German sentence. Claude Code wraps validation failures in
+ * `<tool_use_error>InputValidationError: <tool> was called with input that …`; the reader needs
+ * to know which call failed, not the wrapper. Anything unrecognised is shown clipped, as it came.
+ */
+export function toolErrorText(raw: string, max = 90): string {
+  const flat = raw.replace(/\s+/g, " ").trim();
+  if (/tool_use_error|InputValidationError/.test(flat)) {
+    const tool = /(mcp__hugin__\w+|\b[A-Z][A-Za-z]+)\s+was called/.exec(flat)?.[1];
+    return tool === undefined
+      ? "Ungültige Eingabe, der Agent versucht es erneut"
+      : `Ungültige Eingabe für »${toolLabel(tool)}«, der Agent versucht es erneut`;
+  }
+  if (/timed out|timeout/i.test(flat)) return "Zeitüberschreitung";
+  return flat.length <= max ? flat : `${flat.slice(0, max - 1).trimEnd()}…`;
+}
+
+/** The model as a name, not an id: `sonnet` → `Sonnet`, `claude-haiku-4-5-2025…` → `Haiku 4.5`. */
+export function modelLabel(model: string): string {
+  if (model === "sim") return "Skript";
+  const versioned = /^claude-([a-z]+)-(\d+)-(\d+)/.exec(model);
+  if (versioned !== null) return `${capital(versioned[1])} ${versioned[2]}.${versioned[3]}`;
+  return /^[a-z]+$/.test(model) ? capital(model) : model;
+}
+
+function capital(word: string): string {
+  return word.charAt(0).toUpperCase() + word.slice(1);
+}

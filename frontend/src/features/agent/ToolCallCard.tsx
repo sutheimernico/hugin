@@ -7,6 +7,7 @@
 import { motion } from "motion/react";
 import { memo, useState } from "react";
 import { toolLabel } from "../../lib/describe";
+import { fmtMs } from "../../lib/format";
 import type { TranscriptItem } from "../../state/types";
 
 export type ToolItem = Extract<TranscriptItem, { t: "tool" }>;
@@ -41,7 +42,7 @@ export const ToolCallCard = memo(function ToolCallCard({ call }: { call: ToolIte
           />
         ) : (
           <>
-            <span className="shrink-0 font-mono text-[11px] text-muted tabular-nums">{call.ms ?? 0} ms</span>
+            <span className="shrink-0 font-mono text-[11px] text-muted tabular-nums">{fmtMs(call.ms ?? 0)}</span>
             <span className={call.ok ? "shrink-0 text-green" : "shrink-0 text-red"}>
               {call.ok ? "✓" : "✗"}
             </span>

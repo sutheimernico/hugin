@@ -7,6 +7,7 @@
  * its scroll position and its stick-to-bottom state while an agent is being read.
  */
 
+import { modelLabel } from "../../lib/describe";
 import { ESC_PRIORITY, useEscapeLayer } from "../../lib/escape";
 import { motion } from "motion/react";
 import { X } from "lucide-react";
@@ -93,8 +94,8 @@ export function AgentWindow({ proc, now, onClose, onKill }: AgentWindowProps) {
               {proc.program} · PID {proc.pid}
             </span>
             <span className="text-[13px] font-medium text-text">{STATE_LABEL[proc.state]}</span>
-            <Chip tone="muted" className="max-w-40 truncate font-mono">
-              {proc.model}
+            <Chip tone="muted" className="max-w-40 truncate" title={proc.model}>
+              {modelLabel(proc.model)}
             </Chip>
             <Chip tone={DRIVER_TONE[proc.driver]}>{DRIVER_LABEL[proc.driver]}</Chip>
           </span>

@@ -31,7 +31,7 @@ import {
   type CommandActions,
 } from "./commands";
 
-const GROUPS: Command["group"][] = ["Mission", "Prozesse", "Runs", "Munin"];
+const GROUPS: Command["group"][] = ["Mission", "Prozesse", "Läufe", "Munin"];
 
 /** `cmdk` renders the heading itself, so its style has to reach it through the group element. */
 const GROUP_CLASS =

@@ -8,12 +8,13 @@
  * one — the command stays visible and carries a German reason why it will not start.
  */
 
+import { goalText } from "../../lib/describe";
 import { DRIVER_LABEL, STATE_LABEL } from "../../lib/i18n";
 import type { Driver, Run, SystemStatus } from "../../state/types";
 
 export interface Command {
   id: string;
-  group: "Mission" | "Prozesse" | "Runs" | "Munin";
+  group: "Mission" | "Prozesse" | "Läufe" | "Munin";
   label: string;
   hint?: string;
   disabled?: string;
@@ -117,8 +118,8 @@ export function buildCommands(ctx: CommandContext): Command[] {
   for (const run of newest) {
     commands.push({
       id: `run:${run.id}`,
-      group: "Runs",
-      label: `Run öffnen: ${run.goal}`,
+      group: "Läufe",
+      label: `Lauf öffnen: ${goalText(run.goal)}`,
       hint: `${DRIVER_LABEL[run.driver]} · ${STATE_LABEL[run.state] ?? run.state}`,
       run: () => ctx.actions.openRun(run.id),
     });
@@ -128,7 +129,7 @@ export function buildCommands(ctx: CommandContext): Command[] {
     id: MUNIN_SEARCH_ID,
     group: "Munin",
     label: "Munin durchsuchen…",
-    hint: "Gedächtnis aller Runs",
+    hint: "Gedächtnis aller Läufe",
     // The browser owns the query; an empty one shows the newest memories.
     run: () => ctx.actions.openMunin(""),
   });

@@ -125,7 +125,7 @@ describe("RunsView", () => {
     api.getRecordings.mockResolvedValue([]);
     render(<RunsView />);
 
-    expect(await screen.findByText("Noch keine Runs — starte eine Mission.")).toBeInTheDocument();
+    expect(await screen.findByText("Noch keine Läufe — starte eine Mission.")).toBeInTheDocument();
     expect(screen.getByText("Noch keine Aufnahmen exportiert.")).toBeInTheDocument();
   });
 

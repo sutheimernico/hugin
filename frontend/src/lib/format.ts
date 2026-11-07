@@ -23,6 +23,18 @@ export function fmtUsd(x: number | null): string {
   return `≈ $${comma(x.toFixed(2))}`;
 }
 
+/** A whole number with the German thousands dot: `7528` → `"7.528"`. */
+export function fmtInt(n: number): string {
+  return Number.isFinite(n) ? Math.round(n).toLocaleString("de-DE") : "–";
+}
+
+/** A call's duration: `15` → `"15 ms"`, `6028` → `"6,0 s"`. */
+export function fmtMs(ms: number): string {
+  if (!Number.isFinite(ms)) return "–";
+  if (Math.abs(Math.round(ms)) < 1000) return `${Math.round(ms)} ms`;
+  return `${comma((ms / 1000).toFixed(1))} s`;
+}
+
 function comma(fixed: string): string {
   return fixed.replace(".", ",");
 }

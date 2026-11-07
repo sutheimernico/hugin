@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { fmtDuration, fmtTokens, fmtUsd } from "./format";
+import { fmtDuration, fmtInt, fmtMs, fmtTokens, fmtUsd } from "./format";
 
 describe("fmtTokens", () => {
   it("keeps counts below a thousand as plain digits", () => {
@@ -41,5 +41,15 @@ describe("fmtUsd", () => {
   it("marks costs as estimates with two German decimals", () => {
     expect(fmtUsd(0.0432)).toBe("≈ $0,04");
     expect(fmtUsd(12.5)).toBe("≈ $12,50");
+  });
+});
+
+describe("fmtInt and fmtMs", () => {
+  it("use the German thousands dot and decimal comma", () => {
+    expect(fmtInt(7528)).toBe("7.528");
+    expect(fmtInt(12)).toBe("12");
+    expect(fmtMs(15)).toBe("15 ms");
+    expect(fmtMs(6028)).toBe("6,0 s");
+    expect(fmtMs(999.6)).toBe("1,0 s");
   });
 });

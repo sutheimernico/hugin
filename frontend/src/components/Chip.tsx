@@ -17,15 +17,17 @@ type ChipProps = {
   /** Live elements only — adds a lamp dot that breathes. */
   pulse?: boolean;
   className?: string;
+  title?: string;
   children: ReactNode;
 };
 
 /** A label plate: squared like a sign, with a lamp dot when what it names is live. */
-export function Chip({ tone, pulse, className = "", children }: ChipProps) {
+export function Chip({ tone, pulse, className = "", title, children }: ChipProps) {
   return (
     <span
       data-tone={tone}
       data-pulse={pulse ? "true" : undefined}
+      title={title}
       className={`inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-part border px-1.5 py-0.5 font-display text-[13px] leading-4 font-semibold ${TONE_CLASS[tone]} ${className}`}
     >
       {pulse === true && (

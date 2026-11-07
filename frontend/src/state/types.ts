@@ -111,6 +111,8 @@ export interface LogLine {
   kind: string;
   pid: number | null;
   text: string;
+  /** A `tool.call` of one of hugin's own syscalls, which the kernel logs a second time. */
+  kernelTool?: true;
 }
 
 export interface Meters {

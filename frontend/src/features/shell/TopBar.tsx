@@ -22,9 +22,9 @@ const TOKENS_PER_MIN_SCALE = 2_000;
 
 /** The three views of the shell, in the order they are offered. */
 const TABS: { view: View; label: string }[] = [
-  { view: "control", label: "Mission Control" },
+  { view: "control", label: "Stellwerk" },
   { view: "munin", label: "Munin" },
-  { view: "runs", label: "Runs" },
+  { view: "runs", label: "Läufe" },
 ];
 
 /** The Pages build has no memory store to browse. */

@@ -67,7 +67,20 @@ function LogList({ rows }: { rows: TimetableRow[] }) {
 
   useEffect(() => {
     if (!stick) return;
-    handle.current?.scrollToIndex({ index: "LAST", align: "end" });
+    const toEnd = () => handle.current?.scrollToIndex({ index: "LAST", align: "end" });
+    toEnd();
+    // Rows are measured as they render, so the first jump to a freshly swapped (and much
+    // longer) list lands on an estimate and strands the list below a blank gap. Two more
+    // jumps after layout settle on the real end.
+    let second = 0;
+    const first = requestAnimationFrame(() => {
+      toEnd();
+      second = requestAnimationFrame(toEnd);
+    });
+    return () => {
+      cancelAnimationFrame(first);
+      cancelAnimationFrame(second);
+    };
   }, [rows.length, stick]);
 
   return (
@@ -83,6 +96,7 @@ function LogList({ rows }: { rows: TimetableRow[] }) {
         initialTopMostItemIndex={{ index: "LAST", align: "end" }}
         // A log line is 20 px high; a few pixels of rounding must still count as "at the end".
         atBottomThreshold={24}
+        defaultItemHeight={28}
         atBottomStateChange={(atBottom) => {
           if (atBottom) setStick(true);
         }}

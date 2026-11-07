@@ -14,11 +14,10 @@ export const DRIVER_LABEL: Record<string, string> = {
 };
 /**
  * Why a process stopped, in the kernel's own vocabulary (`_state_for` in `kernel/kernel.py`).
- * `done` keeps the "Beendet:" prefix so the three ways out of a run read as one family in the
- * agent window's footer.
+ * Standalone words, because the agent window's footer shows them without a sentence around them.
  */
 export const EXIT_REASON_LABEL: Record<string, string> = {
-  done: "Beendet: fertig", failed: "Fehler", killed: "Beendet", driver_error: "Treiberfehler",
+  done: "Abgeschlossen", failed: "Fehlgeschlagen", killed: "Gestoppt", driver_error: "Treiberfehler",
   "budget:turns": "Budget: Runden überschritten",
   "budget:seconds": "Budget: Zeit überschritten",
   "budget:output_tokens": "Budget: Tokens überschritten",

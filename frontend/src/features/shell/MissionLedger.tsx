@@ -54,8 +54,14 @@ export function MissionLedger({ run, procs, now, replaying }: MissionLedgerProps
         <Figure label="Laufzeit" value={fmtDuration(ledger.elapsed)} />
         <Figure label="Runden" value={<CountUp value={ledger.turns} />} />
         <Figure
-          label={ledger.tokensAreFloor ? "Tokens, mindestens" : "Tokens"}
-          value={<CountUp value={ledger.outputTokens} format={fmtTokens} />}
+          label="Tokens"
+          hint={ledger.tokensAreFloor ? "Mindestwert: abgeschlossene Runden, laufende zählen erst am Ende" : undefined}
+          value={
+            <>
+              {ledger.tokensAreFloor && <span className="text-[18px] text-muted">≥&#8239;</span>}
+              <CountUp value={ledger.outputTokens} format={fmtTokens} />
+            </>
+          }
         />
         <Figure
           label="Agenten"
@@ -90,9 +96,9 @@ export function MissionLedger({ run, procs, now, replaying }: MissionLedgerProps
   );
 }
 
-function Figure({ label, value }: { label: string; value: ReactNode }) {
+function Figure({ label, value, hint }: { label: string; value: ReactNode; hint?: string }) {
   return (
-    <div className="min-w-0">
+    <div className="min-w-0" title={hint}>
       <dd className="font-display text-[28px] leading-none font-semibold text-text tabular-nums">
         {value}
       </dd>

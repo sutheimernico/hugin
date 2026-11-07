@@ -11,7 +11,8 @@
  *   replay at 8× prunes exactly what the live run pruned.
  */
 
-import { syscallLabel, toolLabel } from "../lib/describe";
+import { syscallLabel, toolErrorText, toolLabel } from "../lib/describe";
+import { fmtInt, fmtMs } from "../lib/format";
 import { DRIVER_LABEL, exitReasonShort, STATE_LABEL } from "../lib/i18n";
 import { ALIVE_STATES } from "./selectors";
 import type {
@@ -87,6 +88,7 @@ export function applyEvent(state: State, e: HEvent, opts?: { logRing?: number })
 
   if (!UNLOGGED.has(e.kind)) {
     const line: LogLine = { seq: e.seq, ts: e.ts, kind: e.kind, pid: e.pid, text: logText(e) };
+    if (e.kind === "tool.call" && str(e.data.tool).startsWith("mcp__hugin__")) line.kernelTool = true;
     const ring = opts?.logRing ?? LOG_RING;
     next.log = [...next.log, line].slice(-ring);
   }
@@ -133,14 +135,14 @@ export function logText(e: HEvent): string {
       return `Prozess ${pid}: ${toolLabel(str(d.tool))}`;
     case "tool.result":
       return d.ok === true
-        ? `Werkzeug fertig in ${num(d.ms)} ms`
-        : `Werkzeug fehlgeschlagen: ${clip(str(d.output_summary))}`;
+        ? `Werkzeug fertig in ${fmtMs(num(d.ms))}`
+        : `Werkzeug fehlgeschlagen: ${toolErrorText(str(d.output_summary))}`;
     case "sys.call":
       return `Prozess ${pid}: ${syscallLabel(str(d.syscall))}`;
     case "sys.result":
       return d.ok === true
-        ? `Syscall erledigt in ${num(d.ms)} ms`
-        : `Syscall abgelehnt: ${clip(str(d.result_summary))}`;
+        ? `Kernel-Aufruf erledigt in ${fmtMs(num(d.ms))}`
+        : `Kernel-Aufruf abgelehnt: ${clip(str(d.result_summary))}`;
     case "msg.sent":
       return `Nachricht ${num(d.from_pid)} → ${num(d.to_pid)}: »${str(d.preview)}«`;
     case "munin.write":
@@ -148,7 +150,7 @@ export function logText(e: HEvent): string {
     case "munin.read":
       return `Speicher durchsucht: »${str(d.query)}« (${num(d.hits)} Treffer)`;
     case "artifact.written":
-      return `Artefakt geschrieben: ${str(d.name)} (${num(d.bytes)} Bytes)`;
+      return `Artefakt geschrieben: ${str(d.name)} (${fmtInt(num(d.bytes))} Bytes)`;
     case "budget.tick":
       return `Budget ${Math.round(num(d.pct) * 100)} % (Prozess ${pid})`;
     case "budget.exceeded":

@@ -75,7 +75,7 @@ describe("CommandPalette", () => {
     expect(await screen.findByText("Mission starten: Recherche-Briefing")).toBeInTheDocument();
     expect(screen.getByText("Mission")).toBeInTheDocument();
     expect(screen.getByText("Alle Prozesse beenden")).toBeInTheDocument();
-    expect(await screen.findByText("Run öffnen: Vergleiche drei Ansätze")).toBeInTheDocument();
+    expect(await screen.findByText("Lauf öffnen: Vergleiche drei Ansätze")).toBeInTheDocument();
     expect(screen.getByText("Munin durchsuchen…")).toBeInTheDocument();
   });
 
@@ -189,7 +189,7 @@ describe("CommandPalette", () => {
 
   it("shows a run in mission control", async () => {
     await openPalette();
-    await userEvent.click(await screen.findByText("Run öffnen: Vergleiche drei Ansätze"));
+    await userEvent.click(await screen.findByText("Lauf öffnen: Vergleiche drei Ansätze"));
     await waitFor(() => expect(useHuginStore.getState().state.activeRunId).toBe("r1"));
   });
 

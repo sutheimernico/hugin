@@ -85,16 +85,16 @@ describe("buildCommands", () => {
   it("lists the eight newest runs, newest first", () => {
     const runs = Array.from({ length: 10 }, (_, index) => makeRun(`r${index}`, index));
     const commands = buildCommands(makeCtx({ runs }));
-    const runCommands = commands.filter((command) => command.group === "Runs");
+    const runCommands = commands.filter((command) => command.group === "Läufe");
     expect(runCommands).toHaveLength(8);
-    expect(runCommands[0].label).toBe("Run öffnen: Ziel r9");
-    expect(runCommands.at(-1)?.label).toBe("Run öffnen: Ziel r2");
+    expect(runCommands[0].label).toBe("Lauf öffnen: Ziel r9");
+    expect(runCommands.at(-1)?.label).toBe("Lauf öffnen: Ziel r2");
   });
 
   it("opens a run by id", () => {
     const actions = makeActions();
     const commands = buildCommands(makeCtx({ runs: [makeRun("r1", 1)], actions }));
-    commands.find((command) => command.group === "Runs")?.run();
+    commands.find((command) => command.group === "Läufe")?.run();
     expect(actions.openRun).toHaveBeenCalledWith("r1");
   });
 

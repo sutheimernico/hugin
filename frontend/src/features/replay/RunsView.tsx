@@ -1,5 +1,5 @@
 /**
- * Runs & Replay: everything that has already happened, and the way back into it.
+ * Läufe & Replay: everything that has already happened, and the way back into it.
  *
  * Like the munin browser this view is not a projection — a finished run is gone from the live
  * event stream, so its list comes from the API. Pressing "Replay" loads that run's events once
@@ -47,7 +47,7 @@ export function RunsView() {
         <Section title="Eigene Läufe">
           {runs.error !== null && <Note tone="error">{runs.error}</Note>}
           {runs.error === null && runs.rows !== null && ordered.length === 0 && (
-            <Note>Noch keine Runs — starte eine Mission.</Note>
+            <Note>Noch keine Läufe — starte eine Mission.</Note>
           )}
           {ordered.map((run, index) => (
             <ReplayRow

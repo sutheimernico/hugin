@@ -48,3 +48,47 @@ describe("describeKind", () => {
     expect(describeKind("something.new").tone).toBe("muted");
   });
 });
+
+describe("timetableRows — repeated lines", () => {
+  const at = (seq: number, kind: string, pid: number, text: string, extra: Partial<LogLine> = {}): LogLine => ({
+    seq,
+    ts: seq,
+    kind,
+    pid,
+    text,
+    ...extra,
+  });
+
+  it("keeps one row per hugin tool call, not the tool and the syscall behind it", () => {
+    const rows = timetableRows(
+      [
+        at(1, "tool.call", 3, "Prozess 3: Speicher beschreiben", { kernelTool: true }),
+        at(2, "sys.call", 3, "Prozess 3: Speicher beschreiben"),
+        at(3, "sys.result", 3, "Kernel-Aufruf erledigt in 0 ms"),
+        at(4, "tool.result", 3, "Werkzeug fertig in 19 ms"),
+      ],
+      0,
+    );
+    expect(rows.map((row) => row.line.kind)).toEqual(["tool.call", "tool.result"]);
+  });
+
+  it("keeps the syscall rows of a driver that logs no tool call", () => {
+    const rows = timetableRows(
+      [at(1, "sys.call", 3, "Prozess 3: Bericht abgeben"), at(2, "sys.result", 3, "Kernel-Aufruf erledigt in 0 ms")],
+      0,
+    );
+    expect(rows).toHaveLength(2);
+  });
+
+  it("hides the lamp flipping between running and tool active", () => {
+    const rows = timetableRows(
+      [
+        at(1, "proc.state", 3, "Prozess 3: Läuft → Werkzeug aktiv"),
+        at(2, "proc.state", 3, "Prozess 3: Werkzeug aktiv → Läuft"),
+        at(3, "proc.state", 3, "Prozess 3: Läuft → Fertig"),
+      ],
+      0,
+    );
+    expect(rows.map((row) => row.line.text)).toEqual(["Prozess 3: Läuft → Fertig"]);
+  });
+});

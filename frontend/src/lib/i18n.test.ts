@@ -3,9 +3,9 @@ import { exitReasonLabel, exitReasonShort } from "./i18n";
 
 describe("exitReasonLabel", () => {
   const cases: [string, string][] = [
-    ["done", "Beendet: fertig"],
-    ["failed", "Fehler"],
-    ["killed", "Beendet"],
+    ["done", "Abgeschlossen"],
+    ["failed", "Fehlgeschlagen"],
+    ["killed", "Gestoppt"],
     ["driver_error", "Treiberfehler"],
     ["budget:turns", "Budget: Runden überschritten"],
     ["budget:seconds", "Budget: Zeit überschritten"],

@@ -109,16 +109,16 @@ describe("TopBar", () => {
     expect(screen.queryByRole("button", { name: "Panik" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Befehle öffnen" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Munin" })).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Runs" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Läufe" })).toBeInTheDocument();
   });
 
   it("offers the three views and marks the active one", () => {
     renderTopBar({ view: "munin" });
-    expect(screen.getByRole("button", { name: "Mission Control" })).not.toHaveAttribute(
+    expect(screen.getByRole("button", { name: "Stellwerk" })).not.toHaveAttribute(
       "aria-current",
     );
     expect(screen.getByRole("button", { name: "Munin" })).toHaveAttribute("aria-current", "page");
-    expect(screen.getByRole("button", { name: "Runs" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Läufe" })).toBeInTheDocument();
   });
 
   it("switches the view when a tab is clicked", async () => {
