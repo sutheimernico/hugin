@@ -30,6 +30,13 @@ describe("ledgerOf", () => {
     expect(ledger).toMatchObject({ turns: 5, outputTokens: 800, procsAlive: 1, procsTotal: 2 });
   });
 
+  it("does not count a queued process as active, and marks tokens a floor while anything lives", () => {
+    const ledger = ledgerOf(run, [proc({}), proc({ state: "queued" }), proc({ state: "done" })], 110);
+    expect(ledger.procsAlive).toBe(1);
+    expect(ledger.tokensAreFloor).toBe(true);
+    expect(ledgerOf(run, [proc({ state: "done" })], 110).tokensAreFloor).toBe(false);
+  });
+
   it("follows the clock while running and stops at the end of a finished run", () => {
     expect(ledgerOf(run, [], 160).elapsed).toBe(60);
     expect(ledgerOf({ ...run, doneAt: 190 }, [], 999).elapsed).toBe(90);

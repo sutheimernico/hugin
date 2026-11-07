@@ -23,6 +23,20 @@ export function pickShowcase(recordings: ApiRecording[]): ApiRecording | undefin
   return recordings.find((recording) => recording.driver === "claude") ?? recordings[0];
 }
 
+const DRIVER_ORDER = ["claude", "scripted", "ollama"];
+
+/**
+ * The real Claude run first, the simulation second, the slow local model last — the order of
+ * how much a visitor will get out of each, not the order the files happen to sort in.
+ */
+export function sortRecordings(recordings: ApiRecording[]): ApiRecording[] {
+  const rank = (driver: string) => {
+    const index = DRIVER_ORDER.indexOf(driver);
+    return index === -1 ? DRIVER_ORDER.length : index;
+  };
+  return [...recordings].sort((a, b) => rank(a.driver) - rank(b.driver) || a.slug.localeCompare(b.slug));
+}
+
 function asset(path: string): string {
   return `${import.meta.env.BASE_URL}recordings/${path}`;
 }

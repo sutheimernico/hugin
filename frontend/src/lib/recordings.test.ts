@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { ApiRecording } from "./api";
-import { parseJsonl, pickShowcase } from "./recordings";
+import { parseJsonl, pickShowcase, sortRecordings } from "./recordings";
 
 const rec = (slug: string, driver: string) => ({ slug, driver }) as ApiRecording;
 
@@ -27,5 +27,12 @@ describe("pickShowcase", () => {
 
   it("returns nothing for an empty list", () => {
     expect(pickShowcase([])).toBeUndefined();
+  });
+});
+
+describe("sortRecordings", () => {
+  it("lists the Claude run first and the local model last", () => {
+    const sorted = sortRecordings([rec("a-ollama", "ollama"), rec("b-sim", "scripted"), rec("c-claude", "claude")]);
+    expect(sorted.map((r) => r.slug)).toEqual(["c-claude", "b-sim", "a-ollama"]);
   });
 });

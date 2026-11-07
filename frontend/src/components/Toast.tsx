@@ -18,7 +18,7 @@ const TONE_CLASS: Record<ToastTone, string> = {
 const DISMISS_MS = 4_000;
 
 /**
- * One transient message at a time, bottom centre. `role="status"` (polite) rather than an
+ * One transient message at a time, top centre, clear of the timeline and the occupancy plan. `role="status"` (polite) rather than an
  * alert: a started mission is news, not an interruption of whatever the reader is doing.
  */
 export function Toast({ toast, onDone }: { toast: ToastMessage | null; onDone: () => void }) {
@@ -34,11 +34,11 @@ export function Toast({ toast, onDone }: { toast: ToastMessage | null; onDone: (
         <motion.div
           key={toast.id}
           role="status"
-          initial={{ opacity: 0, y: 10, scale: 0.98 }}
+          initial={{ opacity: 0, y: -10, scale: 0.98 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 10, transition: { duration: 0.2 } }}
+          exit={{ opacity: 0, y: -10, transition: { duration: 0.2 } }}
           transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-          className={`fixed bottom-14 left-1/2 z-[60] -translate-x-1/2 rounded-panel border bg-surface-2 px-4 py-2 text-[13px] shadow-[0_12px_28px_-14px_rgba(27,33,38,0.45)] ${TONE_CLASS[toast.tone]}`}
+          className={`fixed top-16 left-1/2 z-[60] -translate-x-1/2 rounded-panel border bg-surface-2 px-4 py-2 text-[13px] shadow-[0_12px_28px_-14px_rgba(27,33,38,0.45)] ${TONE_CLASS[toast.tone]}`}
         >
           {toast.text}
         </motion.div>

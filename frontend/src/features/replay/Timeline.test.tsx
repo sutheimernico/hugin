@@ -103,6 +103,14 @@ describe("Timeline", () => {
     expect(replay().runId).toBeNull();
   });
 
+  it("lets Space press a focused button instead of also toggling playback", async () => {
+    render(<Timeline />);
+    screen.getByRole("button", { name: "2×" }).focus();
+    await userEvent.keyboard(" ");
+    expect(replay().speed).toBe(2);
+    expect(replay().playing).toBe(false);
+  });
+
   it("ignores shortcuts while something is being typed into", async () => {
     render(
       <>

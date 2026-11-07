@@ -186,6 +186,8 @@ function useShortcuts(actions: {
       // for text. The scrubber is exempt — it is an input nobody types into.
       if (isTyping(event.target)) return;
       if (event.key === " ") {
+        // On a focused button Space means "press it"; stealing it would toggle playback too.
+        if (event.target instanceof HTMLButtonElement) return;
         event.preventDefault();
         if (playing) pause();
         else play();

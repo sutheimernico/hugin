@@ -17,7 +17,7 @@ import type {
   SystemStatus,
   Usage,
 } from "../state/types";
-import { fetchStaticEvents, fetchStaticRecordings } from "./recordings";
+import { fetchStaticEvents, fetchStaticRecordings, sortRecordings } from "./recordings";
 
 export interface ApiProc {
   pid: number;
@@ -127,8 +127,10 @@ export async function getRunEvents(runId: string, since = 0): Promise<HEvent[]> 
 }
 
 export async function getRecordings(): Promise<ApiRecording[]> {
-  if (__REPLAY_ONLY__) return fetchStaticRecordings();
-  return request<ApiRecording[]>("/api/recordings");
+  const recordings = __REPLAY_ONLY__
+    ? await fetchStaticRecordings()
+    : await request<ApiRecording[]>("/api/recordings");
+  return sortRecordings(recordings);
 }
 
 /**
