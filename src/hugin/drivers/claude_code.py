@@ -200,10 +200,13 @@ def _link(link: Path, target: Path) -> None:
 class _Progress:
     """In-flight usage bookkeeping between the first line and the final `result`.
 
-    Two traps live here. The CLI reports usage per assistant message, and the same message
-    arrives twice (once per content block) with *identical* numbers — summing those would
-    double every count. And `input_tokens` is a context size, not a counter: the latest value
-    wins, cache reads and cache creation included.
+    Three traps live here. With `--include-partial-messages` the `assistant` event carries a
+    usage *snapshot* taken when the message started (output ~1 token), so output tokens come
+    from the stream's `message_delta`, which holds the final count — one per API turn. The
+    `assistant` fallback below only serves streams without partial messages; there the same
+    message arrives once per content block with identical numbers, which must not be summed.
+    And `input_tokens` is a context size, not a counter: the latest value wins, cache reads
+    and cache creation included.
     """
 
     def __init__(self) -> None:
@@ -213,6 +216,7 @@ class _Progress:
         self._thinking: set[object] = set()
         self._saw_block_stop = False
         self._last_counted: tuple[int, int, int, int] | None = None
+        self._streamed = False
 
     def usage(self) -> Usage:
         return Usage(
@@ -236,8 +240,22 @@ class _Progress:
         self._thinking.discard(index)
         return True
 
+    def start_message(self, data: dict) -> None:
+        """A streamed turn begins: its input side is the new context size."""
+        self._streamed = True
+        self.input_tokens = data["input_tokens"] + data["cache_read"] + data["cache_creation"]
+
+    def end_message(self, output_tokens: int) -> bool:
+        """A streamed turn ends with its final output count; always a new turn."""
+        self._streamed = True
+        self.turns += 1
+        self.output_tokens += output_tokens
+        return True
+
     def count(self, data: dict) -> bool:
-        """Fold one usage report in; returns True when it counted as a new turn."""
+        """Fold an `assistant` usage report in; returns True when it counted as a new turn."""
+        if self._streamed:
+            return False  # the streamed events already counted this turn, with exact numbers
         fingerprint = (
             data["input_tokens"],
             data["output_tokens"],
@@ -446,6 +464,11 @@ class ClaudeCodeDriver:
                 ms = int((time.monotonic() - begin) * 1000) if begin is not None else 0
                 await sink.tool_result(call_id, op.data["ok"], op.data["output_summary"], ms)
                 await sink.state("running")
+            case "message_start":
+                progress.start_message(op.data)
+            case "message_end":
+                if progress.end_message(op.data["output_tokens"]):
+                    await sink.usage(progress.usage())
             case "usage":
                 if progress.count(op.data):
                     await sink.usage(progress.usage())

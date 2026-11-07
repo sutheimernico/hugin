@@ -1,0 +1,12 @@
+{"type": "system", "session_id": "22222222-2222-3333-4444-555555555555", "subtype": "init", "cwd": "/tmp/hugin/runs/r1/p1", "tools": [], "model": "claude-sonnet-4-5", "apiKeySource": "none"}
+{"type": "stream_event", "session_id": "22222222-2222-3333-4444-555555555555", "event": {"type": "message_start", "message": {"id": "m1", "type": "message", "role": "assistant", "content": [], "usage": {"input_tokens": 3, "cache_read_input_tokens": 20000, "output_tokens": 1}}}}
+{"type": "stream_event", "session_id": "22222222-2222-3333-4444-555555555555", "event": {"type": "content_block_start", "index": 0, "content_block": {"type": "text", "text": ""}}}
+{"type": "stream_event", "session_id": "22222222-2222-3333-4444-555555555555", "event": {"type": "content_block_delta", "index": 0, "delta": {"type": "text_delta", "text": "A long answer."}}}
+{"type": "assistant", "session_id": "22222222-2222-3333-4444-555555555555", "message": {"id": "m1", "type": "message", "role": "assistant", "content": [{"type": "text", "text": "A long answer."}], "usage": {"input_tokens": 3, "cache_read_input_tokens": 20000, "output_tokens": 2}}}
+{"type": "stream_event", "session_id": "22222222-2222-3333-4444-555555555555", "event": {"type": "content_block_stop", "index": 0}}
+{"type": "stream_event", "session_id": "22222222-2222-3333-4444-555555555555", "event": {"type": "message_delta", "delta": {"stop_reason": "end_turn"}, "usage": {"output_tokens": 480}}}
+{"type": "stream_event", "session_id": "22222222-2222-3333-4444-555555555555", "event": {"type": "message_stop"}}
+{"type": "stream_event", "session_id": "22222222-2222-3333-4444-555555555555", "event": {"type": "message_start", "message": {"id": "m2", "type": "message", "role": "assistant", "content": [], "usage": {"input_tokens": 4, "cache_read_input_tokens": 20500, "output_tokens": 1}}}}
+{"type": "stream_event", "session_id": "22222222-2222-3333-4444-555555555555", "event": {"type": "message_delta", "delta": {"stop_reason": "end_turn"}, "usage": {"output_tokens": 120}}}
+{"type": "stream_event", "session_id": "22222222-2222-3333-4444-555555555555", "event": {"type": "message_stop"}}
+{"type": "result", "session_id": "22222222-2222-3333-4444-555555555555", "subtype": "success", "is_error": false, "num_turns": 2, "duration_ms": 900, "total_cost_usd": 0.01, "result": "done", "usage": {"input_tokens": 7, "cache_read_input_tokens": 40500, "output_tokens": 600}}

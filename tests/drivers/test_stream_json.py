@@ -96,7 +96,6 @@ def test_synthetic_capture_streams_text_and_ignores_input_json_deltas():
 
     ignored = [op.data.get("type") for op in _of_kind(ops, "ignore")]
     assert "input_json_delta" in ignored
-    assert "message_start" in ignored
     assert "message_stop" in ignored
 
 
@@ -315,3 +314,17 @@ def test_result_defaults_are_safe_when_fields_are_missing():
     assert op.data["num_turns"] == 0
     assert op.data["total_cost_usd"] == 0.0
     assert op.data["usage"] == {}
+
+
+def test_streamed_turn_yields_start_context_and_final_output():
+    ops = _parse_fixture("synthetic_tool_use.jsonl")
+
+    (first, second) = _of_kind(ops, "message_start")
+    assert first.data == {"input_tokens": 12, "cache_read": 0, "cache_creation": 0}
+    assert second.data == {"input_tokens": 8, "cache_read": 6409, "cache_creation": 0}
+    assert [op.data["output_tokens"] for op in _of_kind(ops, "message_end")] == [91, 14]
+
+
+def test_message_delta_without_usage_is_ignored():
+    line = json.dumps({"type": "stream_event", "event": {"type": "message_delta", "delta": {}}})
+    assert parse_line(line) == [Op("ignore", {"type": "message_delta"})]

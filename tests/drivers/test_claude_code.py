@@ -433,26 +433,29 @@ async def test_run_over_the_synthetic_capture_forwards_ops_in_order(
         "thinking",
         "thinking",
         "text",
+        "usage",
         "state",
         "tool_call",
-        "usage",
         "tool_result",
         "state",
+        "usage",
     ]
     assert sink.calls[0] == ("thinking", True)
     assert sink.calls[1] == ("thinking", False)
     assert sink.calls[2] == ("text", "Storing the note in munin.")
-    assert sink.calls[3] == ("state", "waiting_tool")
-    kind, call_id, tool, input_summary = sink.calls[4]
+    # The first turn ends at `message_delta`: input is the latest context size, output the
+    # final count of that turn — not the ~1-token snapshot the assistant message carries.
+    assert sink.calls[3] == ("usage", Usage(turns=1, input_tokens=12, output_tokens=91))
+    assert sink.calls[4] == ("state", "waiting_tool")
+    kind, call_id, tool, input_summary = sink.calls[5]
     assert (call_id, tool) == ("toolu_01", "mcp__hugin__munin_write")
     assert input_summary.startswith('{"kind": "note"')
-    # One counted turn: input is the latest context size, output the accumulated tokens.
-    assert sink.calls[5] == ("usage", Usage(turns=1, input_tokens=12 + 6409, output_tokens=91))
     kind, call_id, ok, output_summary, ms = sink.calls[6]
     assert (call_id, ok) == ("toolu_01", True)
     assert output_summary == '{"id": "m-42", "ok": true}'
     assert ms >= 0
     assert sink.calls[7] == ("state", "running")
+    assert sink.calls[8] == ("usage", Usage(turns=2, input_tokens=8 + 6409, output_tokens=105))
 
     assert exit_info.reason == "done"
     assert exit_info.usage == Usage(
@@ -671,3 +674,20 @@ def test_build_command_never_grants_a_bare_file_tool():
     assert {"Read", "Glob", "Grep"}.isdisjoint(allowed)
     assert "Read(//work/space/**)" in allowed
     assert argv[argv.index("--disallowedTools") + 1] == "Read(//work/space/.hugin/**)"
+
+
+async def test_streamed_output_tokens_come_from_message_delta_not_the_snapshot(
+    tmp_path: Path, sink: RecordingSink
+):
+    """Regression: the `assistant` snapshot says 2 output tokens, the turn really wrote 480."""
+    spawn = SpawnSpy(FakeProcess(_fixture_lines("streamed_undercount.jsonl")))
+    driver = _driver(tmp_path, spawn)
+
+    exit_info = await driver.run(_proc(tmp_path), "Answer.", sink)
+
+    usages = [call[1] for call in sink.calls if call[0] == "usage"]
+    assert usages == [
+        Usage(turns=1, input_tokens=3 + 20000, output_tokens=480),
+        Usage(turns=2, input_tokens=4 + 20500, output_tokens=600),
+    ]
+    assert exit_info.usage.output_tokens == 600

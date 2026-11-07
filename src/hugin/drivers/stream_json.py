@@ -22,6 +22,8 @@ OpKind = Literal[
     "assistant_text",
     "tool_call",
     "tool_result",
+    "message_start",
+    "message_end",
     "usage",
     "result",
     "ignore",
@@ -114,9 +116,34 @@ def _stream_event(event: dict) -> list[Op]:
             return _content_block_delta(inner)
         case "content_block_stop":
             return [Op("block_stop", {"index": inner.get("index")})]
+        case "message_start":
+            return _message_start(inner)
+        case "message_delta":
+            usage = inner.get("usage")
+            if not isinstance(usage, dict):
+                return [Op("ignore", {"type": "message_delta"})]
+            return [Op("message_end", {"output_tokens": usage.get("output_tokens") or 0})]
         case other:
-            # message_start / message_delta / message_stop.
+            # message_stop and anything a future CLI version adds.
             return [Op("ignore", {"type": other})]
+
+
+def _message_start(inner: dict) -> list[Op]:
+    """The context size a turn starts with. Its `output_tokens` is a snapshot of ~1 and is dropped."""
+    message = inner.get("message")
+    usage = message.get("usage") if isinstance(message, dict) else None
+    if not isinstance(usage, dict):
+        return [Op("ignore", {"type": "message_start"})]
+    return [
+        Op(
+            "message_start",
+            {
+                "input_tokens": usage.get("input_tokens") or 0,
+                "cache_read": usage.get("cache_read_input_tokens") or 0,
+                "cache_creation": usage.get("cache_creation_input_tokens") or 0,
+            },
+        )
+    ]
 
 
 def _content_block_delta(inner: dict) -> list[Op]:
