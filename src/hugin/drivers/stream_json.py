@@ -129,7 +129,7 @@ def _stream_event(event: dict) -> list[Op]:
 
 
 def _message_start(inner: dict) -> list[Op]:
-    """The context size a turn starts with. Its `output_tokens` is a snapshot of ~1 and is dropped."""
+    """The context size a turn starts with; its `output_tokens` snapshot (~1) is dropped."""
     message = inner.get("message")
     usage = message.get("usage") if isinstance(message, dict) else None
     if not isinstance(usage, dict):
