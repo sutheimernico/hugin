@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { fmtDuration, fmtInt, fmtMs, fmtTokens, fmtUsd } from "./format";
+import { fmtDec, fmtDuration, fmtInt, fmtMs, fmtTokens, fmtUsd } from "./format";
 
 describe("fmtTokens", () => {
   it("keeps counts below a thousand as plain digits", () => {
@@ -51,5 +51,12 @@ describe("fmtInt and fmtMs", () => {
     expect(fmtMs(15)).toBe("15 ms");
     expect(fmtMs(6028)).toBe("6,0 s");
     expect(fmtMs(999.6)).toBe("1,0 s");
+  });
+});
+
+describe("fmtDec", () => {
+  it("uses the decimal comma", () => {
+    expect(fmtDec(231.5)).toBe("231,5");
+    expect(fmtDec(3, 2)).toBe("3,00");
   });
 });

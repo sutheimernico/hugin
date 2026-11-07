@@ -6,7 +6,7 @@ import { StateRing } from "../../components/StateRing";
 import { stateLine } from "../../lib/activity";
 import { fmtDuration, fmtTokens } from "../../lib/format";
 import { ROLE_LABEL } from "../../lib/i18n";
-import { isAlive } from "../../state/selectors";
+import { isActive, isAlive } from "../../state/selectors";
 import type { Proc } from "../../state/types";
 
 type ProcessTableProps = {
@@ -34,7 +34,7 @@ export function ProcessTable({
   showAll,
   onShowAllChange,
 }: ProcessTableProps) {
-  const alive = procs.filter(isAlive).length;
+  const alive = procs.filter(isActive).length;
   return (
     <Panel
       title="Prozesse"
@@ -72,15 +72,15 @@ export function ProcessTable({
           {/* Fixed columns: the agent cell truncates instead of pushing the kill switch out. */}
           <colgroup>
             <col />
-            <col className="w-16" />
-            <col className="w-14" />
-            <col className="w-10" />
+            <col className="w-14 min-[1100px]:w-16" />
+            <col className="hidden w-14 min-[1100px]:table-column" />
+            <col className="w-9 min-[1100px]:w-10" />
           </colgroup>
           <thead>
             <tr>
               <th className={`${HEAD} pl-4 text-left`}>Agent</th>
               <th className={`${HEAD} text-right`}>Tokens</th>
-              <th className={`${HEAD} text-right`}>Zeit</th>
+              <th className={`${HEAD} hidden text-right min-[1100px]:table-cell`}>Zeit</th>
               <th className={`${HEAD} pr-2`}>
                 <span className="sr-only">Beenden</span>
               </th>
@@ -161,7 +161,7 @@ const ProcessRow = memo(function ProcessRow({ proc, end, selected, onSelect, onK
       >
         {fmtTokens(proc.usage.output_tokens)}
       </td>
-      <td className="px-1.5 text-right font-mono text-[12px] whitespace-nowrap text-muted tabular-nums">
+      <td className="hidden px-1.5 text-right font-mono text-[12px] whitespace-nowrap text-muted tabular-nums min-[1100px]:table-cell">
         {elapsed(proc, end)}
       </td>
       <td className="py-1.5 pr-2 text-right">

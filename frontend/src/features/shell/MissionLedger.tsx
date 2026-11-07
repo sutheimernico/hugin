@@ -28,7 +28,7 @@ export function MissionLedger({ run, procs, now, replaying }: MissionLedgerProps
   const tone = budgetTone(ledger.budgetPct);
 
   return (
-    <section aria-label="Mission" className="border-b border-border px-4 py-4">
+    <section aria-label="Mission" className="border-b border-border px-4 py-4 short:py-3">
       <div className="flex flex-wrap items-center gap-2">
         <Chip tone={RUN_TONE[run.state]} pulse={run.state === "running"}>
           {STATE_LABEL[run.state]}
@@ -41,7 +41,7 @@ export function MissionLedger({ run, procs, now, replaying }: MissionLedgerProps
       </div>
 
       <h1
-        className="font-display mt-2.5 line-clamp-5 text-[21px] leading-[1.18] font-semibold text-text"
+        className="font-display mt-2.5 line-clamp-5 text-[17px] leading-[1.2] font-semibold text-text min-[1100px]:text-[21px] min-[1100px]:leading-[1.18] short:mt-2 short:line-clamp-4"
         title={run.goal}
       >
         {goalText(run.goal)}
@@ -50,15 +50,14 @@ export function MissionLedger({ run, procs, now, replaying }: MissionLedgerProps
         <p className="mt-1.5 text-[12px] text-amber">Simulation: feste Beispiel-Mission</p>
       )}
 
-      <dl className="mt-4 grid grid-cols-4 gap-x-3">
+      <dl className="mt-4 grid grid-cols-[auto_auto_auto_auto] justify-between gap-x-2 short:mt-3 min-[1100px]:grid-cols-4 min-[1100px]:gap-x-3">
         <Figure label="Laufzeit" value={fmtDuration(ledger.elapsed)} />
         <Figure label="Runden" value={<CountUp value={ledger.turns} />} />
         <Figure
-          label="Tokens"
+          label={ledger.tokensAreFloor ? "Tokens ≥" : "Tokens"}
           hint={ledger.tokensAreFloor ? "Mindestwert: abgeschlossene Runden, laufende zählen erst am Ende" : undefined}
           value={
             <>
-              {ledger.tokensAreFloor && <span className="text-[18px] text-muted">≥&#8239;</span>}
               <CountUp value={ledger.outputTokens} format={fmtTokens} />
             </>
           }
@@ -74,7 +73,7 @@ export function MissionLedger({ run, procs, now, replaying }: MissionLedgerProps
         />
       </dl>
 
-      <div className="mt-4">
+      <div className="mt-4 short:mt-3">
         <div className="flex items-baseline justify-between text-[12px] text-muted">
           <span>Budget, vollster Agent</span>
           <span className="font-display text-[15px] font-semibold text-text tabular-nums">
@@ -87,7 +86,7 @@ export function MissionLedger({ run, procs, now, replaying }: MissionLedgerProps
       </div>
 
       {run.artifacts.length > 0 && (
-        <p className="mt-3 flex items-center gap-1.5 text-[12px] text-muted">
+        <p className="mt-3 flex items-center gap-1.5 text-[12px] text-muted short:hidden">
           <FileText size={14} aria-hidden />
           {run.artifacts.join(", ")}
         </p>
@@ -99,7 +98,7 @@ export function MissionLedger({ run, procs, now, replaying }: MissionLedgerProps
 function Figure({ label, value, hint }: { label: string; value: ReactNode; hint?: string }) {
   return (
     <div className="min-w-0" title={hint}>
-      <dd className="font-display text-[28px] leading-none font-semibold text-text tabular-nums">
+      <dd className="font-display text-[22px] whitespace-nowrap leading-none font-semibold text-text tabular-nums min-[1100px]:text-[28px]">
         {value}
       </dd>
       <dt className="mt-1 truncate text-[11px] text-muted">{label}</dt>

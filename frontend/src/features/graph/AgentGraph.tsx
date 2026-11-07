@@ -48,7 +48,7 @@ const EDGE_TYPES: EdgeTypes = { pulse: PulseEdge };
  */
 const FIT = { maxZoom: 1.7, minZoom: 0.15, duration: 400 };
 /** Breathing room around the sheet; the bottom edge also clears the lamp legend. */
-const PAD = { x: 24, top: 20, bottom: 56 };
+const PAD = { x: 16, top: 16, bottom: 46 };
 
 type GraphNode = AgentNodeType | MuninNodeType;
 

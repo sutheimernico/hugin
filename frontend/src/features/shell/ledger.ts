@@ -1,6 +1,6 @@
 /** The mission ledger: the sums a reader wants next to the goal, derived from the projection. */
 
-import { isAlive } from "../../state/selectors";
+import { isActive, isAlive } from "../../state/selectors";
 import type { Proc, Run } from "../../state/types";
 
 export interface Ledger {
@@ -19,12 +19,13 @@ export interface Ledger {
 export function ledgerOf(run: Run, procs: Proc[], now: number): Ledger {
   const mine = procs.filter((proc) => proc.runId === run.id);
   const living = mine.filter(isAlive);
+  const active = mine.filter(isActive);
   return {
     elapsed: Math.max(0, (run.doneAt ?? now) - run.createdAt),
     turns: mine.reduce((sum, proc) => sum + proc.usage.turns, 0),
     outputTokens: mine.reduce((sum, proc) => sum + proc.usage.output_tokens, 0),
     tokensAreFloor: living.length > 0,
-    procsAlive: living.length,
+    procsAlive: active.length,
     procsTotal: mine.length,
     artifacts: run.artifacts.length,
     budgetPct: living.reduce((top, proc) => Math.max(top, proc.budgetPct), 0),

@@ -1,7 +1,7 @@
 import { AnimatePresence } from "motion/react";
 import { lazy, Suspense, type ReactNode } from "react";
 import type { Breakpoint } from "../../lib/breakpoint";
-import { isAlive, selectProcs } from "../../state/selectors";
+import { isActive, selectProcs } from "../../state/selectors";
 import type { Pane } from "../../state/store";
 import type { Proc, Run, State } from "../../state/types";
 import { AgentWindow } from "../agent/AgentWindow";
@@ -136,7 +136,7 @@ export function ControlView(props: ControlViewProps) {
   }
 
   return (
-    <div className="grid h-full min-h-0 grid-cols-[minmax(290px,320px)_minmax(0,1fr)_minmax(300px,360px)] min-[1440px]:grid-cols-[330px_minmax(0,1fr)_380px]">
+    <div className="grid h-full min-h-0 grid-cols-[240px_minmax(0,1fr)_256px] min-[1100px]:grid-cols-[minmax(290px,320px)_minmax(0,1fr)_minmax(300px,360px)] min-[1440px]:grid-cols-[330px_minmax(0,1fr)_380px]">
       <div className="flex min-h-0 flex-col border-r border-text/20 bg-surface">
         {ledger}
         <div className="min-h-0 flex-1">{table}</div>
@@ -156,7 +156,7 @@ export function ControlView(props: ControlViewProps) {
 }
 
 function MobileTree(props: { procs: Proc[]; selectedPid: number | null; onSelect: (pid: number) => void }) {
-  const alive = props.procs.filter(isAlive).length;
+  const alive = props.procs.filter(isActive).length;
   return (
     <section aria-label="Gleisbild" className="bg-surface-2 pb-4">
       <h2 className="font-display flex items-baseline justify-between border-b border-text/15 px-4 py-2.5 text-[19px] font-semibold text-text">

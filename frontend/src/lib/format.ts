@@ -28,6 +28,11 @@ export function fmtInt(n: number): string {
   return Number.isFinite(n) ? Math.round(n).toLocaleString("de-DE") : "–";
 }
 
+/** Decimal with the German comma: `231.5` → `"231,5"`. */
+export function fmtDec(n: number, digits = 1): string {
+  return Number.isFinite(n) ? comma(n.toFixed(digits)) : "–";
+}
+
 /** A call's duration: `15` → `"15 ms"`, `6028` → `"6,0 s"`. */
 export function fmtMs(ms: number): string {
   if (!Number.isFinite(ms)) return "–";

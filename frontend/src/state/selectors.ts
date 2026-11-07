@@ -52,6 +52,11 @@ export const ALIVE_STATES: ReadonlySet<ProcState> = new Set<ProcState>([
   "waiting_tool",
 ]);
 
+/** Occupying a slot right now: alive, but not still waiting in the queue for one. */
+export function isActive(proc: Proc): boolean {
+  return isAlive(proc) && proc.state !== "queued";
+}
+
 export function isAlive(proc: Proc): boolean {
   return ALIVE_STATES.has(proc.state);
 }

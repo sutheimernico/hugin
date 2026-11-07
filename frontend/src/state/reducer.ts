@@ -12,7 +12,7 @@
  */
 
 import { syscallLabel, toolErrorText, toolLabel } from "../lib/describe";
-import { fmtInt, fmtMs } from "../lib/format";
+import { fmtDec, fmtInt, fmtMs } from "../lib/format";
 import { DRIVER_LABEL, exitReasonShort, STATE_LABEL } from "../lib/i18n";
 import { ALIVE_STATES } from "./selectors";
 import type {
@@ -112,7 +112,7 @@ export function logText(e: HEvent): string {
     case "run.created":
       return `Mission gestartet: »${str(d.goal)}«`;
     case "run.done":
-      return `Mission abgeschlossen in ${num(d.duration_s).toFixed(1)} s`;
+      return `Mission abgeschlossen in ${fmtDec(num(d.duration_s))} s`;
     case "run.failed":
       return `Mission fehlgeschlagen: ${str(d.reason)}`;
     case "sched.queued":

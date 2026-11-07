@@ -13,8 +13,6 @@ const BAR_COLOR: Record<ProcState, string> = {
   killed: "bg-red",
 };
 
-const ROW_H = 24;
-
 type OccupancyChartProps = {
   run: Run;
   procs: Proc[];
@@ -31,15 +29,14 @@ export function OccupancyChart({ run, procs, now }: OccupancyChartProps) {
   if (bars.length === 0) return null;
 
   return (
-    <section aria-label="Belegungsplan" className="border-t border-text/20 bg-surface-2 px-4 pt-3 pb-2">
+    <section aria-label="Belegungsplan" className="border-t border-text/20 bg-surface-2 px-4 pt-3 pb-2 short:pt-2 short:pb-1">
       <h2 className="font-display text-[17px] leading-none font-semibold text-text">Belegungsplan</h2>
       <div className="mt-2 flex gap-3">
         <ul className="w-[6.5rem] shrink-0">
           {bars.map((bar) => (
             <li
               key={bar.pid}
-              className="truncate text-[13px] text-text"
-              style={{ height: ROW_H, lineHeight: `${ROW_H}px` }}
+              className="h-6 truncate text-[13px] leading-6 text-text short:h-[19px] short:leading-[19px]"
             >
               {ROLE_LABEL[bar.program] ?? bar.program}{" "}
               <span className="font-mono text-[11px] text-muted">{bar.pid}</span>
@@ -48,7 +45,7 @@ export function OccupancyChart({ run, procs, now }: OccupancyChartProps) {
         </ul>
         <div className="relative min-w-0 flex-1">
           {bars.map((bar) => (
-            <div key={bar.pid} className="relative" style={{ height: ROW_H }}>
+            <div key={bar.pid} className="relative h-6 short:h-[19px]">
               {/* The rail the process runs on; the bar is the train standing on it. */}
               <span aria-hidden className="absolute inset-x-0 top-1/2 h-px bg-border" />
               <span

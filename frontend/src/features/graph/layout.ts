@@ -15,13 +15,13 @@
 import type { Proc, State } from "../../state/types";
 
 /** Card size of an agent node. */
-export const NODE_W = 224;
+export const NODE_W = 208;
 export const NODE_H = 100;
 /** The memory hub is a station of the same height as a card. */
-export const HUB_W = 124;
+export const HUB_W = 112;
 export const HUB_H = NODE_H;
 /** Air between two columns (where the track runs) and between two rows. */
-export const COL_GAP = 76;
+export const COL_GAP = 60;
 export const ROW_GAP = 28;
 /** The sheet always has room for this many rows and columns, so a first spawn never re-fits it. */
 const MIN_ROWS = 3;
