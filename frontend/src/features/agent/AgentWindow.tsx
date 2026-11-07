@@ -7,9 +7,10 @@
  * its scroll position and its stick-to-bottom state while an agent is being read.
  */
 
+import { ESC_PRIORITY, useEscapeLayer } from "../../lib/escape";
 import { motion } from "motion/react";
 import { X } from "lucide-react";
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { Virtuoso, type VirtuosoHandle } from "react-virtuoso";
 import { Button } from "../../components/Button";
 import { Chip, type Tone } from "../../components/Chip";
@@ -276,16 +277,10 @@ function ThinkingLine() {
 
 /** Esc closes the sheet — unless the keystroke belongs to something the user is typing in. */
 function useCloseOnEscape(onClose: () => void): void {
-  const close = useCallback(() => onClose(), [onClose]);
-
-  useEffect(() => {
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key !== "Escape" || isTyping(event.target)) return;
-      close();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [close]);
+  useEscapeLayer(true, ESC_PRIORITY.agentWindow, (event) => {
+    if (isTyping(event.target)) return false;
+    onClose();
+  });
 }
 
 /** The command palette owns Esc while its input has the focus; this is that hand-off. */

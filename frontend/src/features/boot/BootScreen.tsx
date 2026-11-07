@@ -11,6 +11,7 @@
  * lift is 2.14 s, and skipping (Esc or a click) ends it at once.
  */
 
+import { ESC_PRIORITY, useEscapeLayer } from "../../lib/escape";
 import { motion, useReducedMotion } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getSystem } from "../../lib/api";
@@ -98,13 +99,7 @@ export function BootScreen({ onDone }: { onDone: () => void }) {
     return () => timers.forEach((timer) => window.clearTimeout(timer));
   }, [lines, reduced, finish]);
 
-  useEffect(() => {
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") finish();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [finish]);
+  useEscapeLayer(true, ESC_PRIORITY.boot, () => finish());
 
   // Under reduced motion the sequence is not run but skipped to its end, so both are derived
   // rather than set — the effect above never has to write state synchronously.

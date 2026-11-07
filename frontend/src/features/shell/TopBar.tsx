@@ -1,6 +1,7 @@
+import { ESC_PRIORITY, useEscapeLayer } from "../../lib/escape";
 import { motion } from "motion/react";
 import { Search } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "../../components/Button";
 import { Kbd } from "../../components/Kbd";
 import { Logomark } from "../../components/Logomark";
@@ -163,14 +164,7 @@ function ViewTabs({
 export function PanicButton({ onKillAll, up = false }: { onKillAll: () => void; up?: boolean }) {
   const [asking, setAsking] = useState(false);
 
-  useEffect(() => {
-    if (!asking) return;
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setAsking(false);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [asking]);
+  useEscapeLayer(asking, ESC_PRIORITY.panic, () => setAsking(false));
 
   return (
     <div className="relative flex items-center">

@@ -1,3 +1,4 @@
+import { ESC_PRIORITY, useEscapeLayer } from "../../lib/escape";
 import { AnimatePresence, motion } from "motion/react";
 import { Brain, Command, History, X, type LucideIcon } from "lucide-react";
 import type { View } from "../../state/store";
@@ -16,6 +17,7 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 
 /** The narrow layout's overflow: the views that have no tab, and the two controls that never hide. */
 export function MoreSheet({ open, replayOnly, onClose, onView, onOpenPalette, onKillAll }: MoreSheetProps) {
+  useEscapeLayer(open, ESC_PRIORITY.sheet, () => onClose());
   const go = (view: View) => {
     onView(view);
     onClose();

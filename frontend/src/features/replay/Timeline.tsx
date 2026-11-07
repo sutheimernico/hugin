@@ -8,6 +8,7 @@
  * thing it was driving.
  */
 
+import { ESC_PRIORITY, useEscapeLayer } from "../../lib/escape";
 import { Pause, Play } from "lucide-react";
 import { useEffect } from "react";
 import { Button } from "../../components/Button";
@@ -194,13 +195,17 @@ function useShortcuts(actions: {
       } else if (event.key === "ArrowRight") {
         event.preventDefault();
         step(1);
-      } else if (event.key === "Escape") {
-        exitReplay();
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [playing, play, pause, step, exitReplay]);
+  }, [playing, play, pause, step]);
+
+  // The lowest layer of the Esc stack: it only fires when no sheet, window or palette is open.
+  useEscapeLayer(true, ESC_PRIORITY.replay, (event) => {
+    if (isTyping(event.target)) return false;
+    exitReplay();
+  });
 }
 
 function isTyping(target: EventTarget | null): boolean {

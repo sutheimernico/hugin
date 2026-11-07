@@ -8,6 +8,7 @@
  * lines below.
  */
 
+import { ESC_PRIORITY, useEscapeLayer } from "../../lib/escape";
 import { Command as Cmdk, defaultFilter } from "cmdk";
 import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -102,14 +103,7 @@ export function CommandPalette({ open, onOpen, onClose, onToast }: CommandPalett
     onClose();
   }, [fallback, onClose]);
 
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") close();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open, close]);
+  useEscapeLayer(open, ESC_PRIORITY.palette, () => close());
 
   const actions: CommandActions = useMemo(
     () => ({
