@@ -147,7 +147,7 @@ export const useHuginStore = create<HuginStore>()((set, get) => ({
     const target =
       delta > 0
         ? (events.find((event) => event.seq > cursorSeq)?.seq ?? cursorSeq)
-        : (events.findLast((event) => event.seq < cursorSeq)?.seq ?? firstSeq(events));
+        : Math.max(firstSeq(events), events.findLast((event) => event.seq < cursorSeq)?.seq ?? 0);
     // Stepping is a manual move, so it takes over from the player rather than fighting it.
     set({ replay: { ...get().replay, playing: false, cursorSeq: target } });
   },
@@ -173,8 +173,12 @@ export function selectVisibleState(store: Pick<HuginStore, "state" | "replay">):
   return stateAt(store.replay.events, store.replay.cursorSeq);
 }
 
+/**
+ * Where a replay rests at its start: the first event after which a process is on the stage.
+ * The events before it (the mission being created) draw an empty kernel, which reads as broken.
+ */
 function firstSeq(events: HEvent[]): number {
-  return events[0]?.seq ?? 0;
+  return (events.find((event) => event.kind === "proc.spawned") ?? events[0])?.seq ?? 0;
 }
 
 function lastSeq(events: HEvent[]): number {

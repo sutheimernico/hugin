@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { initialState } from "../../state/reducer";
 import type { Proc, State } from "../../state/types";
-import { buildGraph, MUNIN_ID, structureKey } from "./layout";
+import { buildGraph, HUB_H, HUB_W, MUNIN_ID, NODE_H, NODE_W, structureKey } from "./layout";
 
 const RUN = "r1";
 
@@ -107,8 +107,64 @@ describe("buildGraph", () => {
   });
 
   it("draws nothing at all while no mission has started", () => {
-    expect(buildGraph(initialState, null)).toEqual({ nodes: [], edges: [] });
-    expect(buildGraph(mission(), null)).toEqual({ nodes: [], edges: [] });
+    expect(buildGraph(initialState, null).nodes).toEqual([]);
+    expect(buildGraph(initialState, null).edges).toEqual([]);
+    expect(buildGraph(mission(), null).nodes).toEqual([]);
+  });
+});
+
+describe("stable slots", () => {
+  const boxOf = (node: { x: number; y: number; kind: string }) => ({
+    left: node.x,
+    top: node.y,
+    right: node.x + (node.kind === "munin" ? HUB_W : NODE_W),
+    bottom: node.y + (node.kind === "munin" ? HUB_H : NODE_H),
+  });
+
+  it("never moves a node when another one joins", () => {
+    const early = stateOf([proc(1, null), proc(2, 1)]);
+    const late = stateOf([proc(1, null), proc(2, 1), proc(3, 1), proc(4, 1)]);
+    const before = buildGraph(early, RUN);
+    const after = buildGraph(late, RUN);
+
+    for (const node of before.nodes) {
+      const same = after.nodes.find((candidate) => candidate.id === node.id)!;
+      expect([same.x, same.y]).toEqual([node.x, node.y]);
+    }
+    expect(after.bounds).toEqual(before.bounds);
+  });
+
+  it("keeps boxes apart, however the tree grows", () => {
+    const deep = stateOf([
+      proc(1, null),
+      proc(2, 1),
+      proc(3, 1),
+      proc(4, 1),
+      proc(5, 1),
+      proc(6, 2),
+      proc(7, 2),
+    ]);
+    for (const state of [mission(), deep]) {
+      const boxes = buildGraph(state, RUN).nodes.map(boxOf);
+      boxes.forEach((a, i) =>
+        boxes.slice(i + 1).forEach((b) => {
+          const apart = a.right <= b.left || b.right <= a.left || a.bottom <= b.top || b.bottom <= a.top;
+          expect(apart).toBe(true);
+        }),
+      );
+    }
+  });
+
+  it("reserves three rows and two columns before anything has spawned there", () => {
+    const solo = buildGraph(stateOf([proc(1, null)]), RUN);
+    const full = buildGraph(mission(), RUN);
+    expect(solo.bounds).toEqual(full.bounds);
+  });
+
+  it("centres a lone planner on the middle row", () => {
+    const { nodes } = buildGraph(mission(), RUN);
+    const at = (id: string) => nodes.find((node) => node.id === id)!;
+    expect(at("p1").y).toBe(at("p3").y);
   });
 });
 

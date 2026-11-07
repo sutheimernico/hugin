@@ -1,23 +1,31 @@
 /**
  * The graph's geometry, kept free of React so it can be unit-tested on plain state.
  *
- * The process tree is laid out by dagre left to right, like track on a signal-box diagram: a
- * parent sits to the left of the children it spawned. The munin hub is *not* part of that layout — it is shared memory, not a step in
- * the tree, and letting dagre rank it would drag every writer onto its own row. It is placed
- * beside the tree instead, at the height of its middle.
+ * The process tree is drawn left to right, like track on a signal-box diagram: a parent sits to
+ * the left of the children it spawned. Positions are *slots*, not a fit: a process takes the
+ * next free row of its column when it spawns and keeps it for the rest of the run, and the
+ * sheet reserves room for at least three rows and two columns up front. Nothing that is
+ * already on the diagram ever moves when another agent joins — a signal box does not re-draw
+ * its track plan when a train arrives.
+ *
+ * The munin hub is not part of the tree — it is shared memory, not a step in it. It sits to
+ * the right of the last reserved column, at the height of the middle row.
  */
 
-import { Graph, layout } from "@dagrejs/dagre";
-import type { State } from "../../state/types";
+import type { Proc, State } from "../../state/types";
 
-/** Card size of an agent node — dagre reserves exactly this, so edges meet the cards. */
+/** Card size of an agent node. */
 export const NODE_W = 224;
 export const NODE_H = 100;
 /** The memory hub is a station of the same height as a card. */
 export const HUB_W = 124;
 export const HUB_H = NODE_H;
-/** Horizontal air between the last rank of the tree and the hub. */
-const HUB_GAP = 48;
+/** Air between two columns (where the track runs) and between two rows. */
+export const COL_GAP = 76;
+export const ROW_GAP = 28;
+/** The sheet always has room for this many rows and columns, so a first spawn never re-fits it. */
+const MIN_ROWS = 3;
+const MIN_COLS = 2;
 
 export const MUNIN_ID = "munin";
 
@@ -82,57 +90,88 @@ export function structureKey(state: State, runId: string | null): string {
     .join("|");
 }
 
+export interface GBounds {
+  width: number;
+  height: number;
+}
+
 /**
  * The graph of one run: an agent per process, the spawn tree between them, and a link to the
- * memory hub for every process that has written to it.
+ * memory hub for every process that has written to it. `bounds` is the reserved sheet the
+ * viewport fits — not the bounding box of what has spawned so far.
  *
- * Positions are top-left corners (what xyflow wants), not dagre's centres.
+ * Positions are top-left corners (what xyflow wants).
  */
-export function buildGraph(state: State, runId: string | null): { nodes: GNode[]; edges: GEdge[] } {
-  if (runId === null) return { nodes: [], edges: [] };
+export function buildGraph(
+  state: State,
+  runId: string | null,
+): { nodes: GNode[]; edges: GEdge[]; bounds: GBounds } {
+  const empty = { nodes: [], edges: [], bounds: reserved(MIN_COLS, MIN_ROWS) };
+  if (runId === null) return empty;
 
-  // Sorted by pid — that is spawn order, and it makes dagre's output deterministic.
+  // Sorted by pid — that is spawn order, and slots are handed out in that order.
   const procs = Object.values(state.procs)
     .filter((proc) => proc.runId === runId)
     .sort((a, b) => a.pid - b.pid);
-  if (procs.length === 0) return { nodes: [], edges: [] };
+  if (procs.length === 0) return empty;
 
   const known = new Set(procs.map((proc) => proc.pid));
-  const graph = new Graph();
-  graph.setGraph({ rankdir: "LR", nodesep: 26, ranksep: 64 });
-  graph.setDefaultEdgeLabel(() => ({}));
-
-  const edges: GEdge[] = [];
-  for (const proc of procs) {
-    graph.setNode(nodeId(proc.pid), { width: NODE_W, height: NODE_H });
-  }
+  const parentOf = new Map<number, number>();
   for (const proc of procs) {
     // A backfill can start mid-run, so a parent may be missing; then the child is a root.
-    if (proc.ppid === null || !known.has(proc.ppid)) continue;
-    graph.setEdge(nodeId(proc.ppid), nodeId(proc.pid));
-    edges.push({
-      id: treeEdgeId(proc.ppid, proc.pid),
-      source: nodeId(proc.ppid),
-      target: nodeId(proc.pid),
-      kind: "tree",
+    if (proc.ppid !== null && known.has(proc.ppid)) parentOf.set(proc.pid, proc.ppid);
+  }
+
+  const columns = new Map<number, Proc[]>();
+  const depthOf = new Map<number, number>();
+  for (const proc of procs) {
+    // pids ascend, so a parent has always been placed before its child.
+    const depth = (depthOf.get(parentOf.get(proc.pid) ?? -1) ?? -1) + 1;
+    depthOf.set(proc.pid, depth);
+    columns.set(depth, [...(columns.get(depth) ?? []), proc]);
+  }
+
+  const cols = Math.max(MIN_COLS, ...[...columns.keys()].map((depth) => depth + 1));
+  const rows = Math.max(MIN_ROWS, ...[...columns.values()].map((column) => column.length));
+  const bounds = reserved(cols, rows);
+  const pitchX = NODE_W + COL_GAP;
+  const pitchY = NODE_H + ROW_GAP;
+
+  const slot = new Map<number, { x: number; y: number }>();
+  for (const [depth, column] of columns) {
+    // A lone root sits on the middle row; everything else fills its column from the top.
+    const lone = depth === 0 && column.length === 1;
+    column.forEach((proc, row) => {
+      slot.set(proc.pid, {
+        x: depth * pitchX,
+        y: lone ? ((rows - 1) / 2) * pitchY : row * pitchY,
+      });
     });
   }
 
-  layout(graph);
+  const edges: GEdge[] = [];
+  for (const [pid, ppid] of parentOf) {
+    edges.push({ id: treeEdgeId(ppid, pid), source: nodeId(ppid), target: nodeId(pid), kind: "tree" });
+  }
 
-  const at = (pid: number) => {
-    const placed = graph.node(nodeId(pid));
-    return { x: placed.x - NODE_W / 2, y: placed.y - NODE_H / 2 };
-  };
-  const nodes: GNode[] = procs.map((proc) => ({
-    id: nodeId(proc.pid),
-    kind: "proc",
-    pid: proc.pid,
-    ...at(proc.pid),
-    from: proc.ppid !== null && known.has(proc.ppid) ? at(proc.ppid) : null,
-  }));
+  const nodes: GNode[] = procs.map((proc) => {
+    const parent = parentOf.get(proc.pid);
+    return {
+      id: nodeId(proc.pid),
+      kind: "proc",
+      pid: proc.pid,
+      ...slot.get(proc.pid)!,
+      from: parent === undefined ? null : slot.get(parent)!,
+    };
+  });
 
-  nodes.push({ id: MUNIN_ID, kind: "munin", from: null, ...hubPosition(nodes) });
+  nodes.push({
+    id: MUNIN_ID,
+    kind: "munin",
+    from: null,
+    x: cols * pitchX,
+    y: ((rows - 1) / 2) * pitchY + (NODE_H - HUB_H) / 2,
+  });
   for (const proc of procs) {
     if (proc.muninWrites === 0) continue;
     edges.push({
@@ -143,13 +182,12 @@ export function buildGraph(state: State, runId: string | null): { nodes: GNode[]
     });
   }
 
-  return { nodes, edges };
+  return { nodes, edges, bounds };
 }
 
-/** Right of the last rank, at the vertical middle of the tree. */
-function hubPosition(nodes: GNode[]): { x: number; y: number } {
-  const right = Math.max(...nodes.map((node) => node.x)) + NODE_W;
-  const top = Math.min(...nodes.map((node) => node.y));
-  const bottom = Math.max(...nodes.map((node) => node.y)) + NODE_H;
-  return { x: right + HUB_GAP, y: (top + bottom) / 2 - HUB_H / 2 };
+function reserved(cols: number, rows: number): GBounds {
+  return {
+    width: cols * (NODE_W + COL_GAP) + HUB_W,
+    height: rows * NODE_H + (rows - 1) * ROW_GAP,
+  };
 }

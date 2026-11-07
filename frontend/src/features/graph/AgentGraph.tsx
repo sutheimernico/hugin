@@ -11,7 +11,6 @@ import {
   ReactFlow,
   ReactFlowProvider,
   useReactFlow,
-  useStore,
   type EdgeTypes,
   type NodeTypes,
 } from "@xyflow/react";
@@ -42,11 +41,14 @@ const NODE_TYPES: NodeTypes = { proc: AgentNode, munin: MuninNode };
 const EDGE_TYPES: EdgeTypes = { pulse: PulseEdge };
 
 /**
- * The one fit the graph ever performs — on a new node, and on a resized panel. The diagram is a
- * fixed sheet: it always shows the whole network, so there is no pan or zoom to get lost in
- * (and a page that scrolls past it on a tablet is never held hostage by it).
+ * The diagram is a fixed sheet that fits its *reserved* bounds (see `layout.ts`), so a spawn
+ * never rescales it; it only re-fits when the panel is resized or the reserve itself grows.
+ * There is no pan or zoom to get lost in, and a page that scrolls past it on a tablet is
+ * never held hostage by it. Wide panels get a larger scale instead of empty margins.
  */
-const FIT = { padding: 0.08, maxZoom: 1.15, minZoom: 0.15, duration: 400 };
+const FIT = { maxZoom: 1.7, minZoom: 0.15, duration: 400 };
+/** Breathing room around the sheet; the bottom edge also clears the lamp legend. */
+const PAD = { x: 24, top: 20, bottom: 56 };
 
 type GraphNode = AgentNodeType | MuninNodeType;
 
@@ -81,25 +83,44 @@ function Graph({ state, runId, selectedPid, onSelect, panicking }: AgentGraphPro
   const nodes = useMemo(() => toNodes(graph.nodes, state, selectedPid), [graph, state, selectedPid]);
   const edges = useMemo(() => toEdges(graph.edges, state), [graph, state]);
 
-  const { fitView } = useReactFlow();
+  const { setViewport } = useReactFlow();
   const count = graph.nodes.length;
   const container = useRef<HTMLDivElement>(null);
-  const measured = useMeasuredNodes();
+  const { width: sheetW, height: sheetH } = graph.bounds;
+  const fitted = useRef(false);
 
+  const fit = useCallback(() => {
+    const element = container.current;
+    if (element === null || element.clientWidth === 0 || element.clientHeight === 0) return;
+    const availW = element.clientWidth - 2 * PAD.x;
+    const availH = element.clientHeight - PAD.top - PAD.bottom;
+    const zoom = Math.min(FIT.maxZoom, Math.max(FIT.minZoom, Math.min(availW / sheetW, availH / sheetH)));
+    // The first fit lands in place; later ones (resize, a grown reserve) glide.
+    void setViewport(
+      {
+        x: (element.clientWidth - sheetW * zoom) / 2,
+        y: PAD.top + (availH - sheetH * zoom) / 2,
+        zoom,
+      },
+      { duration: fitted.current ? FIT.duration : 0 },
+    );
+    fitted.current = true;
+  }, [setViewport, sheetW, sheetH]);
+
+  const hasNodes = count > 0;
   useEffect(() => {
-    if (count === 0) return;
-    void fitView(FIT);
-  }, [measured, count, fitView]);
+    if (hasNodes) fit();
+  }, [hasNodes, fit]);
 
   useEffect(() => {
     const element = container.current;
     // The agent sheet takes the column's width away from the graph, and the window itself can
     // be resized — both change what "fits" means without changing a single event.
     if (element === null || typeof ResizeObserver === "undefined") return;
-    const observer = new ResizeObserver(() => void fitView(FIT));
+    const observer = new ResizeObserver(() => fit());
     observer.observe(element);
     return () => observer.disconnect();
-  }, [fitView]);
+  }, [fit]);
 
   const handleClick = useCallback(
     (_event: MouseEvent, node: { id: string }) => {
@@ -143,9 +164,9 @@ function Graph({ state, runId, selectedPid, onSelect, panicking }: AgentGraphPro
           nodeTypes={NODE_TYPES}
           edgeTypes={EDGE_TYPES}
           onNodeClick={handleClick}
-          fitView
-          fitViewOptions={FIT}
+          onInit={fit}
           minZoom={FIT.minZoom}
+          maxZoom={FIT.maxZoom}
           panOnDrag={false}
           panOnScroll={false}
           zoomOnScroll={false}
@@ -183,24 +204,6 @@ function LampLegend() {
       ))}
     </ul>
   );
-}
-
-/**
- * A signature of every node xyflow has *measured*, which is the moment a re-fit is both due
- * and able to measure what it is fitting.
- *
- * `useNodesInitialized` would read better but never turns true here — the hook also waits for
- * handle bounds, and these nodes hide their handles — so a fit gated on it never ran at all.
- * The measured sizes are the signal that hook is trying to derive, so this reads them directly.
- */
-function useMeasuredNodes(): string {
-  return useStore((state) => {
-    let key = "";
-    for (const [id, node] of state.nodeLookup) {
-      key += `${id}:${node.measured?.width ?? 0}x${node.measured?.height ?? 0}|`;
-    }
-    return key;
-  });
 }
 
 function toNodes(nodes: GNode[], state: State, selectedPid: number | null): GraphNode[] {

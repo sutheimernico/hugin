@@ -40,18 +40,19 @@ export function AgentNode({ data, selected }: NodeProps<AgentNodeType>) {
 
   return (
     <div className="relative" style={{ width: NODE_W, height: NODE_H }}>
-      {/* The card morphs into the agent window (they share `layoutId`), and a shared layout
-          animation hides the card it animates away from — which would leave a hole in the
-          track. This outline holds the slot and reads as "open in the window". */}
-      <span
-        aria-hidden
-        className="absolute inset-0 rounded-part border-[1.5px] border-dashed border-text/30"
+      {/* The handles live on the static slot, not on the card that blooms in: xyflow measures
+          them once, and a handle measured on a half-scaled card draws its track to nowhere. */}
+      <Handle type="target" position={Position.Left} id={HANDLE_IN} className="!opacity-0" />
+      <Handle type="source" position={Position.Right} id={HANDLE_OUT} className="!opacity-0" />
+      <Handle
+        type="source"
+        position={Position.Right}
+        id={HANDLE_MEM}
+        style={{ top: "78%" }}
+        className="!opacity-0"
       />
       <motion.div
         data-testid="agent-node"
-        // Shared with the agent window's header: selecting the node morphs *this* card into the
-        // sheet instead of opening an unrelated panel beside it.
-        layoutId={`proc-${proc.pid}`}
         data-state={proc.state}
         initial={{
           x: data.from?.dx ?? 0,
@@ -66,8 +67,6 @@ export function AgentNode({ data, selected }: NodeProps<AgentNodeType>) {
           selected ? "border-text" : "border-text/35 hover:border-text/70"
         }`}
       >
-        <Handle type="target" position={Position.Left} id={HANDLE_IN} className="!opacity-0" />
-
         {/* The mast: lamp on top, pole, foot. Its colour is the only colour on the card. */}
         <span
           aria-hidden
@@ -129,15 +128,6 @@ export function AgentNode({ data, selected }: NodeProps<AgentNodeType>) {
             {stamp.word}
           </span>
         )}
-
-        <Handle type="source" position={Position.Right} id={HANDLE_OUT} className="!opacity-0" />
-        <Handle
-          type="source"
-          position={Position.Right}
-          id={HANDLE_MEM}
-          style={{ top: "78%" }}
-          className="!opacity-0"
-        />
       </motion.div>
     </div>
   );

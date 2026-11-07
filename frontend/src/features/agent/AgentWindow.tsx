@@ -1,7 +1,7 @@
 /**
  * One agent, up close: who it is, what it has spent, what it has said and
- * the switch that stops it. Clicking a node in the graph morphs that card into this sheet —
- * both carry `layoutId="proc-<pid>"`, so the shell shows one object moving, not two panels.
+ * the switch that stops it. The card in the diagram stays where it is, outlined as selected,
+ * so the track plan never has a hole in it while an agent is being read.
  *
  * The sheet overlays the kernel-log column instead of replacing it in the tree: the log keeps
  * its scroll position and its stick-to-bottom state while an agent is being read.
@@ -73,8 +73,6 @@ export function AgentWindow({ proc, now, onClose, onKill }: AgentWindowProps) {
       className="fixed inset-x-0 top-14 bottom-0 z-50 flex flex-col overflow-hidden border-l border-text/25 bg-surface min-[720px]:left-auto min-[720px]:w-[440px] min-[720px]:shadow-[-14px_0_28px_-18px_rgba(27,33,38,0.5)] min-[1200px]:absolute min-[1200px]:inset-0 min-[1200px]:z-10 min-[1200px]:w-auto min-[1200px]:shadow-none"
     >
       <motion.header
-        layoutId={`proc-${proc.pid}`}
-        transition={SHEET}
         className="flex shrink-0 items-start gap-3 border-b border-border px-4 py-3"
       >
         <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-text">

@@ -27,6 +27,8 @@ export function MuninNode({ data }: NodeProps<MuninNodeType>) {
   }, [writes, controls]);
 
   return (
+    <div className="relative" style={{ width: HUB_W, height: HUB_H }}>
+      <Handle type="target" position={Position.Left} id={HANDLE_IN} className="!opacity-0" />
     <motion.div
       data-testid="munin-node"
       initial={{ scale: 0.6, opacity: 0 }}
@@ -34,7 +36,6 @@ export function MuninNode({ data }: NodeProps<MuninNodeType>) {
       style={{ width: HUB_W, height: HUB_H }}
       className="flex flex-col items-start justify-center rounded-part border-[1.5px] border-green bg-surface px-2.5"
     >
-      <Handle type="target" position={Position.Left} id={HANDLE_IN} className="!opacity-0" />
       <span className="flex items-center gap-1.5 text-green">
         <Database size={16} strokeWidth={2} aria-hidden />
         <span className="font-display text-[19px] leading-6 font-semibold text-text">Speicher</span>
@@ -48,5 +49,6 @@ export function MuninNode({ data }: NodeProps<MuninNodeType>) {
         <span className="text-[12px] text-muted">{writes === 1 ? "Eintrag" : "Einträge"}</span>
       </span>
     </motion.div>
+    </div>
   );
 }
