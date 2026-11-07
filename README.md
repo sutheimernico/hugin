@@ -7,13 +7,14 @@ local Ollama loop — as supervised processes with PIDs, budgets, capability-gat
 append-only event log, and a React UI shows, kills and replays every step live.**
 
 <p align="center">
-  <img src="docs/media/hero.gif" width="900"
-       alt="Mission Control replaying a recorded Claude run: a planner starts three scouts, they search the web and write to memory, the occupancy plan fills in below">
+  <img src="docs/media/hero.gif" width="640"
+       alt="Mission ledger, process table, signal-box diagram and occupancy plan while a recorded Claude run plays: a planner starts three scouts, the third waits for a free slot">
 </p>
 
 <p align="center">
-  <sub>Replay of the real Claude run recorded for this repo (848 events, 231 s), shown at 4x.
-  The shell is the same in live mode; only the data source differs.</sub>
+  <sub>Five seconds at 8x from the real Claude run recorded for this repo (848 events, 231 s): the planner
+  starts scouts, the third queues for a slot. The shell is the same in live mode; only the data source
+  differs. The timetable column is left out of the clip to keep it under 4 MB.</sub>
 </p>
 
 **Headline result.** The largest real run so far: one planner plus three web-searching scouts on
