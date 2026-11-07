@@ -80,6 +80,8 @@ export interface ApiRecording {
   events: number;
   duration_s: number;
   exported_at: number;
+  /** Set in the manifest of a recording whose in-flight token readings undercount. */
+  tokens_lower_bound?: boolean;
 }
 
 interface ApiRun {

@@ -14,7 +14,7 @@
 import { syscallLabel, toolErrorText, toolLabel } from "../lib/describe";
 import { fmtDec, fmtInt, fmtMs } from "../lib/format";
 import { DRIVER_LABEL, exitReasonShort, STATE_LABEL } from "../lib/i18n";
-import { ALIVE_STATES } from "./selectors";
+import { isActive, isAlive } from "./selectors";
 import type {
   Budget,
   Driver,
@@ -404,9 +404,8 @@ function meters(state: State): Meters {
   let totalTokens = 0;
   for (const proc of Object.values(state.procs)) {
     totalTokens += proc.usage.input_tokens + proc.usage.output_tokens;
-    if (!ALIVE_STATES.has(proc.state)) continue;
-    // A queued process holds no slot yet: it is waiting, not active.
-    if (proc.state !== "queued") activeProcs += 1;
+    if (!isAlive(proc)) continue;
+    if (isActive(proc)) activeProcs += 1;
     budgetPct = Math.max(budgetPct, proc.budgetPct);
   }
   // The window is exactly one minute wide, so its sum *is* the tokens-per-minute rate.

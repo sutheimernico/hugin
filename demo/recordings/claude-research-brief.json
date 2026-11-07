@@ -5,5 +5,6 @@
   "driver": "claude",
   "events": 848,
   "duration_s": 231.4909749031067,
-  "exported_at": 1788665664.6153367
+  "exported_at": 1788665664.6153367,
+  "tokens_lower_bound": true
 }

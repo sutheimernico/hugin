@@ -19,7 +19,7 @@ export function useShowcaseReplay(enabled: boolean): void {
     void getRecordings()
       .then((recordings) => {
         const showcase = pickShowcase(recordings);
-        if (showcase !== undefined) return startRecording(showcase.slug, true);
+        if (showcase !== undefined) return startRecording(showcase.slug, showcase.tokens_lower_bound);
       })
       .catch(() => {
         // The stage below lists the recordings and shows the load error itself.

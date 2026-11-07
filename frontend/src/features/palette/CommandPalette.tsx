@@ -156,22 +156,23 @@ export function CommandPalette({ open, onOpen, onClose, onToast }: CommandPalett
   }, [commands, freeText]);
 
   const inputRef = useRef<HTMLInputElement>(null);
-  const pendingSelection = useRef<[number, number] | null>(null);
-  // The placeholder can only be selected once the input shows the template text.
+  // The placeholder can only be selected once the input shows the template text. A counter, not
+  // `search`, drives the effect: choosing the same template twice sets the same string, and an
+  // effect keyed on the string would not run the second time.
+  const [selection, setSelection] = useState<{ tick: number; range: [number, number] } | null>(null);
   useEffect(() => {
-    const range = pendingSelection.current;
-    if (range === null) return;
-    pendingSelection.current = null;
+    if (selection === null) return;
     inputRef.current?.focus();
-    inputRef.current?.setSelectionRange(range[0], range[1]);
-  }, [search]);
+    inputRef.current?.setSelectionRange(selection.range[0], selection.range[1]);
+  }, [selection]);
 
   const select = useCallback(
     (command: Command) => {
       if (command.disabled !== undefined) return;
       if (command.prefill !== undefined) {
         // A template with blanks is a sentence to finish, not a mission to start.
-        pendingSelection.current = firstPlaceholder(command.prefill);
+        const range = firstPlaceholder(command.prefill);
+        setSelection((prev) => (range === null ? null : { tick: (prev?.tick ?? 0) + 1, range }));
         setSearch(command.prefill);
         setSelected(FREE_TEXT_ID);
         return;

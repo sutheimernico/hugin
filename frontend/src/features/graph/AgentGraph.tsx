@@ -25,6 +25,7 @@ import {
   HANDLE_MEM,
   HANDLE_OUT,
   MUNIN_ID,
+  NODE_W,
   pidOfNode,
   structureKey,
   treeEdgeId,
@@ -223,11 +224,17 @@ function toNodes(nodes: GNode[], state: State, selectedPid: number | null): Grap
           position: { x: node.x, y: node.y },
           data: {
             proc: state.procs[node.pid!],
-            from: node.from === null ? null : { dx: node.from.x - node.x, dy: node.from.y - node.y },
+            // A card leaves its parent's right handle, so it never covers the parent's label.
+            from:
+              node.from === null
+                ? null
+                : { dx: node.from.x + NODE_W - node.x, dy: node.from.y - node.y },
           },
           // Read out by a screen reader on focus; the card itself is icons and numbers.
           ariaLabel: `${state.procs[node.pid!].program} · PID ${node.pid}`,
           selected: node.pid === selectedPid,
+          // Parents have lower pids; they stay on top of the cards that grow out of them.
+          zIndex: 1000 - node.pid!,
           draggable: false,
         } satisfies AgentNodeType),
   );

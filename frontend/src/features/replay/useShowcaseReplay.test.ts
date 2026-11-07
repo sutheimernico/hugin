@@ -18,7 +18,7 @@ vi.mock("../../lib/api", () => api);
 const rec = (slug: string, driver: string) => ({ slug, driver }) as ApiRecording;
 const events: HEvent[] = [
   { seq: 1, ts: 1, run_id: "r", pid: null, kind: "run.created", data: {} },
-  { seq: 2, ts: 5, run_id: "r", pid: null, kind: "run.done", data: {} },
+  { seq: 2, ts: 231, run_id: "r", pid: null, kind: "run.done", data: {} },
 ];
 
 beforeEach(() => {
@@ -33,6 +33,14 @@ describe("useShowcaseReplay", () => {
     renderHook(() => useShowcaseReplay(true));
     await waitFor(() => expect(useHuginStore.getState().replay.runId).toBe("real"));
     expect(useHuginStore.getState().replay).toMatchObject({ playing: true, speed: 4 });
+  });
+
+  it("plays a short recording at 1x", async () => {
+    api.getRecordingEvents.mockResolvedValue([events[0], { ...events[1], ts: 8 }]);
+    api.getRecordings.mockResolvedValue([rec("sim", "scripted")]);
+    renderHook(() => useShowcaseReplay(true));
+    await waitFor(() => expect(useHuginStore.getState().replay.runId).toBe("sim"));
+    expect(useHuginStore.getState().replay).toMatchObject({ playing: true, speed: 1 });
   });
 
   it("does nothing when it is not the replay-only build", () => {

@@ -56,6 +56,13 @@ describe("replay slice", () => {
     expect(selectActiveRun(selectVisibleState(store()), store().replay)?.id).toBe("r1");
   });
 
+  it("remembers that a recording's live token readings are a lower bound", () => {
+    store().enterReplay({ slug: "old", lowerBoundTokens: true }, RUN);
+    expect(store().replay.lowerBoundTokens).toBe(true);
+    store().enterReplay({ slug: "new" }, RUN);
+    expect(store().replay.lowerBoundTokens).toBe(false);
+  });
+
   it("replays a recording by its slug", () => {
     store().enterReplay({ slug: "bloom" }, RUN);
     expect(selectMode(store())).toBe("replay");

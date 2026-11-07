@@ -4,7 +4,7 @@ import { getRecordingEvents, getRunEvents } from "../../lib/api";
 import { useHuginStore } from "../../state/store";
 import type { HEvent } from "../../state/types";
 
-type Source = { runId?: string; slug?: string };
+type Source = { runId?: string; slug?: string; lowerBoundTokens?: boolean };
 
 /**
  * Loads a run's or a recording's events once and hands them to the store — from there on the
@@ -22,17 +22,19 @@ export function useReplayLauncher() {
   const [problem, setProblem] = useState<string | null>(null);
 
   const start = useCallback(
-    async (source: Source, load: () => Promise<HEvent[]>, autoplay = false) => {
+    async (source: Source, load: () => Promise<HEvent[]>) => {
       setBusy(source.runId ?? source.slug ?? "");
       setProblem(null);
       try {
-        enterReplay(source, await load());
+        const events = await load();
+        enterReplay(source, events);
         setView("control");
-        if (autoplay) {
-          // A four-minute run at 1x is a long wait for a first impression.
-          setSpeed(4);
-          play();
-        }
+        // A replay starts playing: parked and paused it would sit under a "Läuft" chip doing
+        // nothing. A four-minute run at 1x is a long wait for a first impression, so long
+        // ones start at 4x.
+        const length = (events.at(-1)?.ts ?? 0) - (events[0]?.ts ?? 0);
+        setSpeed(length > 60 ? 4 : 1);
+        play();
       } catch (reason) {
         setProblem(errorText(reason));
       } finally {
@@ -47,8 +49,8 @@ export function useReplayLauncher() {
     [start],
   );
   const startRecording = useCallback(
-    (slug: string, autoplay = false) =>
-      start({ slug }, () => getRecordingEvents(slug), autoplay),
+    (slug: string, lowerBoundTokens = false) =>
+      start({ slug, lowerBoundTokens }, () => getRecordingEvents(slug)),
     [start],
   );
 

@@ -208,3 +208,23 @@ describe("CommandPalette", () => {
     expect(api.getRuns).toHaveBeenCalledTimes(1);
   });
 });
+
+describe("CommandPalette — placeholder selection", () => {
+  it("re-selects the placeholder when the template is chosen again, so the first typed letter survives", async () => {
+    const input = await openPalette();
+    await userEvent.click(await screen.findByText("Mission starten: Recherche-Briefing"));
+    // Enter on the (still highlighted) template runs the same prefill a second time.
+    await userEvent.click(await screen.findByText("Mission starten: Recherche-Briefing"));
+    await userEvent.keyboard("Event Sourcing");
+
+    await waitFor(() => expect(input).toHaveValue("Erstelle ein Recherche-Briefing zu: Event Sourcing"));
+  });
+
+  it("drops a stale selection when the text is edited by hand", async () => {
+    const input = (await openPalette()) as HTMLInputElement;
+    await userEvent.click(await screen.findByText("Mission starten: Recherche-Briefing"));
+    await userEvent.keyboard("Thema A");
+    await userEvent.keyboard("{Backspace}");
+    expect(input.value).toBe("Erstelle ein Recherche-Briefing zu: Thema ");
+  });
+});

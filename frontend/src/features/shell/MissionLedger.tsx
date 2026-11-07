@@ -6,6 +6,7 @@ import { goalText } from "../../lib/describe";
 import { budgetTone, FILL_CLASS } from "../../lib/budget";
 import { fmtDuration, fmtTokens } from "../../lib/format";
 import { DRIVER_LABEL, STATE_LABEL } from "../../lib/i18n";
+import { useHuginStore } from "../../state/store";
 import { fmtDateTimeDe } from "../../lib/time";
 import type { Proc, Run } from "../../state/types";
 import { ledgerOf } from "./ledger";
@@ -25,6 +26,8 @@ type MissionLedgerProps = {
  */
 export function MissionLedger({ run, procs, now, replaying }: MissionLedgerProps) {
   const ledger = ledgerOf(run, procs, now);
+  const lowerBoundRecording = useHuginStore((store) => store.replay.lowerBoundTokens);
+  const tokensAreFloor = ledger.tokensAreFloor && lowerBoundRecording;
   const tone = budgetTone(ledger.budgetPct);
 
   return (
@@ -54,8 +57,8 @@ export function MissionLedger({ run, procs, now, replaying }: MissionLedgerProps
         <Figure label="Laufzeit" value={fmtDuration(ledger.elapsed)} />
         <Figure label="Runden" value={<CountUp value={ledger.turns} />} />
         <Figure
-          label={ledger.tokensAreFloor ? "Tokens ≥" : "Tokens"}
-          hint={ledger.tokensAreFloor ? "Mindestwert: abgeschlossene Runden, laufende zählen erst am Ende" : undefined}
+          label={tokensAreFloor ? "Tokens ≥" : "Tokens"}
+          hint={tokensAreFloor ? "Mindestwert: abgeschlossene Runden, laufende zählen erst am Ende" : undefined}
           value={
             <>
               <CountUp value={ledger.outputTokens} format={fmtTokens} />

@@ -102,7 +102,7 @@ export function RunsView() {
             busy={busy === recording.slug}
             selected={chosen?.kind === "recording" && chosen.id === recording.slug}
             onSelect={() => setPick({ kind: "recording", id: recording.slug })}
-            onReplay={() => void startRecording(recording.slug)}
+            onReplay={() => void startRecording(recording.slug, recording.tokens_lower_bound)}
           />
         ))}
       </Section>
@@ -125,7 +125,7 @@ export function RunsView() {
           driver={chosenRecording.driver}
           load={() => getRecordingEvents(chosenRecording.slug)}
           busy={busy === chosenRecording.slug}
-          onReplay={() => void startRecording(chosenRecording.slug)}
+          onReplay={() => void startRecording(chosenRecording.slug, chosenRecording.tokens_lower_bound)}
         />
       )}
     </div>

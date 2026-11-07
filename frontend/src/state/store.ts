@@ -27,6 +27,11 @@ export interface ReplaySlice {
   speed: Speed;
   cursorSeq: number;
   events: HEvent[];
+  /**
+   * The recording's live token readings undercount (made before output was counted per
+   * turn from the stream). Live runs and newer recordings leave it `false`.
+   */
+  lowerBoundTokens: boolean;
 }
 
 export type Speed = 1 | 2 | 4 | 8;
@@ -38,6 +43,7 @@ export const IDLE_REPLAY: ReplaySlice = {
   speed: 1,
   cursorSeq: 0,
   events: [],
+  lowerBoundTokens: false,
 };
 
 export interface HuginStore {
@@ -72,7 +78,10 @@ export interface HuginStore {
   setActiveRunId: (runId: string | null) => void;
 
   /** Load a finished run or a recording and show it from its first event on. */
-  enterReplay: (source: { runId?: string; slug?: string }, events: HEvent[]) => void;
+  enterReplay: (
+    source: { runId?: string; slug?: string; lowerBoundTokens?: boolean },
+    events: HEvent[],
+  ) => void;
   seek: (seq: number) => void;
   play: () => void;
   pause: () => void;
@@ -119,7 +128,10 @@ export const useHuginStore = create<HuginStore>()((set, get) => ({
     set({
       // Parked on the first event, not before it: seq 0 is the empty kernel, and a recording
       // that opens on "Gleis frei" reads as broken.
-      replay: { runId, playing: false, speed: 1, cursorSeq: firstSeq(events), events },
+      replay: { runId, playing: false, speed: 1, cursorSeq: firstSeq(events),
+        events,
+        lowerBoundTokens: source.lowerBoundTokens === true,
+      },
       // A pid selected in the live shell means nothing in another run's process table.
       selectedPid: null,
     });

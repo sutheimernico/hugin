@@ -75,7 +75,7 @@ export function EmptyStage({ onOpenPalette }: EmptyStageProps) {
             driver={recording.driver}
             meta={[`${recording.events} Ereignisse`, fmtDuration(recording.duration_s)]}
             busy={busy === recording.slug}
-            onReplay={() => void startRecording(recording.slug)}
+            onReplay={() => void startRecording(recording.slug, recording.tokens_lower_bound)}
           />
         ))}
       </section>
