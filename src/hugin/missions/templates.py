@@ -2,6 +2,8 @@
 
 Ids are stable API values; titles and goals are UI copy and therefore German. The braces are
 placeholders the user fills in before starting the mission — the service sees the finished text.
+There is deliberately no repository template: it would need a local path, which a public
+demo must neither prefill nor reveal.
 """
 
 from pydantic import BaseModel
@@ -25,15 +27,6 @@ TEMPLATES: tuple[Template, ...] = (
         goal=(
             "Vergleiche {Option A} und {Option B} entlang von Aufwand, Kosten und Risiko"
             " und sprich eine begründete Empfehlung aus."
-        ),
-    ),
-    Template(
-        id="analyse_repo",
-        title="Repo analysieren",
-        # The path stays inside ~/private — anything else the mission service rejects.
-        goal=(
-            "Analysiere das Repository unter ~/private/{repo}: Aufbau, Testabdeckung"
-            " und die drei größten Risiken."
         ),
     ),
 )

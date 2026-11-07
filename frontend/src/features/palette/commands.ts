@@ -17,6 +17,11 @@ export interface Command {
   label: string;
   hint?: string;
   disabled?: string;
+  /**
+   * A template with `{placeholders}` is not startable as written: choosing it fills the input
+   * with this text (first placeholder selected) instead of running.
+   */
+  prefill?: string;
   run: () => void | Promise<void>;
 }
 
@@ -65,6 +70,18 @@ export function driverReason(system: SystemStatus | null, driver: Driver): strin
   return undefined;
 }
 
+const PLACEHOLDER = /\{[^{}]+\}/;
+
+export function hasPlaceholder(goal: string): boolean {
+  return PLACEHOLDER.test(goal);
+}
+
+/** The first `{placeholder}` as an input selection range, or `null` when there is none. */
+export function firstPlaceholder(goal: string): [number, number] | null {
+  const match = PLACEHOLDER.exec(goal);
+  return match === null ? null : [match.index, match.index + match[0].length];
+}
+
 export function buildCommands(ctx: CommandContext): Command[] {
   const blocked = driverReason(ctx.system, ctx.driver);
 
@@ -74,6 +91,7 @@ export function buildCommands(ctx: CommandContext): Command[] {
     label: `Mission starten: ${template.title}`,
     hint: template.goal,
     disabled: blocked,
+    prefill: hasPlaceholder(template.goal) ? template.goal : undefined,
     run: () => ctx.actions.startMission(template.goal, ctx.driver),
   }));
 
@@ -130,7 +148,9 @@ export function freeTextCommand(
     group: "Mission",
     label: `Mission starten: »${goal}«`,
     hint: DRIVER_LABEL[ctx.driver],
-    disabled: driverReason(ctx.system, ctx.driver),
+    disabled: hasPlaceholder(goal)
+      ? "Platzhalter {…} noch ersetzen"
+      : driverReason(ctx.system, ctx.driver),
     run: () => ctx.actions.startMission(goal, ctx.driver),
   };
 }

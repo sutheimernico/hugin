@@ -11,7 +11,7 @@
 import { ESC_PRIORITY, useEscapeLayer } from "../../lib/escape";
 import { Command as Cmdk, defaultFilter } from "cmdk";
 import { AnimatePresence, motion } from "motion/react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Kbd } from "../../components/Kbd";
 import type { ToastTone } from "../../components/Toast";
 import { getRuns, getTemplates, killAll, postMission } from "../../lib/api";
@@ -22,6 +22,7 @@ import {
   buildCommands,
   DRIVERS,
   driverReason,
+  firstPlaceholder,
   freeTextCommand,
   FREE_TEXT_ID,
   missionCommandId,
@@ -154,9 +155,27 @@ export function CommandPalette({ open, onOpen, onClose, onToast }: CommandPalett
     return text;
   }, [commands, freeText]);
 
+  const inputRef = useRef<HTMLInputElement>(null);
+  const pendingSelection = useRef<[number, number] | null>(null);
+  // The placeholder can only be selected once the input shows the template text.
+  useEffect(() => {
+    const range = pendingSelection.current;
+    if (range === null) return;
+    pendingSelection.current = null;
+    inputRef.current?.focus();
+    inputRef.current?.setSelectionRange(range[0], range[1]);
+  }, [search]);
+
   const select = useCallback(
     (command: Command) => {
       if (command.disabled !== undefined) return;
+      if (command.prefill !== undefined) {
+        // A template with blanks is a sentence to finish, not a mission to start.
+        pendingSelection.current = firstPlaceholder(command.prefill);
+        setSearch(command.prefill);
+        setSelected(FREE_TEXT_ID);
+        return;
+      }
       close();
       void Promise.resolve(command.run()).catch((error: unknown) => {
         onToast(errorText(error), "error");
@@ -197,6 +216,7 @@ export function CommandPalette({ open, onOpen, onClose, onToast }: CommandPalett
             >
               <div className="flex items-center gap-3 border-b border-border px-5">
                 <Cmdk.Input
+                  ref={inputRef}
                   autoFocus
                   value={search}
                   // Typing always points at what the text itself means: start this mission.

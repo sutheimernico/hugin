@@ -91,23 +91,51 @@ describe("CommandPalette", () => {
     expect(await openPalette({ ctrlKey: true })).toBeInTheDocument();
   });
 
-  it("starts a template mission with the simulation driver and reports it", async () => {
-    await openPalette();
+  it("fills the input from a template with blanks and selects the placeholder", async () => {
+    const input = await openPalette();
     await userEvent.click(await screen.findByText("Mission starten: Recherche-Briefing"));
 
-    await waitFor(() => expect(api.postMission).toHaveBeenCalledWith(TEMPLATE.goal, "scripted"));
-    await waitFor(() => expect(onToast).toHaveBeenCalledWith("Mission gestartet", "info"));
+    // Nothing is posted: a raw "{Thema}" must never reach the backend.
+    expect(api.postMission).not.toHaveBeenCalled();
+    await waitFor(() => expect(input).toHaveValue(TEMPLATE.goal));
+    await waitFor(() => {
+      const el = input as HTMLInputElement;
+      expect(el.value.slice(el.selectionStart ?? 0, el.selectionEnd ?? 0)).toBe("{Thema}");
+    });
+  });
+
+  it("starts the finished template once the placeholder is replaced", async () => {
+    const input = await openPalette();
+    await userEvent.click(await screen.findByText("Mission starten: Recherche-Briefing"));
+    await userEvent.keyboard("Agent-Betriebssysteme");
+
+    await waitFor(() => expect(input).toHaveValue("Erstelle ein Recherche-Briefing zu: Agent-Betriebssysteme"));
+    await userEvent.keyboard("{Enter}");
     await waitFor(() =>
-      expect(screen.queryByPlaceholderText("Was soll hugin tun?")).not.toBeInTheDocument(),
+      expect(api.postMission).toHaveBeenCalledWith(
+        "Erstelle ein Recherche-Briefing zu: Agent-Betriebssysteme",
+        "scripted",
+      ),
     );
+    await waitFor(() => expect(onToast).toHaveBeenCalledWith("Mission gestartet", "info"));
+  });
+
+  it("refuses to start while a placeholder is still in the text", async () => {
+    await openPalette();
+    await userEvent.click(await screen.findByText("Mission starten: Recherche-Briefing"));
+    await userEvent.keyboard("{ArrowLeft}{Enter}");
+
+    expect(api.postMission).not.toHaveBeenCalled();
+    expect(await screen.findByText("Platzhalter {…} noch ersetzen")).toBeInTheDocument();
   });
 
   it("shows the backend's German reason when a mission is rejected", async () => {
-    api.postMission.mockRejectedValue(new Error("Pfade müssen unter ~/private liegen."));
-    await openPalette();
-    await userEvent.click(await screen.findByText("Mission starten: Recherche-Briefing"));
+    api.postMission.mockRejectedValue(new Error("Die Mission wurde abgelehnt."));
+    const input = await openPalette();
+    await userEvent.type(input, "Finde drei Optionen");
+    await userEvent.keyboard("{Enter}");
     await waitFor(() =>
-      expect(onToast).toHaveBeenCalledWith("Pfade müssen unter ~/private liegen.", "error"),
+      expect(onToast).toHaveBeenCalledWith("Die Mission wurde abgelehnt.", "error"),
     );
   });
 

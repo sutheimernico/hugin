@@ -165,3 +165,13 @@ describe("freeTextCommand", () => {
     );
   });
 });
+
+describe("placeholders", () => {
+  it("finds the first {placeholder} as a selection range", async () => {
+    const { firstPlaceholder, hasPlaceholder } = await import("./commands");
+    expect(firstPlaceholder("Vergleiche {Option A} und {Option B}")).toEqual([11, 21]);
+    expect(firstPlaceholder("Kein Platzhalter")).toBeNull();
+    expect(hasPlaceholder("zu: {Thema}")).toBe(true);
+    expect(hasPlaceholder("zu: Thema")).toBe(false);
+  });
+});

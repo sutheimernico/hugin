@@ -142,7 +142,6 @@ async def test_templates_are_offered(api):
     assert [template["id"] for template in templates] == [
         "research_brief",
         "compare_options",
-        "analyse_repo",
     ]
     assert templates[0]["title"] == "Recherche-Briefing"
     assert all(template["goal"] for template in templates)
