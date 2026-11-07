@@ -59,16 +59,20 @@ The concept, tokens, type and motion rules are in
        alt="The same mission on a 390 px phone: the diagram redrawn as a vertical process tree with the same lamps and gauges, bottom navigation below">
 </p>
 
-Below 720 px the diagram is redrawn as a vertical process tree instead of being squeezed, the agent
-window becomes a full-height sheet, and navigation moves to a bottom bar. Motion is 150 to 400 ms,
-transform and opacity only, and switched off under `prefers-reduced-motion`. Views other than
+The three columns hold down to 900 px (a 960 px laptop at 200 % scaling is the design target for
+the narrow end); between 720 and 900 px the diagram stacks above two columns, and below 720 px it is
+redrawn as a vertical process tree instead of being squeezed, the agent window becomes a
+full-height sheet, and navigation moves to a bottom bar. Transitions are 150 to 400 ms, transform
+and opacity only; the one looping motion is a slow 2.4 s ring on the lamp of a running agent.
+All of it is switched off under `prefers-reduced-motion`. The design research is in
+[`docs/design-brief.md`](docs/design-brief.md). Views other than
 Mission Control, the command palette and the boot sequence load as separate chunks.
 
 ## What it is — and what it is not
 
 hugin borrows an operating system's *process model*, not its kernel: agents get a PID, a state
 machine (`queued → spawning → running ⇄ waiting_tool → done | failed | killed`), a working
-directory, hard budgets, a capability set and a kill switch. The "scheduler" is a FIFO
+directory, hard budgets (turns, seconds, output tokens), a capability set and a kill switch. The "scheduler" is a FIFO
 concurrency limiter per driver (21 lines), not a time-slicing scheduler. There is no auth and no
 multi-user mode; it binds to 127.0.0.1 and trusts the person at the keyboard. See
 [`docs/THREAT_MODEL.md`](docs/THREAT_MODEL.md) for what that does and does not cover.
@@ -77,14 +81,14 @@ Real: the processes are real `claude -p` subprocesses or a real Ollama tool loop
 are real MCP tools, and the event log is the source of truth. Simulated: exactly one driver — the
 *Simulation* replays a fixed script instead of calling a model, so tests and the offline demo run
 without an LLM. It plays the same example mission whatever goal you type (the UI says so), and the
-mode chip always reads `SIMULATION`, `LIVE · CLAUDE`, `LIVE · OLLAMA` or `REPLAY`.
+mode chip reads `SIMULATION`, `LIVE · CLAUDE`, `LIVE · OLLAMA` or `REPLAY` while a mission or a replay is on screen, and `BEREIT` (ready) when the kernel is idle.
 
 ## How this was built
 
 hugin was built with spec-driven agentic development. I wrote the design spec and the plan
 (`docs/superpowers/specs/`, `docs/superpowers/plans/`), set the constraints (no API cost, no
 network or LLM in tests, capability gate on every syscall), reviewed what the coding agents
-produced, and own the verification: 395 backend tests and 315 frontend tests are the gate, run on
+produced, and own the verification: COUNTS_BACKEND backend tests and COUNTS_FRONTEND frontend tests are the gate, run on
 every push by CI. The architecture decisions that were not obvious are written down as ADRs in
 `docs/adr/`. A later audit pass found real problems in that first version — stale tokens, an
 unbounded child budget, an over-broad file tool, a log that was not actually used to rebuild state
@@ -149,9 +153,13 @@ Full version: [`docs/THREAT_MODEL.md`](docs/THREAT_MODEL.md).
 - Loopback only; `/api` and `/mcp` both refuse non-loopback `Host`/`Origin` (DNS rebinding). To open
   the shell from another device (e.g. a phone over Tailscale), bind `HUGIN_HOST` there and name the
   hostnames you accept in `HUGIN_ALLOWED_HOSTS` (comma-separated, exact match; default: none).
-- File tools are path-scoped to `HUGIN_WORKSPACE_ROOT` (default: this repository), secrets inside
-  it are denied, no program has a shell tool, and every spawn path checks task text against the
-  workspace.
+- File tools are path-scoped to `HUGIN_WORKSPACE_ROOT` (default: this repository), the hugin state
+  directory, the Claude config directory and `.env` files are on a deny list, no program has a
+  shell tool, and every spawn path checks task text against the workspace. The path and deny
+  rules follow Claude Code's documented syntax and are asserted in tests, but **have not been
+  probed live**: the owner still has to run one real `smith` mission whose task points outside the
+  workspace and at a `.env`, and confirm the refusal in the transcript (open item,
+  `docs/THREAT_MODEL.md` R1).
 - Per-program tool whitelist, `--permission-mode dontAsk`, `--strict-mcp-config`, an isolated
   `CLAUDE_CONFIG_DIR` (no user hooks, MCP servers or CLAUDE.md), a scrubbed environment.
 - Capability gate before every syscall; only a run's planner may write its artifact, and not
@@ -177,14 +185,20 @@ uv run python scripts/record_demo.py <run_id> <slug>      # or straight from the
 | `claude-research-brief` | Claude (subscription) | 848 | 231.5 s |
 | `ollama-scout-brief` | Ollama (`program:scout`) | 462 | 242.0 s |
 
+Note on the Claude recording: it was captured before output tokens were counted from the stream's
+`message_delta` (the first version read a start-of-message snapshot of ~1 token per turn). Its live
+token readings while agents run are therefore far too low, and the UI marks that figure as a lower
+bound (`Tokens ≥`) until the agents exit; the exit totals (20,2k output tokens) are exact. New
+runs count per turn from the stream.
+
 ## Development
 
 ```bash
-uv run pytest -q                          # 395 tests
+uv run pytest -q                          # COUNTS_BACKEND tests
 uv run ruff check . && uv run ruff format --check .
 uv run mypy                               # type check
 npm --prefix frontend run check           # tsc + eslint
-npm --prefix frontend test -- --run       # 315 tests
+npm --prefix frontend test -- --run       # COUNTS_FRONTEND tests
 ```
 
 CI (`.github/workflows/ci.yml`) runs exactly these. No test talks to the network, to `claude` or

@@ -46,7 +46,7 @@ keyboard.
 - **R1 — Live check of path rules.** The `Read(//…)` rules follow Claude Code's documented
   permission syntax and are asserted in the argv tests; whether the installed CLI version applies
   them to `Glob` and `Grep` exactly as documented has not been probed with a real run in this
-  change. The failure mode of a mis-parsed rule is a denied tool, not an open one.
+  change. The failure modes differ by flag: a mis-parsed *allow* rule (`--allowedTools`) leaves the tool denied, but a mis-parsed *deny* rule (`--disallowedTools`, which protects the hugin state, the Claude config and `.env` files) fails open: the tool stays allowed. The deny list is therefore covered by tests on the rule strings only, not by observed behaviour. **Open item for the owner:** one real `smith` mission with a task naming `~/.ssh` and a `.env`, checking in the transcript that both reads are refused. It has not been run.
 - **R2 — Injection is not solved.** A scout that reads a hostile page can still be talked into
   writing misleading text into its report or into munin. The kernel bounds what that agent can
   *do* (read, spawn, spend); it cannot make a model immune. Reports from web-reading workers are
