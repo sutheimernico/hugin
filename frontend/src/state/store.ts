@@ -117,7 +117,9 @@ export const useHuginStore = create<HuginStore>()((set, get) => ({
     const runId = source.runId ?? source.slug ?? events[0]?.run_id ?? null;
     if (runId === null) return;
     set({
-      replay: { runId, playing: false, speed: 1, cursorSeq: 0, events },
+      // Parked on the first event, not before it: seq 0 is the empty kernel, and a recording
+      // that opens on "Gleis frei" reads as broken.
+      replay: { runId, playing: false, speed: 1, cursorSeq: firstSeq(events), events },
       // A pid selected in the live shell means nothing in another run's process table.
       selectedPid: null,
     });
@@ -126,14 +128,14 @@ export const useHuginStore = create<HuginStore>()((set, get) => ({
   seek: (seq) => {
     const { events } = get().replay;
     const last = lastSeq(events);
-    set({ replay: { ...get().replay, cursorSeq: Math.min(last, Math.max(0, Math.round(seq))) } });
+    set({ replay: { ...get().replay, cursorSeq: Math.min(last, Math.max(firstSeq(events), Math.round(seq))) } });
   },
 
   play: () => {
     const replay = get().replay;
     // Pressing ▶ on a finished run starts it over; a player that does nothing reads as broken.
     const atEnd = replay.cursorSeq >= lastSeq(replay.events);
-    set({ replay: { ...replay, playing: true, cursorSeq: atEnd ? 0 : replay.cursorSeq } });
+    set({ replay: { ...replay, playing: true, cursorSeq: atEnd ? firstSeq(replay.events) : replay.cursorSeq } });
   },
 
   pause: () => set({ replay: { ...get().replay, playing: false } }),
@@ -145,7 +147,7 @@ export const useHuginStore = create<HuginStore>()((set, get) => ({
     const target =
       delta > 0
         ? (events.find((event) => event.seq > cursorSeq)?.seq ?? cursorSeq)
-        : (events.findLast((event) => event.seq < cursorSeq)?.seq ?? 0);
+        : (events.findLast((event) => event.seq < cursorSeq)?.seq ?? firstSeq(events));
     // Stepping is a manual move, so it takes over from the player rather than fighting it.
     set({ replay: { ...get().replay, playing: false, cursorSeq: target } });
   },
@@ -169,6 +171,10 @@ export const useHuginStore = create<HuginStore>()((set, get) => ({
 export function selectVisibleState(store: Pick<HuginStore, "state" | "replay">): State {
   if (store.replay.runId === null) return store.state;
   return stateAt(store.replay.events, store.replay.cursorSeq);
+}
+
+function firstSeq(events: HEvent[]): number {
+  return events[0]?.seq ?? 0;
 }
 
 function lastSeq(events: HEvent[]): number {

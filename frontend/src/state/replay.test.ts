@@ -50,9 +50,10 @@ describe("replay slice", () => {
     store().enterReplay({ runId: "r1" }, RUN);
 
     expect(selectMode(store())).toBe("replay");
-    expect(store().replay.cursorSeq).toBe(0);
+    // Parked on the first event: the stage shows the mission, never the empty kernel.
+    expect(store().replay.cursorSeq).toBe(1);
     expect(store().replay.events).toHaveLength(5);
-    expect(selectVisibleState(store())).toEqual(initialState);
+    expect(selectActiveRun(selectVisibleState(store()), store().replay)?.id).toBe("r1");
   });
 
   it("replays a recording by its slug", () => {
@@ -87,22 +88,22 @@ describe("replay slice", () => {
     store().seek(99);
     expect(store().replay.cursorSeq).toBe(5);
     store().seek(-3);
-    expect(store().replay.cursorSeq).toBe(0);
+    expect(store().replay.cursorSeq).toBe(1);
   });
 
   it("steps one event forwards and backwards", () => {
     store().enterReplay({ runId: "r1" }, RUN);
     store().step(1);
-    expect(store().replay.cursorSeq).toBe(1);
+    expect(store().replay.cursorSeq).toBe(2);
     store().step(1);
+    expect(store().replay.cursorSeq).toBe(3);
+    store().step(-1);
     expect(store().replay.cursorSeq).toBe(2);
     store().step(-1);
     expect(store().replay.cursorSeq).toBe(1);
-    store().step(-1);
-    expect(store().replay.cursorSeq).toBe(0);
     // Neither end of the run runs off the track.
     store().step(-1);
-    expect(store().replay.cursorSeq).toBe(0);
+    expect(store().replay.cursorSeq).toBe(1);
     store().seek(5);
     store().step(1);
     expect(store().replay.cursorSeq).toBe(5);
@@ -122,7 +123,7 @@ describe("replay slice", () => {
     store().enterReplay({ runId: "r1" }, RUN);
     store().seek(5);
     store().play();
-    expect(store().replay.cursorSeq).toBe(0);
+    expect(store().replay.cursorSeq).toBe(1);
     expect(store().replay.playing).toBe(true);
   });
 
@@ -143,7 +144,7 @@ describe("replay slice", () => {
     store().dispatch(LIVE);
     // The live projection stands still: a replay must not be disturbed by the present.
     expect(store().state).toBe(live);
-    expect(selectVisibleState(store())).toEqual(initialState);
+    expect(selectVisibleState(store()).lastSeq).toBe(1);
 
     store().exitReplay();
     expect(store().replay).toEqual(IDLE_REPLAY);
