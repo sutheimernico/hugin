@@ -8,6 +8,8 @@ import type { Driver } from "../../state/types";
 
 const DRIVER_TONE: Record<string, Tone> = { claude: "blue", ollama: "amber", scripted: "teal" };
 
+const TITLE_CLASS = "font-display line-clamp-2 block text-[19px] leading-[1.2] font-semibold text-text";
+
 /** An unknown driver is shown as it came, never renamed into something friendlier. */
 function driverLabel(driver: Driver | string): string {
   return DRIVER_LABEL[driver] ?? (driver === "" ? "unbekannt" : driver);
@@ -40,16 +42,21 @@ export function ReplayRow({ title, driver, meta, extra, busy, onReplay, selected
       className="hugin-rise ease-out-expo group flex items-center gap-4 border-b border-border px-5 py-4 transition-colors duration-150 hover:bg-surface-2 data-[selected=true]:bg-surface-2 data-[selected=true]:outline data-[selected=true]:-outline-offset-2 data-[selected=true]:outline-text/50"
     >
       <div className="min-w-0 flex-1">
-        <button
-          type="button"
-          aria-pressed={selected}
-          onClick={onSelect}
-          disabled={onSelect === undefined}
-          className="font-display line-clamp-2 block text-left text-[19px] leading-[1.2] font-semibold text-text disabled:cursor-default"
-          title={title}
-        >
-          {goalText(title)}
-        </button>
+        {onSelect === undefined ? (
+          <span className={TITLE_CLASS} title={title}>
+            {goalText(title)}
+          </span>
+        ) : (
+          <button
+            type="button"
+            aria-pressed={selected}
+            onClick={onSelect}
+            className={`${TITLE_CLASS} text-left`}
+            title={title}
+          >
+            {goalText(title)}
+          </button>
+        )}
         <span className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-muted">
           <Chip tone={DRIVER_TONE[driver] ?? "muted"}>{driverLabel(driver)}</Chip>
           {meta.map((part) => (
