@@ -405,7 +405,8 @@ function meters(state: State): Meters {
   for (const proc of Object.values(state.procs)) {
     totalTokens += proc.usage.input_tokens + proc.usage.output_tokens;
     if (!ALIVE_STATES.has(proc.state)) continue;
-    activeProcs += 1;
+    // A queued process holds no slot yet: it is waiting, not active.
+    if (proc.state !== "queued") activeProcs += 1;
     budgetPct = Math.max(budgetPct, proc.budgetPct);
   }
   // The window is exactly one minute wide, so its sum *is* the tokens-per-minute rate.

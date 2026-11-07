@@ -382,6 +382,9 @@ describe("applyEvent — meters and munin activity", () => {
     const state = run(initialState, [
       spawn(ev, 1),
       spawn(ev, 2),
+      spawn(ev, 3),
+      ev("proc.state", { state: "running", prev: "queued" }, { pid: 1 }),
+      ev("proc.state", { state: "running", prev: "queued" }, { pid: 2 }),
       ev("budget.tick", { turns: 1, output_tokens: 100, seconds: 2, pct: 0.4 }, { pid: 1 }),
       ev("budget.tick", { turns: 2, output_tokens: 200, seconds: 2, pct: 0.7 }, { pid: 2 }),
       ev("proc.exit", { reason: "done", usage: NO_USAGE }, { pid: 2 }),
@@ -397,6 +400,7 @@ describe("applyEvent — meters and munin activity", () => {
     const ev = makeFeed();
     const warm = run(initialState, [
       spawn(ev, 1),
+      ev("proc.state", { state: "running", prev: "queued" }, { pid: 1 }),
       ev("budget.tick", { turns: 1, output_tokens: 300, seconds: 1, pct: 0.1 }, { pid: 1, ts: 100 }),
       ev("budget.tick", { turns: 2, output_tokens: 800, seconds: 2, pct: 0.2 }, { pid: 1, ts: 130 }),
     ]);
