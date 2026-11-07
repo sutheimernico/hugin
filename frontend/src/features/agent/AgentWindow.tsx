@@ -122,7 +122,12 @@ export function AgentWindow({ proc, now, onClose, onKill }: AgentWindowProps) {
             value={usage.turns}
             max={budget.max_turns}
             tone="blue"
-            format={(value) => `${value}/${budget.max_turns}`}
+            // The CLI counts its own turns and may end a run slightly past the cap.
+            format={(value) =>
+              value > budget.max_turns
+                ? `${value} (Limit ${budget.max_turns})`
+                : `${value}/${budget.max_turns}`
+            }
           />
           <Meter
             label="Tokens"

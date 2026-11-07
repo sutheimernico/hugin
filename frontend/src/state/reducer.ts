@@ -339,10 +339,11 @@ function spawnProc(next: State, e: HEvent): void {
 
 function exitProc(next: State, e: HEvent): void {
   const reported = usageOf(e.data.usage);
-  sampleTokens(next, e, reported.output_tokens);
+  // The exit report is a lump sum over the whole run: it settles the counters but is not
+  // throughput, so it stays out of the tokens-per-minute window.
   patchProc(next, e.pid, (proc) => ({
     ...proc,
-    usage: mergeUsage(proc.usage, reported),
+    usage: mergeExitUsage(proc.usage, reported),
     exitedAt: e.ts,
     exitReason: str(e.data.reason),
     stderrTail: text(e.data.stderr_tail),
@@ -398,7 +399,8 @@ function meters(state: State): Meters {
     budgetPct = Math.max(budgetPct, proc.budgetPct);
   }
   // The window is exactly one minute wide, so its sum *is* the tokens-per-minute rate.
-  const tokensPerMin = state.tokenSamples.reduce((sum, sample) => sum + sample.tokens, 0);
+  const tokensPerMin =
+    activeProcs === 0 ? 0 : state.tokenSamples.reduce((sum, sample) => sum + sample.tokens, 0);
   return { activeProcs, tokensPerMin, budgetPct, totalTokens };
 }
 
@@ -445,11 +447,16 @@ function fillCall(
   );
 }
 
-/** Both sides are cumulative counters, so the larger one is the truthful one (as in the kernel). */
-function mergeUsage(current: Usage, reported: Usage): Usage {
+/**
+ * Turns and output tokens are cumulative counters, so the larger one is the truthful one.
+ * `input_tokens` is different: live ticks carry the *context size*, while the exit report of the
+ * Claude driver sums the input of every turn. Merging the two would push the context gauge past
+ * 100 %, so the last live value wins and the exit value only fills in when no tick carried one.
+ */
+function mergeExitUsage(current: Usage, reported: Usage): Usage {
   return {
     turns: Math.max(current.turns, reported.turns),
-    input_tokens: Math.max(current.input_tokens, reported.input_tokens),
+    input_tokens: current.input_tokens > 0 ? current.input_tokens : reported.input_tokens,
     output_tokens: Math.max(current.output_tokens, reported.output_tokens),
     cost_usd_equiv: reported.cost_usd_equiv ?? current.cost_usd_equiv,
   };

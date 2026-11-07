@@ -390,6 +390,50 @@ describe("applyEvent — meters and munin activity", () => {
     expect(cold.meters.tokensPerMin).toBe(0);
   });
 
+  it("keeps the context size when the exit report sums input over all turns", () => {
+    const ev = makeFeed();
+    const state = run(initialState, [
+      spawn(ev, 1),
+      ev("budget.tick", { turns: 3, output_tokens: 40, input_tokens: 30_000, seconds: 5, pct: 0.2 }, { pid: 1 }),
+      ev(
+        "proc.exit",
+        { reason: "done", usage: { turns: 14, input_tokens: 334_000, output_tokens: 9_000, cost_usd_equiv: 0.2 } },
+        { pid: 1 },
+      ),
+    ]);
+
+    const proc = state.procs[1];
+    expect(proc.usage.input_tokens).toBe(30_000);
+    expect(proc.usage.output_tokens).toBe(9_000);
+    expect(proc.usage.turns).toBe(14);
+  });
+
+  it("takes the exit input when no tick ever reported a context size", () => {
+    const ev = makeFeed();
+    const state = run(initialState, [
+      spawn(ev, 1),
+      ev("proc.exit", { reason: "done", usage: { ...NO_USAGE, input_tokens: 512 } }, { pid: 1 }),
+    ]);
+    expect(state.procs[1].usage.input_tokens).toBe(512);
+  });
+
+  it("keeps the exit lump sum out of the rate window and shows no rate with nothing running", () => {
+    const ev = makeFeed();
+    const state = run(initialState, [
+      spawn(ev, 1),
+      ev("budget.tick", { turns: 1, output_tokens: 40, seconds: 1, pct: 0.1 }, { pid: 1, ts: 100 }),
+      ev(
+        "proc.exit",
+        { reason: "done", usage: { ...NO_USAGE, turns: 2, output_tokens: 9_000 } },
+        { pid: 1, ts: 101 },
+      ),
+      ev("proc.state", { state: "done", prev: "running" }, { pid: 1, ts: 101 }),
+    ]);
+    expect(state.meters.activeProcs).toBe(0);
+    expect(state.meters.tokensPerMin).toBe(0);
+    expect(state.tokenSamples.reduce((sum, sample) => sum + sample.tokens, 0)).toBe(40);
+  });
+
   it("counts munin writes globally and per process", () => {
     const ev = makeFeed();
     const state = run(initialState, [

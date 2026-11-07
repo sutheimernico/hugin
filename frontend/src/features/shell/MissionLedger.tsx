@@ -53,7 +53,10 @@ export function MissionLedger({ run, procs, now, replaying }: MissionLedgerProps
       <dl className="mt-4 grid grid-cols-4 gap-x-3">
         <Figure label="Laufzeit" value={fmtDuration(ledger.elapsed)} />
         <Figure label="Runden" value={<CountUp value={ledger.turns} />} />
-        <Figure label="Tokens" value={<CountUp value={ledger.outputTokens} format={fmtTokens} />} />
+        <Figure
+          label={ledger.tokensAreFloor ? "Tokens, mindestens" : "Tokens"}
+          value={<CountUp value={ledger.outputTokens} format={fmtTokens} />}
+        />
         <Figure
           label="Agenten"
           value={
