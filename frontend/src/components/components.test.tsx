@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import { fmtTokens } from "../lib/format";
 import { Button } from "./Button";
 import { Chip } from "./Chip";
+import { Inline } from "./Inline";
 import { Kbd } from "./Kbd";
 import { Meter } from "./Meter";
 import { Panel } from "./Panel";
@@ -155,5 +156,14 @@ describe("Toast", () => {
   it("renders nothing without a message", () => {
     render(<Toast toast={null} onDone={vi.fn()} />);
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
+  });
+});
+
+describe("Inline", () => {
+  it("renders `code` and **bold** marks and leaves the rest as typed", () => {
+    render(<p><Inline text={"Nutze `munin_write` und **sofort** speichern"} /></p>);
+    expect(screen.getByText("munin_write").tagName).toBe("CODE");
+    expect(screen.getByText("sofort").tagName).toBe("STRONG");
+    expect(screen.queryByText(/`/)).not.toBeInTheDocument();
   });
 });

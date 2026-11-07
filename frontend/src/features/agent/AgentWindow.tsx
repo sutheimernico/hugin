@@ -7,6 +7,7 @@
  * its scroll position and its stick-to-bottom state while an agent is being read.
  */
 
+import { Inline } from "../../components/Inline";
 import { modelLabel } from "../../lib/describe";
 import { ESC_PRIORITY, useEscapeLayer } from "../../lib/escape";
 import { motion } from "motion/react";
@@ -246,7 +247,7 @@ const Row = memo(function Row({ item, cursor }: { item: TranscriptItem; cursor: 
   if (item.t === "thinking") return <ThinkingLine />;
   return (
     <p className="px-4 py-1.5 text-[14px] leading-[1.55] whitespace-pre-wrap text-text">
-      {item.text}
+      <Inline text={item.text} />
       {cursor && (
         <motion.span
           data-testid="transcript-cursor"

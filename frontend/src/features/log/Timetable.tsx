@@ -1,5 +1,6 @@
 import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { Virtuoso, type VirtuosoHandle } from "react-virtuoso";
+import { Inline } from "../../components/Inline";
 import { Panel } from "../../components/Panel";
 import { fmtDuration } from "../../lib/format";
 import type { LogLine } from "../../state/types";
@@ -32,7 +33,7 @@ export function Timetable({ lines, origin }: TimetableProps) {
     <Panel
       title="Fahrplan"
       right={
-        <span className="font-mono text-[11px] text-muted tabular-nums">
+        <span className="text-[12px] text-muted tabular-nums">
           {rows.length === 0 ? "" : `${rows.length} Ereignisse`}
         </span>
       }
@@ -132,7 +133,7 @@ const LogRow = memo(function LogRow({ row }: { row: TimetableRow }) {
         </span>
       </span>
       <Icon size={15} aria-hidden className={`mt-[3px] ${TONE_TEXT[tone]}`} />
-      <span className={`min-w-0 py-1 break-words hyphens-none ${tone === "muted" ? "text-muted" : "text-text"}`}>{line.text}</span>
+      <span className={`min-w-0 py-1 break-words hyphens-none ${tone === "muted" ? "text-muted" : "text-text"}`}><Inline text={line.text} /></span>
     </div>
   );
 });

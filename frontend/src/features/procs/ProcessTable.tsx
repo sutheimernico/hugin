@@ -135,7 +135,7 @@ const ProcessRow = memo(function ProcessRow({ proc, end, selected, onSelect, onK
         event.preventDefault();
         onSelect(proc.pid);
       }}
-      className="ease-out-expo cursor-pointer border-t border-border/70 transition-colors duration-150 outline-none hover:bg-surface-2 focus-visible:bg-surface-2 data-[selected=true]:bg-surface-2 data-[selected=true]:shadow-[inset_3px_0_0_var(--color-text)]"
+      className="ease-out-expo cursor-pointer border-t border-border/70 transition-colors duration-150 outline-none hover:bg-surface-2 focus-visible:bg-surface-2 data-[selected=true]:bg-surface-2 data-[selected=true]:outline data-[selected=true]:-outline-offset-2 data-[selected=true]:outline-text/60"
     >
       {/* `ROLE_LABEL` is keyed by program name; the kernel's own `role` is English prose
           and only stands in for a program the shell does not know. */}

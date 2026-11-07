@@ -7,11 +7,6 @@ import { DRIVER_LABEL } from "../../lib/i18n";
 import type { Driver } from "../../state/types";
 
 const DRIVER_TONE: Record<string, Tone> = { claude: "blue", ollama: "amber", scripted: "teal" };
-const DRIVER_BAR: Record<string, string> = {
-  claude: "bg-blue",
-  ollama: "bg-amber",
-  scripted: "bg-teal",
-};
 
 /** An unknown driver is shown as it came, never renamed into something friendlier. */
 function driverLabel(driver: Driver | string): string {
@@ -31,18 +26,14 @@ type ReplayRowProps = {
   index?: number;
 };
 
-/** One run or recording: a driver-coloured edge, what it was about, and the way back into it. */
+/** One run or recording: what it was about, which driver ran it, and the way back into it. */
 export function ReplayRow({ title, driver, meta, extra, busy, onReplay, testId, index = 0 }: ReplayRowProps) {
   return (
     <div
       data-testid={testId}
       style={{ "--i": index } as CSSProperties}
-      className="hugin-rise ease-out-expo group relative flex items-center gap-4 border-b border-border py-4 pr-4 pl-5 transition-colors duration-150 hover:bg-surface-2"
+      className="hugin-rise ease-out-expo group flex items-center gap-4 border-b border-border px-5 py-4 transition-colors duration-150 hover:bg-surface-2"
     >
-      <span
-        aria-hidden
-        className={`absolute inset-y-0 left-0 w-1 ${DRIVER_BAR[driver] ?? "bg-muted"}`}
-      />
       <div className="min-w-0 flex-1">
         <span
           className="font-display line-clamp-2 text-[19px] leading-[1.2] font-semibold text-text"

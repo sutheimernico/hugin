@@ -314,7 +314,7 @@ function CommandItem({
       value={command.id}
       disabled={command.disabled !== undefined}
       onSelect={() => onSelect(command)}
-      className="ease-out-expo flex cursor-pointer items-center gap-3 rounded-panel px-3 py-2.5 transition-colors duration-150 data-[disabled=true]:cursor-not-allowed data-[disabled=true]:opacity-45 data-[selected=true]:bg-surface-2 data-[selected=true]:shadow-[inset_3px_0_0_var(--color-text)] data-[selected=true]:text-text"
+      className="ease-out-expo flex cursor-pointer items-center gap-3 rounded-panel px-3 py-2.5 transition-colors duration-150 data-[disabled=true]:cursor-not-allowed data-[disabled=true]:opacity-45 data-[selected=true]:bg-surface-2 data-[selected=true]:text-text data-[selected=true]:outline data-[selected=true]:-outline-offset-1 data-[selected=true]:outline-text/40"
     >
       <span className="min-w-0 flex-1 truncate text-[14px] text-text">{command.label}</span>
       {command.disabled !== undefined ? (

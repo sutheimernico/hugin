@@ -98,7 +98,7 @@ function SpeedButton({
       type="button"
       aria-pressed={active}
       onClick={() => onPick(speed)}
-      className={`ease-out-expo h-6 rounded px-1.5 font-mono text-[11px] transition-colors duration-150 ${
+      className={`ease-out-expo h-6 rounded px-1.5 font-display text-[13px] font-semibold transition-colors duration-150 ${
         active ? "bg-blue/20 text-blue" : "text-muted hover:text-text"
       }`}
     >
