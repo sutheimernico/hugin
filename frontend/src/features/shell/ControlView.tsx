@@ -12,7 +12,7 @@ import { ProcessTree } from "../procs/ProcessTree";
 import { EmptyStage } from "./EmptyStage";
 import { MissionLedger } from "./MissionLedger";
 
-// The diagram pulls in xyflow and dagre, the heaviest part of the bundle: it loads with the
+// The diagram pulls in xyflow, the heaviest part of the bundle: it loads with the
 // first mission, not with the shell.
 const AgentGraph = lazy(() =>
   import("../graph/AgentGraph").then((module) => ({ default: module.AgentGraph })),

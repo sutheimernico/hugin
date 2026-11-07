@@ -78,7 +78,7 @@ export function muninEdgeId(pid: number): string {
  * and which of them have written to munin (that is what adds a hub edge).
  *
  * Streaming text, usage and state changes rewrite `state.procs` many times a second. Running
- * dagre on each of them would relayout — and visibly re-fit — the graph while nothing about
+ * the layout on each of them would relayout — and visibly re-fit — the graph while nothing about
  * its shape moved, so the graph is memoised on this key instead of on the state itself.
  */
 export function structureKey(state: State, runId: string | null): string {

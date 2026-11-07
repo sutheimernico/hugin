@@ -75,7 +75,7 @@ function Graph({ state, runId, selectedPid, onSelect, panicking }: AgentGraphPro
   const graph = useMemo(
     () => buildGraph(state, runId),
     // Deliberately keyed on the *shape* of the run, not on the state object: a state whose
-    // structure key is unchanged always lays out identically, and re-running dagre on every
+    // structure key is unchanged always lays out identically, and recomputing the layout on every
     // streamed token would relayout — and visibly re-fit — a graph that never moved.
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [structure],
